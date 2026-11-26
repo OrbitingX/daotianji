@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 生命灵数</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { display: block; font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select {
+    width: auto; flex: 1; min-width: 0; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: .9rem; padding: .3rem .1rem; outline: none; border-radius: 0; font-family: inherit; cursor: pointer;
+  }
+  .lang-switch select:focus { border-bottom-color: #c9a962; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="date"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+  .data-note { color: #6f6f80; font-size: .8rem; margin-top: 1rem; text-align: center; line-height: 1.7; }
+
+  /* ---- 结果 ---- */
+  .num-hero { text-align: center; padding: 1rem 0 .4rem; }
+  .num-hero .big-num { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 4.5rem; line-height: 1; color: #c9a962; }
+  .num-hero .num-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.3rem; color: #f0ead8; margin-top: .7rem; letter-spacing: .25em; }
+  .ji-badge { display: inline-block; margin-top: 1rem; font-size: .85rem; letter-spacing: .25em; border: 1px solid rgba(201,169,98,.6); border-radius: 999px; padding: .2rem .9rem; color: #c9a962; }
+  .ji-badge.ji-mid { color: #9a9aab; border-color: rgba(154,154,171,.5); }
+  .ji-badge.ji-bad { color: #d97b6c; border-color: rgba(217,123,108,.6); }
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; margin-top: 1.4rem; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .verdict { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .label { color: #c9a962; font-weight: 600; }
+  .master-note { margin-top: .9rem; font-size: .85rem; color: #c9a962; line-height: 1.8; }
+  .sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 1.4rem; }
+  .sub-item { border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1.1rem 1.2rem; }
+  .sub-item.wide { grid-column: 1 / -1; }
+  .sub-item h3 { font-size: .8rem; color: #b08d3e; font-weight: 400; letter-spacing: .25em; margin-bottom: .6rem; }
+  .sub-item p { font-size: .9rem; color: #c8c2ae; line-height: 1.8; }
+  .tag-pill { display: inline-block; font-size: .75rem; color: #c9a962; border: 1px solid rgba(201,169,98,.6); border-radius: 999px; padding: .1rem .6rem; margin: .15rem .3rem .15rem 0; letter-spacing: .05em; }
+  .guaci-note { font-size: .78rem; color: #6f6f80; margin-top: 1.2rem; line-height: 1.6; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .sub-grid { grid-template-columns: 1fr; }
+    .num-hero .big-num { font-size: 3.6rem; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">生命灵数 · 本地占卜</div>
+    </div>
+  </a>
+                <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></span>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">第一幕 · 出生日期</div>
+  <h1 class="slogan" data-i18n-html="slogan">生日里藏着一串数字，<br>数字里藏着一条路。</h1>
+  <p class="subtitle" data-i18n="subtitle">生命灵数免费在线测算 · 附 81 数理查询</p>
+
+  <section class="section">
+    <div class="field">
+      <label for="mode" data-i18n="labelMode">测算方式</label>
+      <select id="mode" onchange="switchMode(this.value)">
+        <option value="life" selected data-i18n="optLife">生命灵数（出生日期）</option>
+        <option value="num81" data-i18n="optNum81">81数理查询（任意数字）</option>
+      </select>
+    </div>
+    <div id="panel-life">
+      <div class="field">
+        <label for="birthdate" data-i18n="labelBirth">出生日期</label>
+        <input type="date" id="birthdate">
+      </div>
+    </div>
+    <div id="panel-num81" class="hidden">
+      <div class="field">
+        <label for="num" data-i18n="labelNum">数字（1–81）</label>
+        <input type="number" id="num" min="1" max="81" step="1" placeholder="如 8" data-i18n-ph="phNum">
+      </div>
+    </div>
+    <div class="error" id="input-error"></div>
+    <button class="submit-btn" onclick="doCompute()" data-i18n="btnSubmit">推数 · 看灵数</button>
+    <div class="data-note" id="data-note"></div>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">命数</div>
+    <div class="num-hero">
+      <div class="big-num" id="big-num"></div>
+      <div class="num-name" id="num-name"></div>
+      <div><span class="ji-badge" id="ji-badge"></span></div>
+    </div>
+    <div class="result-head" id="result-head"></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="master-note hidden" id="master-note"></div>
+    <div class="sub-grid" id="sub-grid"></div>
+    <div class="guaci-note" id="classical-note"></div>
+      <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="shengminglingshu" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+</section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">生命灵数：免费测算与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">生命灵数是什么？</summary>
+      <p data-i18n="faqA1">把出生年月日的每一位数字相加，再不断化约，直到得到 1–9 之间的数字（或大师数 11、22、33）。这个数字被看作一个人的人生主线：天赋、行事方式与一生课题的底色。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">大师数 11 / 22 / 33 是什么？</summary>
+      <p data-i18n="faqA2">化约的过程中一旦出现 11、22 或 33，就停下来、不再继续化约。它们被视为能量更强、课题也更重的数字：11 偏直觉与启发，22 偏把理想落成现实，33 偏爱与服务。本页算出大师数时会特别标出。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">81数理和生命灵数有什么区别？</summary>
+      <p data-i18n="faqA3">生命灵数只看出生日期，算出 1–9 或大师数；81数理是五格剖象用的 1–81 吉凶断语表，任意数字都能查。本页把两者放在一起：生命灵数算出主数后，再用同一张 81数理表查它的断语。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">生命灵数会变吗？</summary>
+      <p data-i18n="faqA4">不会。出生日期固定不变，主数也就不变。会变的是流年、流月与姓名笔画带来的数字，那是另外的算法，不在本页。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">测算免费吗？</summary>
+      <p data-i18n="faqA5">免费。生命灵数的推算在你的浏览器本地完成，81数理断语来自本站数据文件，不收费，也不会保存你的出生日期。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">生命灵数属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="offlineNote">出生日期只在你的浏览器里计算，不会发送到任何服务器；81数理断语取自本站同源数据文件。</span>
+  </footer>
+</div>
+</main>
+
+<script>
+/* ==I18N== */
+/* 四语词典：zh-CN（默认）、zh-TW、en、ja。古典断语原文一律保留中文，见 classicalNote。 */
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '生命灵数 · 本地占卜',
+  navGroup: '占卜',
+  nav_1: '解梦', nav_2: '六爻占卜', nav_3: '梅花易数', nav_4: '小六壬', nav_5: '塔罗牌',
+  nav_6: '雷诺曼', nav_7: '北欧卢恩符文', nav_8: '奇门遁甲', nav_9: '印度占星卜卦', nav_10: '西方卜卦占星',
+  nav_11: '大六壬', nav_12: '金口诀', nav_13: '太乙神数', nav_14: '占星骰子',
+  nav_15: '生命灵数', nav_16: '测字', nav_17: '诸葛神数', nav_18: '灵签', nav_19: '称骨算命',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  langLabel: '语言',
+  eyebrow: '第一幕 · 出生日期',
+  slogan: '生日里藏着一串数字，<br>数字里藏着一条路。',
+  subtitle: '生命灵数免费在线测算 · 附 81 数理查询',
+  labelMode: '测算方式',
+  optLife: '生命灵数（出生日期）',
+  optNum81: '81数理查询（任意数字）',
+  labelBirth: '出生日期',
+  labelNum: '数字（1–81）',
+  phNum: '如 8',
+  btnSubmit: '推数 · 看灵数',
+  errNoBirth: '请先选择出生日期。',
+  errBadBirth: '出生日期格式不正确。',
+  errNumRange: '请输入 1 到 81 之间的整数。',
+  errDataLoad: '81数理数据未能加载，仅显示推算出的数字。',
+  dataLoading: '正在加载 81 数理数据…',
+  resultTitle: '命数',
+  ai_interpret: 'AI 解读',
+  lifePathIs: '你的生命灵数是',
+  masterTag: '大师数',
+  num81Title: '81数理 · 第 {n} 数',
+  stepsLabel: '推算过程',
+  traitLabel: '特质',
+  duanyuLabel: '断语',
+  meaningLabel: '含义',
+  jiyeLabel: '基业',
+  jiatingLabel: '家庭',
+  jiankangLabel: '健康',
+  tagsLabel: '归类',
+  jiSource: '81数理吉凶',
+  masterNote: '大师数：化约中途出现 11 / 22 / 33 时不再继续化约，保留为大师数，能量更强、课题也更重。',
+  classicalNote: '',
+  faqTitle: '生命灵数：免费测算与使用常见问题',
+  faqQ1: '生命灵数是什么？',
+  faqA1: '把出生年月日的每一位数字相加，再不断化约，直到得到 1–9 之间的数字（或大师数 11、22、33）。这个数字被看作一个人的人生主线：天赋、行事方式与一生课题的底色。',
+  faqQ2: '大师数 11 / 22 / 33 是什么？',
+  faqA2: '化约的过程中一旦出现 11、22 或 33，就停下来、不再继续化约。它们被视为能量更强、课题也更重的数字：11 偏直觉与启发，22 偏把理想落成现实，33 偏爱与服务。本页算出大师数时会特别标出。',
+  faqQ3: '81数理和生命灵数有什么区别？',
+  faqA3: '生命灵数只看出生日期，算出 1–9 或大师数；81数理是五格剖象用的 1–81 吉凶断语表，任意数字都能查。本页把两者放在一起：生命灵数算出主数后，再用同一张 81数理表查它的断语。',
+  faqQ4: '生命灵数会变吗？',
+  faqA4: '不会。出生日期固定不变，主数也就不变。会变的是流年、流月与姓名笔画带来的数字，那是另外的算法，不在本页。',
+  faqQ5: '测算免费吗？',
+  faqA5: '免费。生命灵数的推算在你的浏览器本地完成，81数理断语来自本站数据文件，不收费，也不会保存你的出生日期。',
+  disclaimer: '生命灵数属传统术数，仅供参考，不构成决策依据。',
+  offlineNote: '出生日期只在你的浏览器里计算，不会发送到任何服务器；81数理断语取自本站同源数据文件。',
+  colon: '：',
+  traits: {
+    '1': '独立开创 · 目标明确 · 适合带头',
+    '2': '温和细腻 · 善于合作 · 天生的协调者',
+    '3': '乐观表达 · 创意丰富 · 善于沟通',
+    '4': '踏实稳重 · 讲究秩序 · 靠积累成事',
+    '5': '自由多变 · 适应力强 · 喜欢探索',
+    '6': '重情重家 · 责任感强 · 善于照顾他人',
+    '7': '善于思考 · 喜欢钻研 · 追求内在真相',
+    '8': '务实进取 · 目标感强 · 擅长经营管理',
+    '9': '宽厚包容 · 理想主义 · 愿为他人付出',
+    '11': '直觉敏锐 · 理想高远 · 启发他人的光',
+    '22': '务实的大师数 · 能把大理想落成现实',
+    '33': '以爱与服务为使命 · 善于疗愈与付出'
+  },
+  ji: { '吉': '吉', '半吉': '半吉', '凶': '凶' }
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '生命靈數 · 本地占卜',
+  navGroup: '占卜',
+  nav_1: '解夢', nav_2: '六爻占卜', nav_3: '梅花易數', nav_4: '小六壬', nav_5: '塔羅牌',
+  nav_6: '雷諾曼', nav_7: '北歐盧恩符文', nav_8: '奇門遁甲', nav_9: '印度占星卜卦', nav_10: '西方卜卦占星',
+  nav_11: '大六壬', nav_12: '金口訣', nav_13: '太乙神數', nav_14: '占星骰子',
+  nav_15: '生命靈數', nav_16: '測字', nav_17: '諸葛神數', nav_18: '靈籤', nav_19: '稱骨算命',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  langLabel: '語言',
+  eyebrow: '第一幕 · 出生日期',
+  slogan: '生日裡藏著一串數字，<br>數字裡藏著一條路。',
+  subtitle: '生命靈數免費線上測算 · 附 81 數理查詢',
+  labelMode: '測算方式',
+  optLife: '生命靈數（出生日期）',
+  optNum81: '81數理查詢（任意數字）',
+  labelBirth: '出生日期',
+  labelNum: '數字（1–81）',
+  phNum: '如 8',
+  btnSubmit: '推數 · 看靈數',
+  errNoBirth: '請先選擇出生日期。',
+  errBadBirth: '出生日期格式不正確。',
+  errNumRange: '請輸入 1 到 81 之間的整數。',
+  errDataLoad: '81數理數據未能加載，僅顯示推算出的數字。',
+  dataLoading: '正在加載 81 數理數據…',
+  resultTitle: '命數',
+  ai_interpret: 'AI 解讀',
+  lifePathIs: '你的生命靈數是',
+  masterTag: '大師數',
+  num81Title: '81數理 · 第 {n} 數',
+  stepsLabel: '推算過程',
+  traitLabel: '特質',
+  duanyuLabel: '斷語',
+  meaningLabel: '含義',
+  jiyeLabel: '基業',
+  jiatingLabel: '家庭',
+  jiankangLabel: '健康',
+  tagsLabel: '歸類',
+  jiSource: '81數理吉凶',
+  masterNote: '大師數：化約中途出現 11 / 22 / 33 時不再繼續化約，保留為大師數，能量更強、課題也更重。',
+  classicalNote: '',
+  faqTitle: '生命靈數：免費測算與使用常見問題',
+  faqQ1: '生命靈數是什麼？',
+  faqA1: '把出生年月日的每一位數字相加，再不斷化約，直到得到 1–9 之間的數字（或大師數 11、22、33）。這個數字被看作一個人的人生主線：天賦、行事方式與一生課題的底色。',
+  faqQ2: '大師數 11 / 22 / 33 是什麼？',
+  faqA2: '化約的過程中一旦出現 11、22 或 33，就停下來、不再繼續化約。它們被視為能量更強、課題也更重的數字：11 偏直覺與啟發，22 偏把理想落成現實，33 偏愛與服務。本頁算出大師數時會特別標出。',
+  faqQ3: '81數理和生命靈數有什麼區別？',
+  faqA3: '生命靈數只看出生日期，算出 1–9 或大師數；81數理是五格剖象用的 1–81 吉凶斷語表，任意數字都能查。本頁把兩者放在一起：生命靈數算出主數後，再用同一張 81數理表查它的斷語。',
+  faqQ4: '生命靈數會變嗎？',
+  faqA4: '不會。出生日期固定不變，主數也就不變。會變的是流年、流月與姓名筆畫帶來的數字，那是另外的算法，不在本頁。',
+  faqQ5: '測算免費嗎？',
+  faqA5: '免費。生命靈數的推算在你的瀏覽器本地完成，81數理斷語來自本站數據文件，不收費，也不會保存你的出生日期。',
+  disclaimer: '生命靈數屬傳統術數，僅供參考，不構成決策依據。',
+  offlineNote: '出生日期只在你的瀏覽器裡計算，不會發送到任何服務器；81數理斷語取自本站同源數據文件。',
+  colon: '：',
+  traits: {
+    '1': '獨立開創 · 目標明確 · 適合帶頭',
+    '2': '溫和細膩 · 善於合作 · 天生的協調者',
+    '3': '樂觀表達 · 創意豐富 · 善於溝通',
+    '4': '踏實穩重 · 講究秩序 · 靠積累成事',
+    '5': '自由多變 · 適應力強 · 喜歡探索',
+    '6': '重情重家 · 責任感強 · 善於照顧他人',
+    '7': '善於思考 · 喜歡鑽研 · 追求內在真相',
+    '8': '務實進取 · 目標感強 · 擅長經營管理',
+    '9': '寬厚包容 · 理想主義 · 願為他人付出',
+    '11': '直覺敏銳 · 理想高遠 · 啟發他人的光',
+    '22': '務實的大師數 · 能把大理想落成現實',
+    '33': '以愛與服務為使命 · 善於療癒與付出'
+  },
+  ji: { '吉': '吉', '半吉': '半吉', '凶': '凶' }
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Life Path Numerology · Local Reading',
+  navGroup: 'Divination',
+  nav_1: 'Dream Interpretation', nav_2: 'Six Lines (Liu Yao)', nav_3: 'Meihua Yishu', nav_4: 'Xiao Liuren', nav_5: 'Tarot',
+  nav_6: 'Lenormand', nav_7: 'Norse Runes', nav_8: 'Qimen Dunjia', nav_9: 'Vedic Astrology', nav_10: 'Western Horary Astrology',
+  nav_11: 'Da Liuren', nav_12: 'Jinkou Jue', nav_13: 'Taiyi Shenshu', nav_14: 'Astrology Dice',
+  nav_15: 'Life Path Numerology', nav_16: 'Character Divination', nav_17: 'Zhuge Oracle', nav_18: 'Fortune Sticks', nav_19: 'Bone-Weight Fortune',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  langLabel: 'Language',
+  eyebrow: 'Act I · Your Birth Date',
+  slogan: 'A string of numbers hides in your birthday,<br>and a road hides in the numbers.',
+  subtitle: 'Free online Life Path reading · with 81-number lookup',
+  labelMode: 'Reading mode',
+  optLife: 'Life Path (birth date)',
+  optNum81: '81-number lookup (any number)',
+  labelBirth: 'Birth date',
+  labelNum: 'Number (1–81)',
+  phNum: 'e.g. 8',
+  btnSubmit: 'Calculate my number',
+  errNoBirth: 'Please choose your birth date first.',
+  errBadBirth: 'The birth date format is invalid.',
+  errNumRange: 'Please enter a whole number from 1 to 81.',
+  errDataLoad: 'The 81-number data could not be loaded; only the calculated number is shown.',
+  dataLoading: 'Loading the 81-number data…',
+  resultTitle: 'Your Number',
+  ai_interpret: 'AI Reading',
+  lifePathIs: 'Your Life Path number is',
+  masterTag: 'Master number',
+  num81Title: '81-Number · No. {n}',
+  stepsLabel: 'How it reduces',
+  traitLabel: 'Character',
+  duanyuLabel: 'Reading',
+  meaningLabel: 'Meaning',
+  jiyeLabel: 'Foundation',
+  jiatingLabel: 'Family',
+  jiankangLabel: 'Health',
+  tagsLabel: 'Categories',
+  jiSource: '81-number fortune',
+  masterNote: 'Master number: when 11, 22 or 33 appears during reduction, it is kept and not reduced further — a stronger number with heavier lessons.',
+  classicalNote: 'Classical text shown in Chinese.',
+  faqTitle: 'Life Path Numerology: Free Reading & FAQ',
+  faqQ1: 'What is a Life Path number?',
+  faqA1: 'Add up every digit of your birth date, then keep reducing the sum by adding its digits until you reach a single digit from 1 to 9 — or a master number 11, 22 or 33. That number is read as the main thread of a life: natural gifts, the way you act, and the recurring theme of your journey.',
+  faqQ2: 'What are the master numbers 11, 22 and 33?',
+  faqA2: 'When 11, 22 or 33 appears during reduction, stop — do not reduce it further. They are read as stronger numbers with heavier lessons: 11 leans toward intuition and inspiration, 22 toward turning big ideals into reality, and 33 toward love and service. This page marks them specially when they come up.',
+  faqQ3: 'How is the 81-number table different from Life Path numerology?',
+  faqA3: 'Life Path numerology uses only your birth date and gives 1–9 or a master number. The 81-number table comes from the Five-Grid system: a fortune-and-meaning table for the numbers 1–81 that any number can be looked up in. This page puts them together — once your Life Path number is calculated, its reading is looked up in that same 81-number table.',
+  faqQ4: 'Does my Life Path number ever change?',
+  faqA4: 'No. Your birth date never changes, so your Life Path number does not either. What changes are the numbers of the passing year, the passing month and the strokes of a name — those use different methods and are not covered on this page.',
+  faqQ5: 'Is the reading free?',
+  faqA5: 'Yes, free. The Life Path calculation runs locally in your browser, and the 81-number readings come from this site\u2019s data file. No charge, and your birth date is never saved.',
+  disclaimer: 'Life Path numerology is a traditional divination art, for reference only; it is not a basis for decisions.',
+  offlineNote: 'Your birth date is calculated only in your browser and never sent to any server; the 81-number readings come from this site\u2019s own data file.',
+  colon: ': ',
+  traits: {
+    '1': 'Independent and pioneering — clear goals, born to lead',
+    '2': 'Gentle and perceptive — a natural peacemaker and partner',
+    '3': 'Bright and expressive — rich in ideas, gifted with words',
+    '4': 'Steady and practical — builds lasting things step by step',
+    '5': 'Free and adaptable — restless curiosity, loves change',
+    '6': 'Warm and responsible — family-minded, cares for others',
+    '7': 'Thoughtful and analytical — seeks the truth beneath things',
+    '8': 'Driven and pragmatic — strong goals, skilled at building and managing',
+    '9': 'Compassionate and idealistic — gives generously to others',
+    '11': 'Highly intuitive — lofty ideals, a light that inspires others',
+    '22': 'The practical master number — turns grand ideals into reality',
+    '33': 'Love and service as a calling — heals and gives'
+  },
+  ji: { '吉': 'Favorable', '半吉': 'Partly favorable', '凶': 'Unfavorable' }
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '生命霊数 · ローカル占い',
+  navGroup: '占い',
+  nav_1: '夢占い', nav_2: '六爻占い', nav_3: '梅花易数', nav_4: '小六壬', nav_5: 'タロット',
+  nav_6: 'ルノルマン', nav_7: '北欧ルーン', nav_8: '奇門遁甲', nav_9: 'インド占星術', nav_10: '西洋ホラリー占星術',
+  nav_11: '大六壬', nav_12: '金口訣', nav_13: '太乙神数', nav_14: '占星ダイス',
+  nav_15: '生命霊数', nav_16: '測字占い', nav_17: '諸葛神数', nav_18: '霊籤', nav_19: '称骨算命',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  langLabel: '言語',
+  eyebrow: '第一幕 · 生年月日',
+  slogan: '誕生日には数字の列が隠れ、<br>数字の中には一本の道が隠れている。',
+  subtitle: '生命霊数 無料オンライン鑑定 · 81数理検索つき',
+  labelMode: '鑑定方法',
+  optLife: '生命霊数（生年月日）',
+  optNum81: '81数理検索（任意の数字）',
+  labelBirth: '生年月日',
+  labelNum: '数字（1–81）',
+  phNum: '例 8',
+  btnSubmit: '数を推す',
+  errNoBirth: 'まず生年月日を選択してください。',
+  errBadBirth: '生年月日の形式が正しくありません。',
+  errNumRange: '1 から 81 までの整数を入力してください。',
+  errDataLoad: '81数理データを読み込めませんでした。推算した数字のみ表示します。',
+  dataLoading: '81数理データを読み込み中…',
+  resultTitle: '命数',
+  ai_interpret: 'AI 解釈',
+  lifePathIs: 'あなたの生命霊数は',
+  masterTag: 'マスターナンバー',
+  num81Title: '81数理 · 第{n}数',
+  stepsLabel: '推算過程',
+  traitLabel: '特質',
+  duanyuLabel: '断語',
+  meaningLabel: '意味',
+  jiyeLabel: '基業',
+  jiatingLabel: '家庭',
+  jiankangLabel: '健康',
+  tagsLabel: '分類',
+  jiSource: '81数理の吉凶',
+  masterNote: 'マスターナンバー：還元の途中で 11・22・33 が現れたら、それ以上還元せずそのまま用います。エネルギーが強く、課題も重い数字です。',
+  classicalNote: '原文は中国語のまま表示しています。',
+  faqTitle: '生命霊数：無料鑑定とよくある質問',
+  faqQ1: '生命霊数とは？',
+  faqA1: '生年月日の数字をすべて足し、桁を足す還元を繰り返して 1〜9 の数字（またはマスターナンバー 11・22・33）を得ます。この数字は人生の主線とされます。天賦の才、行動の仕方、一生のテーマの基調です。',
+  faqQ2: 'マスターナンバー 11・22・33 とは？',
+  faqA2: '還元の途中で 11・22・33 が現れたら、そこで止めてそれ以上還元しません。これらはエネルギーが強く課題も重い数字とされます。11 は直感と啓発、22 は理想の実現、33 は愛と奉仕に寄ります。本ページではマスターナンバーが出た場合に特別に表示します。',
+  faqQ3: '81数理と生命霊数の違いは？',
+  faqA3: '生命霊数は生年月日だけから 1〜9 またはマスターナンバーを算出します。81数理は五格剖象の 1〜81 の吉凶断語表で、任意の数字を調べられます。本ページでは両者を組み合わせ、生命霊数を算出したうえで、同じ 81数理表からその断語を引きます。',
+  faqQ4: '生命霊数は変わりますか？',
+  faqA4: '変わりません。生年月日は固定なので、主数も変わりません。変わるのは流年・流月や姓名の画数による数字で、それらは別の算法であり、本ページの対象外です。',
+  faqQ5: '鑑定は無料ですか？',
+  faqA5: '無料です。生命霊数の推算はブラウザ内でローカルに行われ、81数理の断語は本サイトのデータファイルから取得します。料金はかからず、生年月日も保存されません。',
+  disclaimer: '生命霊数は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  offlineNote: '生年月日はブラウザ内でのみ計算され、外部サーバーには送信されません。81数理の断語は本サイトのデータファイルから取得します。',
+  colon: '：',
+  traits: {
+    '1': '自立して切り開く · 目標が明確 · 先頭に立つタイプ',
+    '2': '穏やかで繊細 · 協調が得意 · 天性の調整役',
+    '3': '楽観的で表現豊か · 創造性に富み、伝えるのが得意',
+    '4': '堅実で安定 · 秩序を重んじ、積み重ねで成し遂げる',
+    '5': '自由で変化に富む · 適応力が高く、探索好き',
+    '6': '情に厚く家庭を重んじる · 責任感が強く、面倒見がよい',
+    '7': '思考力が高い · 探究好き · 内なる真実を求める',
+    '8': '現実的で向上心が高い · 目標意識が強く、経営管理が得意',
+    '9': '寛容で包容力がある · 理想主義 · 他人のために尽くす',
+    '11': '直感が鋭い · 理想が高く、他者を照らす光',
+    '22': '現実的なマスターナンバー · 大きな理想を現実にする',
+    '33': '愛と奉仕を使命とする · 癒しと献身が得意'
+  },
+  ji: { '吉': '吉', '半吉': '半吉', '凶': '凶' }
+}
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var NUM81 = null, NUM81_FAILED = false, LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function traitFor(n) {
+  var tr = (I18N[LANG].traits || {})[String(n)];
+  if (tr) return tr;
+  return (I18N['zh-CN'].traits || {})[String(n)] || '';
+}
+function jiLabel(ji) {
+  var m = (I18N[LANG].ji || {})[ji];
+  return m || ji;
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var ie = document.getElementById('input-error'); if (ie) ie.textContent = '';
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+
+/* ==LOGIC== */
+/* 把一位或多位整数的各位相加 */
+function digitSum(n) {
+  var s = 0;
+  n = Math.abs(n);
+  while (n > 0) { s += n % 10; n = Math.floor(n / 10); }
+  return s;
+}
+var MASTER_NUMBERS = [11, 22, 33];
+function isMaster(n) { return MASTER_NUMBERS.indexOf(n) !== -1; }
+
+/* 化约：反复各位相加到 1-9，中途出现 11 / 22 / 33 即停，不再化约 */
+function reduceLifePath(firstSum) {
+  var steps = [];
+  var cur = firstSum;
+  while (cur > 9 && !isMaster(cur)) {
+    var parts = String(cur).split('');
+    var next = 0;
+    for (var i = 0; i < parts.length; i++) next += parseInt(parts[i], 10);
+    steps.push(parts.join('+') + '=' + next);
+    cur = next;
+  }
+  return { num: cur, steps: steps };
+}
+
+/* 出生日期 YYYY-MM-DD → 生命灵数 */
+function lifePathFromBirth(birth) {
+  var digits = birth.replace(/-/g, '');
+  var sum = 0, disp = [];
+  for (var i = 0; i < digits.length; i++) {
+    var d = parseInt(digits.charAt(i), 10);
+    if (isNaN(d)) return null;
+    sum += d;
+    disp.push(d);
+  }
+  var r = reduceLifePath(sum);
+  r.steps.unshift(disp.join('+') + '=' + sum);
+  r.birth = birth;
+  r.mode = 'life';
+  return r;
+}
+
+function num81Item(n) {
+  if (!NUM81 || !NUM81.items) return null;
+  for (var i = 0; i < NUM81.items.length; i++) {
+    if (NUM81.items[i].n === n) return NUM81.items[i];
+  }
+  return null;
+}
+
+/* ==UI== */
+function switchMode(mode) {
+  document.getElementById('panel-life').classList.toggle('hidden', mode !== 'life');
+  document.getElementById('panel-num81').classList.toggle('hidden', mode !== 'num81');
+  document.getElementById('input-error').textContent = '';
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function doCompute() {
+  var mode = document.getElementById('mode').value;
+  var err = document.getElementById('input-error');
+  err.textContent = '';
+  if (mode === 'life') {
+    var v = document.getElementById('birthdate').value;
+    if (!v) { err.textContent = t('errNoBirth'); return; }
+    var r = lifePathFromBirth(v);
+    if (!r) { err.textContent = t('errBadBirth'); return; }
+    showResult(r);
+  } else {
+    var n = parseInt(document.getElementById('num').value, 10);
+    if (isNaN(n) || n < 1 || n > 81) { err.textContent = t('errNumRange'); return; }
+    showResult({ mode: 'num81', num: n, steps: [], birth: null });
+  }
+}
+
+function showResult(r, noScroll) {
+  LAST_RESULT = r;
+  var item = num81Item(r.num);
+  var isLife = r.mode === 'life';
+  var master = isLife && isMaster(r.num);
+
+  document.getElementById('big-num').textContent = String(r.num);
+  document.getElementById('num-name').textContent = item ? item.name : '';
+  var badge = document.getElementById('ji-badge');
+  if (item) {
+    badge.textContent = jiLabel(item.ji) + ' · ' + t('jiSource');
+    badge.className = 'ji-badge' + (item.ji === '凶' ? ' ji-bad' : (item.ji === '半吉' ? ' ji-mid' : ''));
+    badge.style.display = '';
+  } else {
+    badge.textContent = NUM81_FAILED ? t('errDataLoad') : t('dataLoading');
+    badge.className = 'ji-badge ji-mid';
+    badge.style.display = '';
+  }
+
+  var head = '';
+  if (isLife) {
+    head += t('lifePathIs') + ' <b>' + r.num + '</b>' + (master ? ' · ' + t('masterTag') : '') + '<br>';
+    head += t('stepsLabel') + t('colon') + esc(r.birth) + ' → ' + r.steps.join(' → ');
+  } else {
+    head += t('num81Title').replace('{n}', String(r.num));
+    if (item) head += ' · <b>' + esc(item.name) + '</b>';
+  }
+  document.getElementById('result-head').innerHTML = head;
+
+  var verdict = '';
+  if (isLife) {
+    var tr = traitFor(r.num);
+    if (tr) verdict += '<span class="label">' + t('traitLabel') + t('colon') + '</span>' + esc(tr) + '<br>';
+  }
+  if (item) {
+    verdict += '<span class="label">' + t('duanyuLabel') + t('colon') + '</span>' + esc(item.duanyu);
+  } else {
+    verdict += NUM81_FAILED ? t('errDataLoad') : t('dataLoading');
+  }
+  document.getElementById('verdict').innerHTML = verdict;
+
+  var mn = document.getElementById('master-note');
+  if (master) { mn.textContent = t('masterNote'); mn.classList.remove('hidden'); }
+  else { mn.textContent = ''; mn.classList.add('hidden'); }
+
+  var grid = '';
+  if (item) {
+    grid += '<div class="sub-item wide"><h3>' + t('meaningLabel') + '</h3><p>' + esc(item.sub['含义']) + '</p></div>';
+    grid += '<div class="sub-item"><h3>' + t('jiyeLabel') + '</h3><p>' + esc(item.sub['基业']) + '</p></div>';
+    grid += '<div class="sub-item"><h3>' + t('jiatingLabel') + '</h3><p>' + esc(item.sub['家庭']) + '</p></div>';
+    grid += '<div class="sub-item"><h3>' + t('jiankangLabel') + '</h3><p>' + esc(item.sub['健康']) + '</p></div>';
+    if (item.tags && item.tags.length) {
+      var pills = '';
+      for (var i = 0; i < item.tags.length; i++) pills += '<span class="tag-pill">' + esc(item.tags[i]) + '</span>';
+      grid += '<div class="sub-item"><h3>' + t('tagsLabel') + '</h3><p>' + pills + '</p></div>';
+    }
+  }
+  document.getElementById('sub-grid').innerHTML = grid;
+  document.getElementById('classical-note').textContent = item ? t('classicalNote') : '';
+
+  document.getElementById('result-card').classList.remove('hidden');
+  if (!noScroll) document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* 81数理数据：站根相对路径，同源取回 */
+function loadNum81() {
+  var note = document.getElementById('data-note');
+  fetch('/data/num81.json').then(function (resp) {
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    return resp.json();
+  }).then(function (d) {
+    NUM81 = d;
+    if (note) note.textContent = '';
+    if (LAST_RESULT) showResult(LAST_RESULT, true);
+  }).catch(function () {
+    NUM81_FAILED = true;
+    if (note) note.textContent = t('errDataLoad');
+    if (LAST_RESULT) showResult(LAST_RESULT, true);
+  });
+}
+
+applyI18n();
+loadNum81();
+
+// ==AI-INTERPRET==
+// Shared AI 解读 button (/js/ai-jiegua.js). Summary comes from this page's
+// own result state; null/'' means "no result yet" and the button only shows
+// a hint instead of calling the backend.
+function aiTrunc(s, n) { s = String(s == null ? '' : s); return s.length > n ? s.slice(0, n) + '…' : s; }
+window.getJieguaSummary = function() {
+if (!LAST_RESULT) return null;
+var r = LAST_RESULT;
+var item = num81Item(r.num);
+var parts = [];
+if (r.mode === 'life') {
+parts.push('生命灵数（出生日期 ' + r.birth + '）：' + r.num + '号' + (isMaster(r.num) ? '（大师数）' : ''));
+parts.push('化约过程：' + r.birth + ' → ' + r.steps.join(' → '));
+var tr = traitFor(r.num);
+if (tr) parts.push('天赋特质：' + aiTrunc(tr, 200));
+} else {
+parts.push('81数理：' + r.num + '数');
+}
+if (item) {
+parts.push('数名：' + item.name + '（' + jiLabel(item.ji) + '）');
+if (item.duanyu) parts.push('断语：' + aiTrunc(item.duanyu, 200));
+if (item.sub) {
+if (item.sub['含义']) parts.push('含义：' + aiTrunc(item.sub['含义'], 160));
+if (item.sub['基业']) parts.push('基业：' + aiTrunc(item.sub['基业'], 120));
+if (item.sub['家庭']) parts.push('家庭：' + aiTrunc(item.sub['家庭'], 120));
+if (item.sub['健康']) parts.push('健康：' + aiTrunc(item.sub['健康'], 120));
+}
+}
+return parts.join('\n');
+};
+
+if (window.AIInterpret) { window.AIInterpret.attach(); }
+else { document.addEventListener('DOMContentLoaded', function () { if (window.AIInterpret) window.AIInterpret.attach(); }); }
+</script>
+<script src="/js/ai-jiegua.js"></script>
+</body>
+</html>

@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 铁板神数</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+  .gua-name-cn { display: block; font-size: .85rem; color: #9a9aab; font-weight: 400; margin-top: .2rem; letter-spacing: .05em; }
+  .guaci-note { font-size: .78rem; color: #6f6f80; margin-top: .5rem; line-height: 1.6; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .method-row { display: flex; gap: 2rem; }
+  .method-row > .field { flex: 1; min-width: 0; }
+  .num-row { display: flex; gap: 2rem; }
+  .num-row > .field { flex: 1; min-width: 0; }
+  .check-row { display: flex; align-items: center; gap: .6rem; margin-top: .7rem; }
+  .check-row input { accent-color: #c9a962; width: 1rem; height: 1rem; }
+  .check-row label { margin: 0; font-size: .9rem; color: #9a9aab; letter-spacing: .1em; }
+  .link-btn { background: none; border: none; color: #c9a962; font-size: .75rem; cursor: pointer; letter-spacing: .1em; padding: 0; margin-left: .5rem; font-family: inherit; }
+  .link-btn:hover { text-decoration: underline; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .submit-btn:disabled { opacity: .45; cursor: default; }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+  .hint { color: #9a9aab; font-size: .85rem; line-height: 1.8; margin-bottom: 1rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .num-card {
+    margin-top: 1.2rem; padding: 1.4rem 1.2rem; text-align: center;
+    border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05);
+  }
+  .num-card .num-big { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.2rem; color: #f0ead8; letter-spacing: .06em; }
+  .num-card .num-big b { color: #c9a962; }
+  .num-card .num-sub { font-size: .88rem; color: #9a9aab; margin-top: .6rem; line-height: 1.9; }
+  .num-card .num-sub b { color: #f0ead8; font-weight: 600; }
+  .blank-flag {
+    display: inline-block; margin-left: .5rem; font-size: .75rem; color: #d97b6c;
+    border: 1px solid rgba(217,123,108,.6); border-radius: 999px; padding: .05rem .6rem; white-space: nowrap;
+  }
+  .verdict { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .level { color: #c9a962; font-weight: 700; }
+  .verdict h3, .poem-block h3, .suanpan-block h3 { font-size: .8rem; color: #b08d3e; font-weight: 400; letter-spacing: .25em; margin-bottom: .6rem; }
+  .poem-block { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.3); border-radius: 6px; }
+  .poem-block .poem-text { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.15rem; color: #f0ead8; line-height: 1.9; }
+  .poem-block .poem-cat { font-size: .82rem; color: #9a9aab; margin-top: .5rem; }
+  .suanpan-block { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.3); border-radius: 6px; }
+  .suanpan-block .poem-text { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.05rem; color: #f0ead8; line-height: 1.9; }
+  .suanpan-block .poem-sub { font-size: .82rem; color: #9a9aab; margin-top: .5rem; line-height: 1.8; }
+  .note-line { font-size: .82rem; color: #6f6f80; line-height: 1.8; margin-top: .8rem; }
+  .data-status { font-size: .82rem; color: #6f6f80; margin-top: 1rem; line-height: 1.8; }
+  .data-status.err { color: #d97b6c; }
+
+  /* ---- 取数表 ---- */
+  .table-wrap { overflow-x: auto; margin-top: 1.2rem; }
+  table.chart { width: 100%; border-collapse: collapse; font-size: .88rem; min-width: 560px; }
+  table.chart th { color: #b08d3e; font-weight: 400; letter-spacing: .18em; text-align: left; padding: .5rem .6rem; border-bottom: 1px solid rgba(201,169,98,.45); white-space: nowrap; }
+  table.chart td { padding: .55rem .6rem; border-bottom: 1px solid rgba(201,169,98,.12); color: #c8c2ae; white-space: nowrap; line-height: 1.6; }
+  table.chart td b { color: #f0ead8; font-weight: 600; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .method-row, .num-row { flex-direction: column; gap: 0; }
+    .num-card .num-big { font-size: 1.7rem; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">铁板神数 · 本地排盘</div>
+    </div>
+  </a>
+            <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></span>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">一生之图 · 生辰信息</div>
+  <h1 class="slogan" data-i18n-html="slogan">生辰既报，<br>铁板自有定数。</h1>
+  <p class="subtitle" data-i18n="subtitle">铁板神数免费在线排盘</p>
+
+  <section class="section">
+    <div class="method-row">
+      <div class="field">
+        <label for="cal-type" data-i18n="labelCal">历法</label>
+        <select id="cal-type" onchange="switchCal(this.value)">
+          <option value="lunar" selected data-i18n="optLunar">农历（阴历）</option>
+          <option value="solar" data-i18n="optSolar">公历（阳历）</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="gender" data-i18n="labelGender">性别</label>
+        <select id="gender">
+          <option value="male" selected data-i18n="optMale">男</option>
+          <option value="female" data-i18n="optFemale">女</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="panel-lunar">
+      <div class="num-row">
+        <div class="field">
+          <label for="lunar-year" data-i18n="labelYear">出生年（农历）</label>
+          <input type="number" id="lunar-year" min="1900" max="2100" step="1" value="1988" placeholder="如 1988" data-i18n-ph="phYear">
+        </div>
+        <div class="field">
+          <label for="lunar-month" data-i18n="labelMonth">出生月（农历）</label>
+          <select id="lunar-month">
+            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+            <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8" selected>8</option>
+            <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+          </select>
+          <div class="check-row"><input type="checkbox" id="lunar-leap"><label for="lunar-leap" data-i18n="labelLeap">闰月</label></div>
+        </div>
+        <div class="field">
+          <label for="lunar-day" data-i18n="labelDay">出生日（农历）</label>
+          <input type="number" id="lunar-day" min="1" max="30" step="1" value="8" placeholder="如 8" data-i18n-ph="phDay">
+        </div>
+      </div>
+      <div class="field">
+        <label for="lunar-hour" data-i18n="labelHour">出生时辰</label>
+        <select id="lunar-hour"></select>
+      </div>
+      <p class="hint" data-i18n="lunarHint">时辰按两小时一段；子时为 23 时至次日 1 时。若只知大概时段，选最接近的时辰即可，但条文号只按时辰取数。</p>
+    </div>
+
+    <div id="panel-solar" class="hidden">
+      <div class="field">
+        <label for="solar-datetime"><span data-i18n="labelBirthSolar">出生日期与时间（公历）</span> <button type="button" class="link-btn" onclick="useNow()" data-i18n="btnNow">用当前时间</button></label>
+        <input type="datetime-local" id="solar-datetime">
+      </div>
+      <p class="hint" data-i18n="solarHint">公历将换算为农历后取四柱；时辰由所填时间自动判定。</p>
+    </div>
+
+    <div class="error" id="form-error"></div>
+    <button class="submit-btn" id="submit-btn" onclick="doDivination()" data-i18n="btnSubmit">起数 · 查铁板</button>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">排盘结果</div>
+    <div class="result-head" id="result-head"></div>
+    <div class="num-card" id="num-card"></div>
+    <div class="verdict" id="tiaowen-block"></div>
+    <div class="poem-block" id="verse-block"></div>
+    <div id="suanpan-wrap"></div>
+    <div class="section-title" style="margin-top:1.8rem" data-i18n="secRef">取数表备查</div>
+    <div class="table-wrap"><table class="chart" id="ref-table"></table></div>
+    <p class="note-line" data-i18n="refNote">上表为本站所据映射文件的取数对照：干支化卦、太玄数、地支数，仅供备查；条文号本身由日月星辰数表得出，不由上表拼合。</p>
+    <div class="data-status" id="data-status"></div>
+      <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="tieban" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+</section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">铁板神数：免费排盘与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">铁板神数的条文号是怎样算出来的？</summary>
+      <p data-i18n="faqA1">分四步：先由出生时间起农历四柱；再以年柱干支查纳音，定局（金四、木三、水二、火六、土五）；然后以日干支为经、时支为纬，查日月星辰数表，得铁板数；条文号即该数，在一万二千条条文中取第 1000 加该数条，诗文取同号。取数过程与结果一并列在排盘上方，可逐项核对。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">什么是「局」和纳音？</summary>
+      <p data-i18n="faqA2">纳音是年柱干支所配的五行之音，如甲子乙丑为海中金；纳音的五行定局：金局四、木局三、水局二、火局六、土局五。局与纳音五行列在结果中；算盘诗按纳音五行分男女取，岁运诗另列。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">为什么有的条文标着「空白条」？</summary>
+      <p data-i18n="faqA3">所据一万二千条整理本中约四成条目标为空白（无考刻数），本站仍照原文列出文字，并标出空白以示区别，不补写、不改写。传统做法中，空白条提示须核对出生刻分；本站只按时辰取数，不做考刻。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">为什么有时候没有算盘诗？</summary>
+      <p data-i18n="faqA4">算盘诗表只收约八百个四位数，多数铁板数不在表中；没有对应条目时本站直接说明，不编造诗句。算盘诗按纳音五行与性别取，另有岁运诗，有则一并列出。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">条文和诗文是同一本书吗？</summary>
+      <p data-i18n="faqA5">不是同一整理本：条文一万二千条来自 kinastro/tieban 整理本（梁湘润《铁板神数》系，现代整理层）；诗文六千二百零八首来自铁板神数清刻足本（心一堂术数珍本古籍丛刊，2013）。本站按同一条文号取诗文，是本站的取数约定，并非两书原文自带的互见。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ6">出生时间只精确到时辰够吗？</summary>
+      <p data-i18n="faqA6">不够传统铁板的要求，但够本站的取数。传统铁板须考刻分：每时辰分八刻，同一时辰不同刻分可能对应不同条文，须当面以已知家事核对刻分才定。本站所据日月星辰数表只分到时辰，不分刻，故结果以时辰为准；若出生时间正在时辰交界前后，请以当地真太阳时核对时辰再查。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ7">铁板神数排盘免费吗？数据从哪里来？</summary>
+      <p data-i18n="faqA7">免费。本页排盘在本地完成，不收费，也不会保存你的生辰。条文、诗文与算盘诗数据来自 comprehensive-shushu-engine（GPL-3.0）所收的铁板神数数据文件；农历换算使用本地 lunar.js，条文文本按需从本站数据文件加载。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">铁板神数属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="attrLine">条文与诗文数据：comprehensive-shushu-engine（GPL-3.0），铁板神数 · 梁湘润《铁板神数》日月星辰数表；清刻足本诗文。</span><br>
+    <span data-i18n="offlineNote">本页排盘在本地完成，农历换算使用本地 lunar.js，不向任何服务器发送数据；条文与诗文按需从本站数据文件加载。</span>
+  </footer>
+</div>
+</main>
+<script src="lunar.js"></script>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。条文与诗文原文一律保留中文，见 classicalNote。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '铁板神数 · 本地排盘',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '一生之图 · 生辰信息',
+  slogan: '生辰既报，<br>铁板自有定数。',
+  subtitle: '铁板神数免费在线排盘',
+  labelCal: '历法',
+  optLunar: '农历（阴历）',
+  optSolar: '公历（阳历）',
+  labelGender: '性别',
+  optMale: '男',
+  optFemale: '女',
+  labelYear: '出生年（农历）',
+  phYear: '如 1988',
+  labelMonth: '出生月（农历）',
+  labelLeap: '闰月',
+  labelDay: '出生日（农历）',
+  phDay: '如 8',
+  labelHour: '出生时辰',
+  lunarHint: '时辰按两小时一段；子时为 23 时至次日 1 时。若只知大概时段，选最接近的时辰即可，但条文号只按时辰取数。',
+  labelBirthSolar: '出生日期与时间（公历）',
+  btnNow: '用当前时间',
+  solarHint: '公历将换算为农历后取四柱；时辰由所填时间自动判定。',
+  btnSubmit: '起数 · 查铁板',
+  errNoDate: '请先填写出生日期与时间。',
+  errBadYear: '出生年须在 1900 至 2100 之间。',
+  errBadDay: '出生日须在 1 至 30 之间。',
+  errBadLunar: '农历日期不正确（该月没有这一天）。',
+  errLeapMismatch: '该年没有闰此月，请取消闰月或改月。',
+  errBadSolar: '公历日期格式不正确。',
+  errDataSmall: '取数表未能加载，请刷新后重试。',
+  errDataBig: '条文数据未能加载，仅显示排盘；可刷新后重试。',
+  resultTitle: '排盘结果',
+  ai_interpret: 'AI 解读',
+  resBirth: '出生',
+  resSizhu: '四柱',
+  resNayin: '年柱纳音',
+  resJu: '局',
+  resLiang: '日月星辰数',
+  resLiangDetail: '查表',
+  resNum: '铁板数',
+  resTiaowenNo: '条文号',
+  resKaoKe: '考刻数',
+  resTiaowen: '条文',
+  resVerse: '诗文',
+  resVerseCat: '类',
+  resSuanpan: '算盘诗',
+  resSuanpanNone: '此铁板数在算盘诗表中无对应条目。',
+  resSuiyun: '岁运诗',
+  resSuanpanFail: '算盘诗数据未能加载。',
+  secRef: '取数表备查',
+  refNote: '上表为本站所据映射文件的取数对照：干支化卦、太玄数、地支数，仅供备查；条文号本身由日月星辰数表得出，不由上表拼合。',
+  colPillar: '柱',
+  colGanZhi: '干支',
+  colGanGua: '干化卦',
+  colZhiGua: '支化卦',
+  colTaiXuan: '太玄数',
+  colBranchNum: '地支数',
+  pillarYear: '年柱',
+  pillarMonth: '月柱',
+  pillarDay: '日柱',
+  pillarHour: '时柱',
+  blankFlag: '空白条',
+  blankNote: '此条在原表标为空白（无考刻数），文字照整理本列出，传统做法会以此提示核对出生刻分。',
+  classicalNote: '',
+  dataLoading: '条文数据加载中……',
+  dataReady: '条文数据已加载。',
+  dataFail: '条文数据未能加载，仅显示排盘；可刷新后重试。',
+  faqTitle: '铁板神数：免费排盘与使用常见问题',
+  faqQ1: '铁板神数的条文号是怎样算出来的？',
+  faqA1: '分四步：先由出生时间起农历四柱；再以年柱干支查纳音，定局（金四、木三、水二、火六、土五）；然后以日干支为经、时支为纬，查日月星辰数表，得铁板数；条文号即该数，在一万二千条条文中取第 1000 加该数条，诗文取同号。取数过程与结果一并列在排盘上方，可逐项核对。',
+  faqQ2: '什么是「局」和纳音？',
+  faqA2: '纳音是年柱干支所配的五行之音，如甲子乙丑为海中金；纳音的五行定局：金局四、木局三、水局二、火局六、土局五。局与纳音五行列在结果中；算盘诗按纳音五行分男女取，岁运诗另列。',
+  faqQ3: '为什么有的条文标着「空白条」？',
+  faqA3: '所据一万二千条整理本中约四成条目标为空白（无考刻数），本站仍照原文列出文字，并标出空白以示区别，不补写、不改写。传统做法中，空白条提示须核对出生刻分；本站只按时辰取数，不做考刻。',
+  faqQ4: '为什么有时候没有算盘诗？',
+  faqA4: '算盘诗表只收约八百个四位数，多数铁板数不在表中；没有对应条目时本站直接说明，不编造诗句。算盘诗按纳音五行与性别取，另有岁运诗，有则一并列出。',
+  faqQ5: '条文和诗文是同一本书吗？',
+  faqA5: '不是同一整理本：条文一万二千条来自 kinastro/tieban 整理本（梁湘润《铁板神数》系，现代整理层）；诗文六千二百零八首来自铁板神数清刻足本（心一堂术数珍本古籍丛刊，2013）。本站按同一条文号取诗文，是本站的取数约定，并非两书原文自带的互见。',
+  faqQ6: '出生时间只精确到时辰够吗？',
+  faqA6: '不够传统铁板的要求，但够本站的取数。传统铁板须考刻分：每时辰分八刻，同一时辰不同刻分可能对应不同条文，须当面以已知家事核对刻分才定。本站所据日月星辰数表只分到时辰，不分刻，故结果以时辰为准；若出生时间正在时辰交界前后，请以当地真太阳时核对时辰再查。',
+  faqQ7: '铁板神数排盘免费吗？数据从哪里来？',
+  faqA7: '免费。本页排盘在本地完成，不收费，也不会保存你的生辰。条文、诗文与算盘诗数据来自 comprehensive-shushu-engine（GPL-3.0）所收的铁板神数数据文件；农历换算使用本地 lunar.js，条文文本按需从本站数据文件加载。',
+  disclaimer: '铁板神数属传统术数，仅供参考，不构成决策依据。',
+  attrLine: '条文与诗文数据：comprehensive-shushu-engine（GPL-3.0），铁板神数 · 梁湘润《铁板神数》日月星辰数表；清刻足本诗文。',
+  offlineNote: '本页排盘在本地完成，农历换算使用本地 lunar.js，不向任何服务器发送数据；条文与诗文按需从本站数据文件加载。',
+  langLabel: '语言',
+  hourOpts: ['子时 23–1时','丑时 1–3时','寅时 3–5时','卯时 5–7时','辰时 7–9时','巳时 9–11时','午时 11–13时','未时 13–15时','申时 15–17时','酉时 17–19时','戌时 19–21时','亥时 21–23时'],
+  lunarDateFmt: '农历{year}年{month}{day}',
+  solarDateFmt: '公历{year}年{month}月{day}日 {hour}时',
+  hourWord: '时',
+  juWord: '局',
+  genderMale: '男命',
+  genderFemale: '女命',
+  elementName: { '金': '金', '木': '木', '水': '水', '火': '火', '土': '土' },
+  branchName: { '子': '子', '丑': '丑', '寅': '寅', '卯': '卯', '辰': '辰', '巳': '巳', '午': '午', '未': '未', '申': '申', '酉': '酉', '戌': '戌', '亥': '亥' }
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '鐵板神數 · 本地排盤',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '一生之圖 · 生辰資訊',
+  slogan: '生辰既報，<br>鐵板自有定數。',
+  subtitle: '鐵板神數免費線上排盤',
+  labelCal: '曆法',
+  optLunar: '農曆（陰曆）',
+  optSolar: '公曆（陽曆）',
+  labelGender: '性別',
+  optMale: '男',
+  optFemale: '女',
+  labelYear: '出生年（農曆）',
+  phYear: '如 1988',
+  labelMonth: '出生月（農曆）',
+  labelLeap: '閏月',
+  labelDay: '出生日（農曆）',
+  phDay: '如 8',
+  labelHour: '出生時辰',
+  lunarHint: '時辰按兩小時一段；子時為 23 時至次日 1 時。若只知大概時段，選最接近的時辰即可，但條文號只按時辰取數。',
+  labelBirthSolar: '出生日期與時間（公曆）',
+  btnNow: '用當前時間',
+  solarHint: '公曆將換算為農曆後取四柱；時辰由所填時間自動判定。',
+  btnSubmit: '起數 · 查鐵板',
+  errNoDate: '請先填寫出生日期與時間。',
+  errBadYear: '出生年須在 1900 至 2100 之間。',
+  errBadDay: '出生日須在 1 至 30 之間。',
+  errBadLunar: '農曆日期不正確（該月沒有這一天）。',
+  errLeapMismatch: '該年沒有閏此月，請取消閏月或改月。',
+  errBadSolar: '公曆日期格式不正確。',
+  errDataSmall: '取數表未能加載，請刷新後重試。',
+  errDataBig: '條文數據未能加載，僅顯示排盤；可刷新後重試。',
+  resultTitle: '排盤結果',
+  ai_interpret: 'AI 解讀',
+  resBirth: '出生',
+  resSizhu: '四柱',
+  resNayin: '年柱納音',
+  resJu: '局',
+  resLiang: '日月星辰數',
+  resLiangDetail: '查表',
+  resNum: '鐵板數',
+  resTiaowenNo: '條文號',
+  resKaoKe: '考刻數',
+  resTiaowen: '條文',
+  resVerse: '詩文',
+  resVerseCat: '類',
+  resSuanpan: '算盤詩',
+  resSuanpanNone: '此鐵板數在算盤詩表中無對應條目。',
+  resSuiyun: '歲運詩',
+  resSuanpanFail: '算盤詩數據未能加載。',
+  secRef: '取數表備查',
+  refNote: '上表為本站所據映射文件的取數對照：干支化卦、太玄數、地支數，僅供備查；條文號本身由日月星辰數表得出，不由上表拼合。',
+  colPillar: '柱',
+  colGanZhi: '干支',
+  colGanGua: '干化卦',
+  colZhiGua: '支化卦',
+  colTaiXuan: '太玄數',
+  colBranchNum: '地支數',
+  pillarYear: '年柱',
+  pillarMonth: '月柱',
+  pillarDay: '日柱',
+  pillarHour: '時柱',
+  blankFlag: '空白條',
+  blankNote: '此條在原表標為空白（無考刻數），文字照整理本列出，傳統做法會以此提示核對出生刻分。',
+  classicalNote: '',
+  dataLoading: '條文數據加載中……',
+  dataReady: '條文數據已加載。',
+  dataFail: '條文數據未能加載，僅顯示排盤；可刷新後重試。',
+  faqTitle: '鐵板神數：免費排盤與使用常見問題',
+  faqQ1: '鐵板神數的條文號是怎樣算出來的？',
+  faqA1: '分四步：先由出生時間起農曆四柱；再以年柱干支查納音，定局（金四、木三、水二、火六、土五）；然後以日干支為經、時支為緯，查日月星辰數表，得鐵板數；條文號即該數，在一萬二千條條文中取第 1000 加該數條，詩文取同號。取數過程與結果一併列在排盤上方，可逐項核對。',
+  faqQ2: '什麼是「局」和納音？',
+  faqA2: '納音是年柱干支所配的五行之音，如甲子乙丑為海中金；納音的五行定局：金局四、木局三、水局二、火局六、土局五。局與納音五行列在結果中；算盤詩按納音五行分男女取，歲運詩另列。',
+  faqQ3: '為什麼有的條文標著「空白條」？',
+  faqA3: '所據一萬二千條整理本中約四成條目標為空白（無考刻數），本站仍照原文列出文字，並標出空白以示區別，不補寫、不改寫。傳統做法中，空白條提示須核對出生刻分；本站只按時辰取數，不做考刻。',
+  faqQ4: '為什麼有時候沒有算盤詩？',
+  faqA4: '算盤詩表只收約八百個四位數，多數鐵板數不在表中；沒有對應條目時本站直接說明，不編造詩句。算盤詩按納音五行與性別取，另有歲運詩，有則一併列出。',
+  faqQ5: '條文和詩文是同一本書嗎？',
+  faqA5: '不是同一整理本：條文一萬二千條來自 kinastro/tieban 整理本（梁湘潤《鐵板神數》系，現代整理層）；詩文六千二百零八首來自鐵板神數清刻足本（心一堂術數珍本古籍叢刊，2013）。本站按同一條文號取詩文，是本站的取數約定，並非兩書原文自帶的互見。',
+  faqQ6: '出生時間只精確到時辰夠嗎？',
+  faqA6: '不夠傳統鐵板的要求，但夠本站的取數。傳統鐵板須考刻分：每時辰分八刻，同一時辰不同刻分可能對應不同條文，須當面以已知家事核對刻分才定。本站所據日月星辰數表只分到時辰，不分刻，故結果以時辰為準；若出生時間正在時辰交界前後，請以當地真太陽時核對時辰再查。',
+  faqQ7: '鐵板神數排盤免費嗎？數據從哪裡來？',
+  faqA7: '免費。本頁排盤在本地完成，不收費，也不會保存你的生辰。條文、詩文與算盤詩數據來自 comprehensive-shushu-engine（GPL-3.0）所收的鐵板神數數據文件；農曆換算使用本地 lunar.js，條文文本按需從本站數據文件加載。',
+  disclaimer: '鐵板神數屬傳統術數，僅供參考，不構成決策依據。',
+  attrLine: '條文與詩文數據：comprehensive-shushu-engine（GPL-3.0），鐵板神數 · 梁湘潤《鐵板神數》日月星辰數表；清刻足本詩文。',
+  offlineNote: '本頁排盤在本地完成，農曆換算使用本地 lunar.js，不向任何伺服器發送數據；條文與詩文按需從本站數據文件加載。',
+  langLabel: '語言',
+  hourOpts: ['子時 23–1時','丑時 1–3時','寅時 3–5時','卯時 5–7時','辰時 7–9時','巳時 9–11時','午時 11–13時','未時 13–15時','申時 15–17時','酉時 17–19時','戌時 19–21時','亥時 21–23時'],
+  lunarDateFmt: '農曆{year}年{month}{day}',
+  solarDateFmt: '公曆{year}年{month}月{day}日 {hour}時',
+  hourWord: '時',
+  juWord: '局',
+  genderMale: '男命',
+  genderFemale: '女命',
+  elementName: { '金': '金', '木': '木', '水': '水', '火': '火', '土': '土' },
+  branchName: { '子': '子', '丑': '丑', '寅': '寅', '卯': '卯', '辰': '辰', '巳': '巳', '午': '午', '未': '未', '申': '申', '酉': '酉', '戌': '戌', '亥': '亥' }
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Tieban Shenshu · Local Chart',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'Life Chart · Birth Information',
+  slogan: 'Give your birth time,<br>and the iron plate answers.',
+  subtitle: 'Free online Tieban Shenshu chart',
+  labelCal: 'Calendar',
+  optLunar: 'Lunar calendar',
+  optSolar: 'Solar (Gregorian) calendar',
+  labelGender: 'Gender',
+  optMale: 'Male',
+  optFemale: 'Female',
+  labelYear: 'Birth year (lunar)',
+  phYear: 'e.g. 1988',
+  labelMonth: 'Birth month (lunar)',
+  labelLeap: 'Leap month',
+  labelDay: 'Birth day (lunar)',
+  phDay: 'e.g. 8',
+  labelHour: 'Birth double-hour',
+  lunarHint: 'Each double-hour spans two hours; Zi is 23:00–01:00. If you only know the rough time, pick the closest double-hour — the number is taken by double-hour only.',
+  labelBirthSolar: 'Birth date and time (solar)',
+  btnNow: 'Use now',
+  solarHint: 'The solar date is converted to the lunar calendar before the chart is cast; the double-hour is read from the time you enter.',
+  btnSubmit: 'Cast the number',
+  errNoDate: 'Please enter a birth date and time first.',
+  errBadYear: 'The birth year must be between 1900 and 2100.',
+  errBadDay: 'The birth day must be between 1 and 30.',
+  errBadLunar: 'That lunar date is invalid (this month has no such day).',
+  errLeapMismatch: 'That year has no leap month of this number — uncheck leap month or change the month.',
+  errBadSolar: 'The solar date format is invalid.',
+  errDataSmall: 'The number tables could not be loaded. Please refresh and try again.',
+  errDataBig: 'The text data could not be loaded; only the chart is shown. Please refresh and try again.',
+  resultTitle: 'The Chart',
+  ai_interpret: 'AI Reading',
+  resBirth: 'Birth',
+  resSizhu: 'Four Pillars',
+  resNayin: 'Year-pillar Nayin',
+  resJu: 'Bureau (Ju)',
+  resLiang: 'Sun-Moon-Stars number',
+  resLiangDetail: 'Table lookup',
+  resNum: 'Iron Plate number',
+  resTiaowenNo: 'Statement no.',
+  resKaoKe: 'Kao-ke numbers',
+  resTiaowen: 'Statement',
+  resVerse: 'Verse',
+  resVerseCat: 'Category',
+  resSuanpan: 'Abacus verse',
+  resSuanpanNone: 'This number has no entry in the abacus-verse table.',
+  resSuiyun: 'Annual-fortune verse',
+  resSuanpanFail: 'The abacus-verse data could not be loaded.',
+  secRef: 'Number Tables (Reference)',
+  refNote: 'The table above is the reference mapping from this site’s data files — stems and branches turned into trigrams, Taixuan numbers and branch numbers. The statement number itself comes from the Sun-Moon-Stars table, not from combining this table.',
+  colPillar: 'Pillar',
+  colGanZhi: 'Stem-Branch',
+  colGanGua: 'Stem trigram',
+  colZhiGua: 'Branch trigram',
+  colTaiXuan: 'Taixuan no.',
+  colBranchNum: 'Branch no.',
+  pillarYear: 'Year',
+  pillarMonth: 'Month',
+  pillarDay: 'Day',
+  pillarHour: 'Hour',
+  blankFlag: 'Blank entry',
+  blankNote: 'This entry is marked blank in the source table (no kao-ke numbers). The text is shown as printed in the compiled edition; traditionally a blank entry means the birth quarter should be re-checked.',
+  classicalNote: 'Statements and verses are shown in classical Chinese.',
+  dataLoading: 'Loading the text data…',
+  dataReady: 'Text data loaded.',
+  dataFail: 'The text data could not be loaded; only the chart is shown. Please refresh and try again.',
+  faqTitle: 'Tieban Shenshu: Free Chart & FAQ',
+  faqQ1: 'How is the Tieban statement number calculated?',
+  faqA1: 'In four steps: the birth time gives the four lunar pillars; the year pillar’s Nayin sets the bureau (Metal 4, Wood 3, Water 2, Fire 6, Earth 5); the day stem-branch and the hour branch are looked up in the Sun-Moon-Stars table to give the Iron Plate number; the statement is entry 1000 plus that number in the 12,000-statement collection, and the verse is taken under the same number. Every step is printed above the result so you can check it.',
+  faqQ2: 'What are the “bureau” (Ju) and Nayin?',
+  faqA2: 'Nayin is the five-element tone assigned to the year stem-branch — for example Jiazi and Yichou are “Gold in the Sea”. Its element sets the bureau: Metal 4, Wood 3, Water 2, Fire 6, Earth 5. The bureau and the Nayin element are printed in the result; the abacus verse is chosen by Nayin element and gender, and the annual-fortune verse is listed separately.',
+  faqQ3: 'Why are some statements marked “Blank entry”?',
+  faqA3: 'About four in ten of the 12,000 statements in the compiled edition are marked blank (no kao-ke numbers). This site still prints their text and marks them as blank instead of inventing or rewriting anything. Traditionally a blank entry means the birth quarter should be re-checked; this site takes the number by double-hour only and does no quarter calibration.',
+  faqQ4: 'Why is there sometimes no abacus verse?',
+  faqA4: 'The abacus-verse table holds only about 800 four-digit numbers, and most Iron Plate numbers are not in it. When there is no matching entry the site says so plainly instead of inventing a verse. The abacus verse is chosen by Nayin element and gender; the annual-fortune verse is shown as well when present.',
+  faqQ5: 'Do the statements and the verses come from the same book?',
+  faqA5: 'No — they are two different compiled editions. The 12,000 statements come from the kinastro/tieban compilation (in the line of Liang Xiangrun’s Tieban Shenshu, a modern collation); the 6,208 verses come from the Qing woodblock edition of Tieban Shenshu (Xin Yi Tang reprint series, 2013). This site takes the verse under the same number as the statement — that is this site’s lookup convention, not a cross-reference printed in either book.',
+  faqQ6: 'Is knowing the birth time to the double-hour enough?',
+  faqA6: 'Not for traditional Tieban, but enough for this site’s tables. Traditional Tieban requires calibrating the quarter (ke): each double-hour is divided into eight quarters, and different quarters in the same double-hour can give different statements, checked in person against known family facts. This site’s Sun-Moon-Stars table only distinguishes double-hours, not quarters, so the result is by double-hour. If the birth time is near a double-hour boundary, check the double-hour against local true solar time first.',
+  faqQ7: 'Is the Tieban Shenshu chart free? Where does the data come from?',
+  faqA7: 'Yes, free. The chart is computed locally in your browser — no charge, and your birth data is never saved. The statement, verse and abacus-verse data come from the Tieban Shenshu data files in the comprehensive-shushu-engine collection (GPL-3.0). Lunar conversion uses the local lunar.js; the texts are loaded on demand from this site’s data files.',
+  disclaimer: 'Tieban Shenshu is a traditional divination art, for reference only; it is not a basis for decisions.',
+  attrLine: 'Statement and verse data: comprehensive-shushu-engine (GPL-3.0) — Tieban Shenshu, Sun-Moon-Stars table from Liang Xiangrun’s Tieban Shenshu; verses from the Qing woodblock edition.',
+  offlineNote: 'Charting runs locally. Lunar conversion uses the local lunar.js and no data is sent to any server; statements and verses are loaded on demand from this site’s data files.',
+  langLabel: 'Language',
+  hourOpts: ['Zi 23:00–01:00','Chou 01:00–03:00','Yin 03:00–05:00','Mao 05:00–07:00','Chen 07:00–09:00','Si 09:00–11:00','Wu 11:00–13:00','Wei 13:00–15:00','Shen 15:00–17:00','You 17:00–19:00','Xu 19:00–21:00','Hai 21:00–23:00'],
+  lunarDateFmt: 'Lunar {year}-{month}-{day}',
+  solarDateFmt: 'Solar {year}-{month}-{day} {hour}:00',
+  hourWord: ' hour',
+  juWord: '',
+  genderMale: 'Male',
+  genderFemale: 'Female',
+  elementName: { '金': 'Metal', '木': 'Wood', '水': 'Water', '火': 'Fire', '土': 'Earth' },
+  branchName: { '子': 'Zi', '丑': 'Chou', '寅': 'Yin', '卯': 'Mao', '辰': 'Chen', '巳': 'Si', '午': 'Wu', '未': 'Wei', '申': 'Shen', '酉': 'You', '戌': 'Xu', '亥': 'Hai' }
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '鉄板神数 · ローカル排盤',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '一生之図 · 生辰情報',
+  slogan: '生辰を告げれば、<br>鉄板自ずと定数を出す。',
+  subtitle: '鉄板神数 無料オンライン排盤',
+  labelCal: '暦',
+  optLunar: '旧暦（陰暦）',
+  optSolar: '新暦（陽暦）',
+  labelGender: '性別',
+  optMale: '男',
+  optFemale: '女',
+  labelYear: '生まれた年（旧暦）',
+  phYear: '例 1988',
+  labelMonth: '生まれた月（旧暦）',
+  labelLeap: '閏月',
+  labelDay: '生まれた日（旧暦）',
+  phDay: '例 8',
+  labelHour: '生まれた刻（時辰）',
+  lunarHint: '時辰は2時間ごと。子時は23時から翌1時。おおよその時間しか分からない場合は最も近い時辰を選んでください。条文番号は時辰単位で決まります。',
+  labelBirthSolar: '生年月日と時刻（新暦）',
+  btnNow: '現在時刻を使う',
+  solarHint: '新暦は旧暦に換算して四柱を立てます。時辰は入力した時刻から自動で決まります。',
+  btnSubmit: '起数 · 鉄板を調べる',
+  errNoDate: 'まず生年月日と時刻を入力してください。',
+  errBadYear: '生まれた年は1900年から2100年の間で入力してください。',
+  errBadDay: '生まれた日は1日から30日の間で入力してください。',
+  errBadLunar: 'その旧暦日付は正しくありません（その月にその日はありません）。',
+  errLeapMismatch: 'その年にはその月の閏月はありません。閏月のチェックを外すか、月を変えてください。',
+  errBadSolar: '新暦日付の形式が正しくありません。',
+  errDataSmall: '取数表を読み込めませんでした。更新して再度お試しください。',
+  errDataBig: '条文データを読み込めませんでした。排盤のみ表示します。更新して再度お試しください。',
+  resultTitle: '排盤結果',
+  ai_interpret: 'AI 解釈',
+  resBirth: '出生',
+  resSizhu: '四柱',
+  resNayin: '年柱納音',
+  resJu: '局',
+  resLiang: '日月星辰数',
+  resLiangDetail: '表引き',
+  resNum: '鉄板数',
+  resTiaowenNo: '条文番号',
+  resKaoKe: '考刻数',
+  resTiaowen: '条文',
+  resVerse: '詩文',
+  resVerseCat: '分類',
+  resSuanpan: '算盤詩',
+  resSuanpanNone: 'この鉄板数に対応する算盤詩はありません。',
+  resSuiyun: '歳運詩',
+  resSuanpanFail: '算盤詩データを読み込めませんでした。',
+  secRef: '取数表（備考）',
+  refNote: '上の表は本サイトのデータファイルによる取数対照です。干支の卦化、太玄数、地支数を備考として示しています。条文番号そのものは日月星辰数表から得るもので、この表を組み合わせて作るものではありません。',
+  colPillar: '柱',
+  colGanZhi: '干支',
+  colGanGua: '干の卦',
+  colZhiGua: '支の卦',
+  colTaiXuan: '太玄数',
+  colBranchNum: '地支数',
+  pillarYear: '年柱',
+  pillarMonth: '月柱',
+  pillarDay: '日柱',
+  pillarHour: '時柱',
+  blankFlag: '空白条',
+  blankNote: 'この条は原表で空白とされています（考刻数なし）。文字は整理本のとおり表示しています。伝統的には空白条は出生の刻分を再確認すべき合図です。',
+  classicalNote: '条文と詩文は中国語原文のまま表示しています。',
+  dataLoading: '条文データを読み込んでいます……',
+  dataReady: '条文データを読み込みました。',
+  dataFail: '条文データを読み込めませんでした。排盤のみ表示します。更新して再度お試しください。',
+  faqTitle: '鉄板神数：無料排盤とよくある質問',
+  faqQ1: '鉄板神数の条文番号はどうやって出すのですか？',
+  faqA1: '四つの手順です。まず出生時刻から旧暦の四柱を立てます。次に年柱の干支から納音を調べ、局を定めます（金四・木三・水二・火六・土五）。そして日干支を縦、時支を横として日月星辰数表を引き、鉄板数を得ます。条文番号はその数で、一万二千条の中から1000にその数を加えた条を引き、詩文は同じ番号で引きます。取数の過程は結果の上に併せて示してあり、一つずつ確認できます。',
+  faqQ2: '「局」と納音とは何ですか？',
+  faqA2: '納音は年柱の干支に配された五行の音です。例えば甲子・乙丑は海中金です。納音の五行で局が決まります。金局四・木局三・水局二・火局六・土局五。局と納音の五行は結果に表示します。算盤詩は納音の五行と性別で引き、歳運詩は別に示します。',
+  faqQ3: 'なぜ「空白条」と表示される条文があるのですか？',
+  faqA3: '根拠とした一万二千条の整理本のうち約四割の条が空白とされています（考刻数なし）。本サイトでは文字は原文のとおり表示し、空白であることを明示します。補ったり書き換えたりはしません。伝統的には空白条は出生の刻分を再確認すべき合図です。本サイトは時辰単位で数を取るのみで、考刻は行いません。',
+  faqQ4: '算盤詩が出ないことがあるのはなぜですか？',
+  faqA4: '算盤詩の表には約八百の四桁の数しか収められておらず、多くの鉄板数には対応する条がありません。対応がない場合はそのまま明記し、詩句を創作することはありません。算盤詩は納音の五行と性別で引き、歳運詩があれば併せて表示します。',
+  faqQ5: '条文と詩文は同じ本のものですか？',
+  faqA5: 'いいえ、別の整理本です。条文一万二千条は kinastro/tieban の整理本（梁湘潤『鉄板神数』系、現代の整理版）から、詩文六千二百八首は鉄板神数清刻足本（心一堂術数珍本古籍叢刊、2013年）から来ています。本サイトでは条文と同じ番号で詩文を引いていますが、これは本サイトの取数上の約束で、両書の原文に備わる相互参照ではありません。',
+  faqQ6: '出生時刻は時辰まで分かれば十分ですか？',
+  faqA6: '伝統的な鉄板神数には不十分ですが、本サイトの取数には十分です。伝統の鉄板では刻分を考る必要があります。一つの時辰は八刻に分かれ、同じ時辰でも刻分が違えば条文が変わることがあり、既知の家事と照らして対面で刻分を定めます。本サイトの日月星辰数表は時辰までしか区別しないため、結果は時辰単位です。出生時刻が時辰の境目に近い場合は、現地の真太陽時で時辰を確認してから調べてください。',
+  faqQ7: '鉄板神数の排盤は無料ですか？データはどこから来ていますか？',
+  faqA7: '無料です。このページの排盤はローカルで計算され、料金もかからず、生辰は保存されません。条文・詩文・算盤詩のデータは comprehensive-shushu-engine（GPL-3.0）収録の鉄板神数データファイルから来ています。旧暦換算はローカルの lunar.js を使い、条文テキストは本サイトのデータファイルから必要に応じて読み込みます。',
+  disclaimer: '鉄板神数は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  attrLine: '条文・詩文データ：comprehensive-shushu-engine（GPL-3.0）、鉄板神数 · 梁湘潤『鉄板神数』日月星辰数表、清刻足本詩文。',
+  offlineNote: 'このページはローカルで排盤します。旧暦換算はローカルの lunar.js を使い、データは外部サーバーに送信されません。条文と詩文は本サイトのデータファイルから必要に応じて読み込みます。',
+  langLabel: '言語',
+  hourOpts: ['子時 23–1時','丑時 1–3時','寅時 3–5時','卯時 5–7時','辰時 7–9時','巳時 9–11時','午時 11–13時','未時 13–15時','申時 15–17時','酉時 17–19時','戌時 19–21時','亥時 21–23時'],
+  lunarDateFmt: '旧暦{year}年{month}月{day}日',
+  solarDateFmt: '新暦{year}年{month}月{day}日 {hour}時',
+  hourWord: '時',
+  juWord: '局',
+  genderMale: '男命',
+  genderFemale: '女命',
+  elementName: { '金': '金', '木': '木', '水': '水', '火': '火', '土': '土' },
+  branchName: { '子': '子', '丑': '丑', '寅': '寅', '卯': '卯', '辰': '辰', '巳': '巳', '午': '午', '未': '未', '申': '申', '酉': '酉', '戌': '戌', '亥': '亥' }
+}
+};
+
+// 先天八卦数：乾一、兑二、离三、震四、巽五、坎六、艮七、坤八（数据文件用简体“干”，与“乾”同数）
+var GUA_NUM = { '乾': 1, '干': 1, '兑': 2, '离': 3, '震': 4, '巽': 5, '坎': 6, '艮': 7, '坤': 8 };
+var BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var HOUR_CENTRAL = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22];
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+var DATA = { mappings: null, liang: null, tiaowen: null, verses: null, suanpan: null };
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function elName(el) { var m = t('elementName'); return (m && m[el]) ? m[el] : el; }
+function brName(b) { var m = t('branchName'); return (m && m[b]) ? m[b] : b; }
+function fmt(s, o) {
+  var r = s;
+  for (var k in o) r = r.split('{' + k + '}').join(o[k]);
+  return r;
+}
+
+function buildHourOptions() {
+  var sel = document.getElementById('lunar-hour');
+  if (!sel) return;
+  var keep = sel.value;
+  var opts = t('hourOpts');
+  sel.innerHTML = '';
+  for (var i = 0; i < 12; i++) {
+    var op = document.createElement('option');
+    op.value = String(i);
+    op.textContent = opts[i];
+    sel.appendChild(op);
+  }
+  sel.value = (keep !== '' && keep !== null && typeof keep !== 'undefined') ? keep : '4';
+  if (sel.selectedIndex < 0) sel.value = '4';
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  buildHourOptions();
+  var fe = document.getElementById('form-error'); if (fe) fe.textContent = '';
+  if (LAST_RESULT) renderResult(LAST_RESULT);
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function p2(n) { return (n < 10 ? '0' : '') + n; }
+
+function fetchJson(path) {
+  return fetch(path).then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
+}
+function loadSmall() {
+  if (DATA.mappings && DATA.liang) return Promise.resolve(true);
+  return Promise.all([
+    fetchJson('/data/tieban_mappings.json'),
+    fetchJson('/data/tieban_liang.json')
+  ]).then(function(res) {
+    if (res[0]) DATA.mappings = res[0];
+    if (res[1]) DATA.liang = res[1];
+    return !!(DATA.mappings && DATA.liang);
+  });
+}
+
+function switchCal(v) {
+  var lunar = document.getElementById('panel-lunar');
+  var solar = document.getElementById('panel-solar');
+  if (v === 'solar') { lunar.classList.add('hidden'); solar.classList.remove('hidden'); }
+  else { solar.classList.add('hidden'); lunar.classList.remove('hidden'); }
+  var fe = document.getElementById('form-error'); if (fe) fe.textContent = '';
+}
+function useNow() {
+  var d = new Date();
+  var v = d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()) + 'T' + p2(d.getHours()) + ':' + p2(d.getMinutes());
+  document.getElementById('solar-datetime').value = v;
+}
+
+function taiXuanOf(ch) {
+  var pairs = DATA.mappings.he_luo_pairs || [];
+  for (var i = 0; i < pairs.length; i++) {
+    var chars = pairs[i][0];
+    for (var j = 0; j < chars.length; j++) if (chars[j] === ch) return pairs[i][1];
+  }
+  return '—';
+}
+function branchNumOf(zhi) {
+  var bn = DATA.mappings.branch_num || {};
+  for (var k in bn) if (k.indexOf(zhi) >= 0) return bn[k];
+  return '—';
+}
+function guaLabel(gua) {
+  if (!gua) return '—';
+  return gua + ' ' + (GUA_NUM[gua] || '');
+}
+
+function lunarDateStr(lunar) {
+  if (LANG === 'zh-CN' || LANG === 'zh-TW') {
+    return fmt(t('lunarDateFmt'), { year: lunar.getYear(), month: lunar.getMonthInChinese(), day: lunar.getDayInChinese() });
+  }
+  return fmt(t('lunarDateFmt'), { year: lunar.getYear(), month: lunar.getMonth(), day: lunar.getDay() });
+}
+function solarDateStr(lunar) {
+  var s = lunar.getSolar();
+  return fmt(t('solarDateFmt'), { year: s.getYear(), month: s.getMonth(), day: s.getDay(), hour: s.getHour() });
+}
+
+function buildLunar() {
+  var cal = document.getElementById('cal-type').value;
+  var errEl = document.getElementById('form-error');
+  if (cal === 'solar') {
+    var v = document.getElementById('solar-datetime').value;
+    if (!v) { errEl.textContent = t('errNoDate'); return null; }
+    var d = new Date(v);
+    if (isNaN(d.getTime())) { errEl.textContent = t('errBadSolar'); return null; }
+    try {
+      var solar = Solar.fromYmdHms(d.getFullYear(), d.getMonth() + 1, d.getDate(), d.getHours(), d.getMinutes(), 0);
+      return solar.getLunar();
+    } catch (e) { errEl.textContent = t('errBadSolar'); return null; }
+  }
+  var year = parseInt(document.getElementById('lunar-year').value, 10);
+  var month = parseInt(document.getElementById('lunar-month').value, 10);
+  var day = parseInt(document.getElementById('lunar-day').value, 10);
+  var hourIdx = parseInt(document.getElementById('lunar-hour').value, 10);
+  var leap = document.getElementById('lunar-leap').checked;
+  if (isNaN(year) || year < 1900 || year > 2100) { errEl.textContent = t('errBadYear'); return null; }
+  if (isNaN(month) || month < 1 || month > 12) { errEl.textContent = t('errBadLunar'); return null; }
+  if (isNaN(day) || day < 1 || day > 30) { errEl.textContent = t('errBadDay'); return null; }
+  if (isNaN(hourIdx) || hourIdx < 0 || hourIdx > 11) hourIdx = 4;
+  if (leap) {
+    var leapMonth = 0;
+    try { leapMonth = LunarYear.fromYear(year).getLeapMonth(); } catch (e) { leapMonth = 0; }
+    if (leapMonth !== month) { errEl.textContent = t('errLeapMismatch'); return null; }
+    month = -month;
+  }
+  try {
+    return Lunar.fromYmdHms(year, month, day, HOUR_CENTRAL[hourIdx], 0, 0);
+  } catch (e) { errEl.textContent = t('errBadLunar'); return null; }
+}
+
+function derive(lunar) {
+  var yearGZ = lunar.getYearInGanZhi();
+  var monthGZ = lunar.getMonthInGanZhi();
+  var dayGZ = lunar.getDayInGanZhi();
+  var timeGZ = lunar.getTimeInGanZhi();
+  var nayin = DATA.mappings.nayin[yearGZ] || '';
+  var ju = nayin ? DATA.mappings.nayin_to_ju[nayin] : null;
+  var element = nayin ? nayin.charAt(nayin.length - 1) : '';
+  var dayGan = dayGZ.charAt(0), dayZhi = dayGZ.charAt(1), timeZhi = timeGZ.charAt(1);
+  var hourIdx = BRANCHES.indexOf(timeZhi);
+  var liangKey = dayZhi + '_' + dayGan;
+  var arr = DATA.liang[liangKey] || [];
+  var n = (hourIdx >= 0 && arr[hourIdx] != null) ? arr[hourIdx] : null;
+  return {
+    lunarStr: lunarDateStr(lunar), solarStr: solarDateStr(lunar),
+    yearGZ: yearGZ, monthGZ: monthGZ, dayGZ: dayGZ, timeGZ: timeGZ,
+    nayin: nayin, ju: ju, element: element,
+    dayGan: dayGan, dayZhi: dayZhi, timeZhi: timeZhi, hourIdx: hourIdx,
+    liangKey: liangKey, num: n
+  };
+}
+
+function renderResult(r) {
+  var head = document.getElementById('result-head');
+  head.innerHTML =
+    esc(t('resBirth')) + ': <b>' + esc(r.lunarStr) + '</b> (' + esc(r.solarStr) + ')<br>' +
+    esc(t('resSizhu')) + ': <b>' + esc(r.yearGZ) + ' ' + esc(r.monthGZ) + ' ' + esc(r.dayGZ) + ' ' + esc(r.timeGZ) + '</b><br>' +
+    esc(t('resNayin')) + ': <b>' + esc(r.nayin) + ' (' + esc(elName(r.element)) + ')</b> · ' +
+    esc(t('resJu')) + ': <b>' + esc(String(r.ju)) + esc(t('juWord')) + '</b><br>' +
+    esc(t('resLiang')) + ': <b>' + esc(r.liangKey) + ' · ' + esc(brName(r.timeZhi)) + esc(t('hourWord')) + ' → ' + esc(String(r.num)) + '</b>';
+
+  var numCard = document.getElementById('num-card');
+  var blankHtml = '';
+  if (r.tiaowen && r.tiaowen.is_blank) blankHtml = '<span class="blank-flag">' + esc(t('blankFlag')) + '</span>';
+  var kaoKe = r.tiaowen ? r.tiaowen.note : '—';
+  numCard.innerHTML =
+    '<div class="num-big">' + esc(t('resNum')) + ' <b>' + esc(String(r.num)) + '</b>' + blankHtml + '</div>' +
+    '<div class="num-sub">' + esc(t('resTiaowenNo')) + ': <b>' + esc(String(1000 + r.num)) + '</b> · ' +
+    esc(t('resKaoKe')) + ': <b>' + esc(kaoKe) + '</b></div>' +
+    ((r.tiaowen && r.tiaowen.is_blank) ? '<div class="note-line">' + esc(t('blankNote')) + '</div>' : '');
+
+  var twBlock = document.getElementById('tiaowen-block');
+  if (r.tiaowen) {
+    twBlock.innerHTML = '<h3>' + esc(t('resTiaowen')) + '</h3><div>' + esc(r.tiaowen.text) + '</div>' +
+      (t('classicalNote') ? '<div class="guaci-note">' + esc(t('classicalNote')) + '</div>' : '');
+  } else {
+    twBlock.innerHTML = '<h3>' + esc(t('resTiaowen')) + '</h3><div class="error">' + esc(t('dataFail')) + '</div>';
+  }
+
+  var vsBlock = document.getElementById('verse-block');
+  if (r.verse) {
+    vsBlock.innerHTML = '<h3>' + esc(t('resVerse')) + '</h3><div class="poem-text">' + esc(r.verse.verse) + '</div>' +
+      '<div class="poem-cat">' + esc(t('resVerseCat')) + ': ' + esc(r.verse.category) + '</div>' +
+      (t('classicalNote') ? '<div class="guaci-note">' + esc(t('classicalNote')) + '</div>' : '');
+  } else {
+    vsBlock.innerHTML = '<h3>' + esc(t('resVerse')) + '</h3><div class="error">' + esc(t('dataFail')) + '</div>';
+  }
+
+  var spWrap = document.getElementById('suanpan-wrap');
+  if (r.suanpanFail) {
+    spWrap.innerHTML = '<p class="note-line">' + esc(t('resSuanpanFail')) + '</p>';
+  } else if (r.suanpanPoem || r.suanpanSuiyun) {
+    var h = '<div class="suanpan-block"><h3>' + esc(t('resSuanpan')) + '</h3>';
+    if (r.suanpanPoem) h += '<div class="poem-text">' + esc(r.suanpanPoem.text) + '</div>';
+    if (r.suanpanSuiyun) h += '<div class="poem-sub">' + esc(t('resSuiyun')) + ': ' + esc(r.suanpanSuiyun.text) + '</div>';
+    h += '</div>';
+    spWrap.innerHTML = h;
+  } else {
+    spWrap.innerHTML = '<p class="note-line">' + esc(t('resSuanpanNone')) + '</p>';
+  }
+
+  var tbl = document.getElementById('ref-table');
+  var pillars = [
+    [t('pillarYear'), r.yearGZ], [t('pillarMonth'), r.monthGZ],
+    [t('pillarDay'), r.dayGZ], [t('pillarHour'), r.timeGZ]
+  ];
+  var th = '<tr><th>' + esc(t('colPillar')) + '</th><th>' + esc(t('colGanZhi')) + '</th><th>' +
+    esc(t('colGanGua')) + '</th><th>' + esc(t('colZhiGua')) + '</th><th>' +
+    esc(t('colTaiXuan')) + '</th><th>' + esc(t('colBranchNum')) + '</th></tr>';
+  var rows = '';
+  for (var i = 0; i < pillars.length; i++) {
+    var gz = pillars[i][1];
+    var gan = gz.charAt(0), zhi = gz.charAt(1);
+    var ganGua = DATA.mappings.stem_to_gua[gan] || '';
+    var zhiGua = DATA.mappings.branch_to_gua[zhi] || '';
+    rows += '<tr><td><b>' + esc(pillars[i][0]) + '</b></td><td><b>' + esc(gz) + '</b></td>' +
+      '<td>' + esc(guaLabel(ganGua)) + '</td><td>' + esc(guaLabel(zhiGua)) + '</td>' +
+      '<td>' + esc(String(taiXuanOf(gan))) + ' / ' + esc(String(taiXuanOf(zhi))) + '</td>' +
+      '<td>' + esc(String(branchNumOf(zhi))) + '</td></tr>';
+  }
+  tbl.innerHTML = th + rows;
+
+  var ds = document.getElementById('data-status');
+  ds.className = 'data-status';
+  ds.textContent = t('dataReady');
+  document.getElementById('result-card').classList.remove('hidden');
+}
+
+function doDivination() {
+  var errEl = document.getElementById('form-error');
+  errEl.textContent = '';
+  var btn = document.getElementById('submit-btn');
+  var lunar;
+  try { lunar = buildLunar(); } catch (e) { errEl.textContent = t('errBadLunar'); return; }
+  if (!lunar) return;
+  btn.disabled = true;
+  var ds = document.getElementById('data-status');
+  ds.className = 'data-status';
+  ds.textContent = t('dataLoading');
+  loadSmall().then(function(ok) {
+    if (!ok) { errEl.textContent = t('errDataSmall'); btn.disabled = false; return; }
+    var r;
+    try { r = derive(lunar); } catch (e) { errEl.textContent = t('errDataSmall'); btn.disabled = false; return; }
+    if (r.num == null || r.ju == null) { errEl.textContent = t('errDataSmall'); btn.disabled = false; return; }
+    var gender = document.getElementById('gender').value;
+    r.gender = gender;
+    Promise.all([
+      fetchJson('/data/tieban_tiaowen.json'),
+      fetchJson('/data/tieban_verses.json'),
+      fetchJson('/data/tieban_suanpan.json')
+    ]).then(function(res) {
+      var tiaowen = res[0], verses = res[1], suanpan = res[2];
+      var twKey = String(1000 + r.num);
+      var vsKey = ('0000' + r.num).slice(-4);
+      r.tiaowen = (tiaowen && tiaowen[twKey]) ? tiaowen[twKey] : null;
+      r.verse = (verses && verses[vsKey]) ? verses[vsKey] : null;
+      r.suanpanPoem = null; r.suanpanSuiyun = null; r.suanpanFail = !suanpan;
+      if (suanpan && suanpan[r.element]) {
+        var sec = suanpan[r.element];
+        var gk = gender === 'female' ? '女命' : '男命';
+        if (sec[gk] && sec[gk][String(r.num)]) r.suanpanPoem = sec[gk][String(r.num)];
+        if (sec['岁运'] && sec['岁运'][String(r.num)]) r.suanpanSuiyun = sec['岁运'][String(r.num)];
+      }
+      LAST_RESULT = r;
+      renderResult(r);
+      btn.disabled = false;
+      var card = document.getElementById('result-card');
+      if (card.scrollIntoView) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+}
+
+loadSmall().catch(function() {});
+applyI18n();
+// ==LOGIC-END==
+
+// ==AI-INTERPRET==
+// Shared AI 解读 button (/js/ai-jiegua.js). Summary comes from this page's
+// own result state; null/'' means "no result yet" and the button only shows
+// a hint instead of calling the backend.
+function aiTrunc(s, n) { s = String(s == null ? '' : s); return s.length > n ? s.slice(0, n) + '…' : s; }
+window.getJieguaSummary = function() {
+if (!LAST_RESULT) return null;
+var r = LAST_RESULT;
+var parts = [];
+parts.push('铁板神数（' + r.lunarStr + ' · ' + r.solarStr + '）');
+parts.push('四柱：' + r.yearGZ + ' ' + r.monthGZ + ' ' + r.dayGZ + ' ' + r.timeGZ);
+parts.push('纳音：' + r.nayin + ' · 局：' + r.ju + ' · 五行：' + r.element);
+parts.push('铁板数：' + r.num);
+if (r.tiaowen) parts.push('条文：' + aiTrunc(r.tiaowen, 300));
+if (r.verse) parts.push('诗：' + aiTrunc(r.verse, 200));
+if (r.suanpanPoem) parts.push('算盘诗：' + aiTrunc(r.suanpanPoem, 200));
+if (r.suanpanSuiyun) parts.push('岁运：' + aiTrunc(r.suanpanSuiyun, 200));
+return parts.join('\n');
+};
+
+if (window.AIInterpret) { window.AIInterpret.attach(); }
+else { document.addEventListener('DOMContentLoaded', function () { if (window.AIInterpret) window.AIInterpret.attach(); }); }
+</script>
+<script src="/js/ai-jiegua.js"></script>
+</body>
+</html>

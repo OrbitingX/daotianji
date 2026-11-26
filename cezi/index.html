@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 测字</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .char-field input { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.6rem; text-align: center; letter-spacing: .2em; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .submit-btn:disabled { opacity: .55; cursor: default; }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .big-char {
+    font-family: "Noto Serif SC","Songti SC","SimSun",serif;
+    font-size: 4.2rem; line-height: 1.2; text-align: center; color: #f0ead8;
+    margin: .4rem 0 .2rem;
+  }
+  .char-meta { text-align: center; color: #9a9aab; font-size: .9rem; line-height: 1.9; }
+  .char-meta b { color: #c9a962; font-weight: 600; }
+  .decomp-chain {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    gap: .55rem; margin-top: 1.2rem;
+    font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.5rem; color: #f0ead8;
+  }
+  .decomp-chain .op { color: #c9a962; font-size: 1.1rem; font-family: inherit; }
+  .decomp-chain .part {
+    border: 1px solid rgba(201,169,98,.45); border-radius: 6px;
+    padding: .35rem .8rem; min-width: 3rem; text-align: center;
+  }
+  .decomp-chain .part.unknown { color: #6f6f80; border-style: dashed; }
+  .decomp-chain .src { font-size: 1.5rem; border-color: #c9a962; background: rgba(201,169,98,.08); }
+  .decomp-note { text-align: center; color: #9a9aab; font-size: .85rem; margin-top: .9rem; line-height: 1.8; }
+  .decomp-note .ids { color: #6f6f80; letter-spacing: .1em; }
+  .missing { color: #9a9aab; font-size: .9rem; line-height: 1.8; }
+  .entry-card {
+    background: transparent; border: 1px solid rgba(201,169,98,.3); border-radius: 6px;
+    padding: 1.1rem 1.2rem; margin-top: 1.2rem;
+  }
+  .entry-card h3 { font-size: .8rem; color: #b08d3e; font-weight: 400; letter-spacing: .25em; margin-bottom: .6rem; }
+  .entry-card .entry-id { color: #c9a962; font-weight: 600; letter-spacing: .05em; }
+  .entry-card .entry-source { color: #9a9aab; font-size: .85rem; margin-left: .6rem; letter-spacing: .05em; }
+  .entry-card .entry-text {
+    font-family: "Noto Serif SC","Songti SC","SimSun",serif;
+    font-size: 1.05rem; color: #f0ead8; line-height: 1.9; margin: .7rem 0 .3rem;
+  }
+  .entry-card .entry-plain { font-size: .9rem; color: #c8c2ae; line-height: 1.8; }
+  .entry-card .entry-principle { font-size: .88rem; color: #9a9aab; line-height: 1.8; border-top: 1px dashed rgba(201,169,98,.35); padding-top: .7rem; margin-top: .7rem; }
+  .entry-card .entry-principle b, .entry-card .entry-meta b { color: #f0ead8; font-weight: 600; }
+  .entry-card .entry-meta { font-size: .85rem; color: #9a9aab; line-height: 1.9; margin-top: .5rem; }
+  .entry-card .entry-meta .nature { color: #c9a962; }
+  .classical-note { font-size: .78rem; color: #6f6f80; margin-top: .5rem; line-height: 1.6; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
+  .chip {
+    background: transparent; border: 1px solid rgba(201,169,98,.4); border-radius: 999px;
+    color: #f0ead8; font-family: "Noto Serif SC","Songti SC","SimSun",serif;
+    font-size: 1.05rem; padding: .3rem .9rem; cursor: pointer;
+  }
+  .chip:hover { border-color: #c9a962; background: rgba(201,169,98,.08); }
+  .chip-more { border-style: dashed; color: #9a9aab; font-size: .85rem; font-family: inherit; padding: .45rem .9rem; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .big-char { font-size: 3.4rem; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">测字 · 本地占卜</div>
+    </div>
+  </a>
+                <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_cezi">测字</span></span>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">第一幕 · 写下一个字</div>
+  <h1 class="slogan" data-i18n-html="slogan">一字拆开，<br>吉凶自现。</h1>
+  <p class="subtitle" data-i18n="subtitle">测字免费在线占卜</p>
+
+  <section class="section">
+    <div class="field char-field">
+      <label for="char-input" data-i18n="labelChar">所测之字</label>
+      <input type="text" id="char-input" maxlength="2" autocomplete="off" placeholder="安" data-i18n-ph="phChar">
+    </div>
+    <div class="field">
+      <label for="question" data-i18n="labelQuestion">所问之事（可选）</label>
+      <input type="text" id="question" placeholder="例如：这件事能不能成？" data-i18n-ph="phQuestion">
+    </div>
+    <div class="error" id="char-error"></div>
+    <button class="submit-btn" id="submit-btn" onclick="doCezi()" data-i18n="btnSubmit">测字</button>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">拆字</div>
+    <div class="big-char" id="result-char"></div>
+    <div class="char-meta" id="result-meta"></div>
+    <div class="decomp-chain" id="result-decomp"></div>
+    <div class="decomp-note" id="result-decomp-note"></div>
+    <div id="result-entries"></div>
+    <div id="result-related"></div>
+      <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="cezi" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+</section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">测字：免费占卜与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">测字是什么？</summary>
+      <p data-i18n="faqA1">测字是中国传统术数之一：问事者随手写下一个字，占者拆开字形、看笔画与部件的增损离合，再对照古人留下的字例断语，推断所问之事的吉凶。写字时的心念与落笔，被认为与所问之事相应。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">为什么一个字能断事？</summary>
+      <p data-i18n="faqA2">测字讲“字为心画”：一个字由哪些部件组成、笔画多寡、结构是左右还是上下，都被看作问事者当下处境的投射。例如“安”字上为宀、下为女，古人便取“宀下有女、安身”之象。本页先把字拆开给你看，再查古籍字例的原文断语。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">测字和姓名学有什么区别？</summary>
+      <p data-i18n="faqA3">姓名学断的是名字本身——笔画数理与五格，对象固定，一生只用一个名字。测字断的是当下随手写的一个字，字随问事而变，同一件事今天写“安”、明天写“愁”，断语也随之不同；测字问的是眼前这一件事，不是命。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">为什么有的字查不到断语？</summary>
+      <p data-i18n="faqA4">本页的断语来自《古今图书集成·拆字部汇考》与清代《测字秘牒》两部古籍整理出的字库，共约两千四百字。古人只给常问的字留了断语，生僻字或新造字没有收录；没有收录的字，本页会如实显示拆字与笔画，不编造断语。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">测字免费吗？结果会保存吗？</summary>
+      <p data-i18n="faqA5">免费。拆字与查表都在本页完成，不收费，也不会保存你输入的字与问题。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">测字属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="dataNote">拆字与查表在本页完成，字库文件按需加载；不保存你输入的字与问题。</span>
+  </footer>
+</div>
+</main>
+
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。断语原文与白话翻译一律保留中文，见 classicalNote。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '测字 · 本地占卜',
+  navGroup: '占卜',
+  nav_1: '解梦', nav_2: '六爻占卜', nav_3: '梅花易数', navCezi: '测字', nav_4: '小六壬', nav_5: '塔罗牌',
+  nav_6: '雷诺曼', nav_7: '北欧卢恩符文', nav_8: '奇门遁甲', nav_9: '印度占星卜卦', nav_10: '西方卜卦占星',
+  nav_11: '大六壬', nav_12: '金口诀', nav_13: '太乙神数', nav_14: '占星骰子',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  langLabel: '语言',
+  eyebrow: '第一幕 · 写下一个字',
+  slogan: '一字拆开，<br>吉凶自现。',
+  subtitle: '测字免费在线占卜',
+  labelChar: '所测之字',
+  phChar: '写一个字，如：安',
+  labelQuestion: '所问之事（可选）',
+  phQuestion: '例如：这件事能不能成？',
+  btnSubmit: '测字',
+  btnLoading: '查字库中…',
+  errNotSingle: '请输入一个汉字。',
+  errLoad: '字库加载失败，请稍后重试。',
+  resultTitle: '拆字',
+  ai_interpret: 'AI 解读',
+  asked: '所问',
+  lblStrokes: '笔画',
+  strokesUnit: '画',
+  lblDecomp: '拆字',
+  lblDict: '字例断语',
+  lblRelated: '含此字的字',
+  lblSource: '来源',
+  lblOriginal: '原文',
+  lblPlain: '白话',
+  lblPrinciple: '拆字原理',
+  lblNature: '断语性质',
+  lblScene: '应用场景',
+  noDecomp: '此字暂无拆分收录。',
+  noStrokes: '此字暂无笔画收录。',
+  noDict: '此字暂无收录。',
+  noRelated: '',
+  unknownPart: '部件未收录',
+  classicalNote: '',
+  moreChars: '等，共',
+  moreCharsUnit: '字',
+  'struct_⿰': '左右结构', 'struct_⿱': '上下结构', 'struct_⿲': '左中右结构', 'struct_⿳': '上中下结构',
+  'struct_⿴': '全包围结构', 'struct_⿵': '上三包围', 'struct_⿶': '下三包围', 'struct_⿷': '左三包围',
+  'struct_⿸': '左上包围', 'struct_⿹': '右上包围', 'struct_⿺': '左下包围', 'struct_⿻': '镶嵌结构',
+  nature_吉: '吉', nature_凶: '凶', nature_中: '中',
+  nature_字库直查: '字库直查', nature_六书测义: '六书测义',
+  faqTitle: '测字：免费占卜与使用常见问题',
+  faqQ1: '测字是什么？',
+  faqA1: '测字是中国传统术数之一：问事者随手写下一个字，占者拆开字形、看笔画与部件的增损离合，再对照古人留下的字例断语，推断所问之事的吉凶。写字时的心念与落笔，被认为与所问之事相应。',
+  faqQ2: '为什么一个字能断事？',
+  faqA2: '测字讲“字为心画”：一个字由哪些部件组成、笔画多寡、结构是左右还是上下，都被看作问事者当下处境的投射。例如“安”字上为宀、下为女，古人便取“宀下有女、安身”之象。本页先把字拆开给你看，再查古籍字例的原文断语。',
+  faqQ3: '测字和姓名学有什么区别？',
+  faqA3: '姓名学断的是名字本身——笔画数理与五格，对象固定，一生只用一个名字。测字断的是当下随手写的一个字，字随问事而变，同一件事今天写“安”、明天写“愁”，断语也随之不同；测字问的是眼前这一件事，不是命。',
+  faqQ4: '为什么有的字查不到断语？',
+  faqA4: '本页的断语来自《古今图书集成·拆字部汇考》与清代《测字秘牒》两部古籍整理出的字库，共约两千四百字。古人只给常问的字留了断语，生僻字或新造字没有收录；没有收录的字，本页会如实显示拆字与笔画，不编造断语。',
+  faqQ5: '测字免费吗？结果会保存吗？',
+  faqA5: '免费。拆字与查表都在本页完成，不收费，也不会保存你输入的字与问题。',
+  disclaimer: '测字属传统术数，仅供参考，不构成决策依据。',
+  dataNote: '拆字与查表在本页完成，字库文件按需加载；不保存你输入的字与问题。'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '測字 · 本地占卜',
+  navGroup: '占卜',
+  nav_1: '解夢', nav_2: '六爻占卜', nav_3: '梅花易數', navCezi: '測字', nav_4: '小六壬', nav_5: '塔羅牌',
+  nav_6: '雷諾曼', nav_7: '北歐盧恩符文', nav_8: '奇門遁甲', nav_9: '印度占星卜卦', nav_10: '西方卜卦占星',
+  nav_11: '大六壬', nav_12: '金口訣', nav_13: '太乙神數', nav_14: '占星骰子',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  langLabel: '語言',
+  eyebrow: '第一幕 · 寫下一個字',
+  slogan: '一字拆開，<br>吉凶自現。',
+  subtitle: '測字免費線上占卜',
+  labelChar: '所測之字',
+  phChar: '寫一個字，如：安',
+  labelQuestion: '所問之事（可選）',
+  phQuestion: '例如：這件事能不能成？',
+  btnSubmit: '測字',
+  btnLoading: '查字庫中…',
+  errNotSingle: '請輸入一個漢字。',
+  errLoad: '字庫載入失敗，請稍後重試。',
+  resultTitle: '拆字',
+  ai_interpret: 'AI 解讀',
+  asked: '所問',
+  lblStrokes: '筆畫',
+  strokesUnit: '畫',
+  lblDecomp: '拆字',
+  lblDict: '字例斷語',
+  lblRelated: '含此字的字',
+  lblSource: '來源',
+  lblOriginal: '原文',
+  lblPlain: '白話',
+  lblPrinciple: '拆字原理',
+  lblNature: '斷語性質',
+  lblScene: '應用場景',
+  noDecomp: '此字暫無拆分收錄。',
+  noStrokes: '此字暫無筆畫收錄。',
+  noDict: '此字暫無收錄。',
+  noRelated: '',
+  unknownPart: '部件未收錄',
+  classicalNote: '',
+  moreChars: '等，共',
+  moreCharsUnit: '字',
+  'struct_⿰': '左右結構', 'struct_⿱': '上下結構', 'struct_⿲': '左中右結構', 'struct_⿳': '上中下結構',
+  'struct_⿴': '全包圍結構', 'struct_⿵': '上三包圍', 'struct_⿶': '下三包圍', 'struct_⿷': '左三包圍',
+  'struct_⿸': '左上包圍', 'struct_⿹': '右上包圍', 'struct_⿺': '左下包圍', 'struct_⿻': '鑲嵌結構',
+  nature_吉: '吉', nature_凶: '凶', nature_中: '中',
+  nature_字库直查: '字庫直查', nature_六书测义: '六書測義',
+  faqTitle: '測字：免費占卜與使用常見問題',
+  faqQ1: '測字是什麼？',
+  faqA1: '測字是中國傳統術數之一：問事者隨手寫下一個字，占者拆開字形、看筆畫與部件的增損離合，再對照古人留下的字例斷語，推斷所問之事的吉凶。寫字時的心念與落筆，被認為與所問之事相應。',
+  faqQ2: '為什麼一個字能斷事？',
+  faqA2: '測字講「字為心畫」：一個字由哪些部件組成、筆畫多寡、結構是左右還是上下，都被看作問事者當下處境的投射。例如「安」字上為宀、下為女，古人便取「宀下有女、安身」之象。本頁先把字拆開給你看，再查古籍字例的原文斷語。',
+  faqQ3: '測字和姓名學有什麼區別？',
+  faqA3: '姓名學斷的是名字本身——筆畫數理與五格，對象固定，一生只用一個名字。測字斷的是當下隨手寫的一個字，字隨問事而變，同一件事今天寫「安」、明天寫「愁」，斷語也隨之不同；測字問的是眼前這一件事，不是命。',
+  faqQ4: '為什麼有的字查不到斷語？',
+  faqA4: '本頁的斷語來自《古今圖書集成·拆字部彙考》與清代《測字秘牒》兩部古籍整理出的字庫，共約兩千四百字。古人只給常問的字留了斷語，生僻字或新造字沒有收錄；沒有收錄的字，本頁會如實顯示拆字與筆畫，不編造斷語。',
+  faqQ5: '測字免費嗎？結果會保存嗎？',
+  faqA5: '免費。拆字與查表都在本頁完成，不收費，也不會保存你輸入的字與問題。',
+  disclaimer: '測字屬傳統術數，僅供參考，不構成決策依據。',
+  dataNote: '拆字與查表在本頁完成，字庫文件按需載入；不保存你輸入的字與問題。'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Character Divination · Local',
+  navGroup: 'Divination',
+  nav_1: 'Dream Interpretation', nav_2: 'Six Lines (Liu Yao)', nav_3: 'Meihua Yishu', navCezi: 'Character Divination', nav_4: 'Xiao Liuren', nav_5: 'Tarot',
+  nav_6: 'Lenormand', nav_7: 'Norse Runes', nav_8: 'Qimen Dunjia', nav_9: 'Vedic Astrology', nav_10: 'Western Horary Astrology',
+  nav_11: 'Da Liuren', nav_12: 'Jinkou Jue', nav_13: 'Taiyi Shenshu', nav_14: 'Astrology Dice',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  langLabel: 'Language',
+  eyebrow: 'Act I · Write One Character',
+  slogan: 'Split one character open,<br>and fortune shows itself.',
+  subtitle: 'Free online character divination',
+  labelChar: 'Your character',
+  phChar: 'Write one character, e.g. 安',
+  labelQuestion: 'Your question (optional)',
+  phQuestion: 'e.g. Will this work out?',
+  btnSubmit: 'Divine the character',
+  btnLoading: 'Loading the dictionary…',
+  errNotSingle: 'Please enter exactly one Chinese character.',
+  errLoad: 'Failed to load the dictionary. Please try again later.',
+  resultTitle: 'The Breakdown',
+  ai_interpret: 'AI Reading',
+  asked: 'Question',
+  lblStrokes: 'Strokes',
+  strokesUnit: ' strokes',
+  lblDecomp: 'Decomposition',
+  lblDict: 'Classical readings',
+  lblRelated: 'Characters containing this one',
+  lblSource: 'Source',
+  lblOriginal: 'Original text',
+  lblPlain: 'Plain-language reading',
+  lblPrinciple: 'Reading principle',
+  lblNature: 'Verdict type',
+  lblScene: 'Applies to',
+  noDecomp: 'No decomposition recorded for this character.',
+  noStrokes: 'No stroke count recorded for this character.',
+  noDict: 'No entry recorded for this character.',
+  noRelated: '',
+  unknownPart: 'component not recorded',
+  classicalNote: 'Classical text shown in Chinese.',
+  moreChars: 'and more —',
+  moreCharsUnit: ' in total',
+  'struct_⿰': 'Left–right structure', 'struct_⿱': 'Top–bottom structure', 'struct_⿲': 'Left–middle–right structure', 'struct_⿳': 'Top–middle–bottom structure',
+  'struct_⿴': 'Full enclosure', 'struct_⿵': 'Top enclosure', 'struct_⿶': 'Bottom enclosure', 'struct_⿷': 'Left enclosure',
+  'struct_⿸': 'Top-left enclosure', 'struct_⿹': 'Top-right enclosure', 'struct_⿺': 'Bottom-left enclosure', 'struct_⿻': 'Interlocking structure',
+  nature_吉: 'Favorable', nature_凶: 'Unfavorable', nature_中: 'Neutral',
+  nature_字库直查: 'Dictionary entry', nature_六书测义: 'Six-scripts reading',
+  faqTitle: 'Character Divination: Free Readings & FAQ',
+  faqQ1: 'What is character divination (cezi)?',
+  faqA1: 'Cezi is a traditional Chinese divination art: the querent writes down a single character by hand, and the diviner splits its shape apart — looking at its components, stroke count, and how parts are added, removed, or rearranged — then matches it against readings left by earlier masters to judge the fortune of the matter asked about. The thought in mind as the character is written is held to correspond to the matter itself.',
+  faqQ2: 'Why can one character tell fortunes?',
+  faqA2: 'Cezi holds that “a character is the mind drawn”: which components a character is made of, how many strokes it has, and whether its structure is left–right or top–bottom are all read as a projection of the querent’s present situation. For example, 安 is 宀 over 女, and the old masters read in it the image of “a woman under a roof — a place to rest.” This page first shows you the character split open, then looks up the classical readings.',
+  faqQ3: 'How is cezi different from name analysis?',
+  faqA3: 'Name analysis judges the name itself — its stroke numerology and five-grid pattern. The object is fixed: one name for a lifetime. Cezi judges a single character written by hand in the moment; the character changes with the question — write 安 today and 愁 tomorrow, and the reading changes too. Cezi asks about the one matter at hand, not about a destiny.',
+  faqQ4: 'Why do some characters have no reading?',
+  faqA4: 'The readings on this page come from a dictionary compiled from two classical sources — the Cezi section of the Gujin Tushu Jicheng and the Qing-dynasty Cezi Midie — covering about 2,400 characters. The old masters only left readings for characters people commonly asked about; rare or newly coined characters were never recorded. For those, this page shows the decomposition and stroke count as they are, and invents no reading.',
+  faqQ5: 'Is it free? Are my inputs saved?',
+  faqA5: 'Yes, free. The decomposition and lookup are done on this page, with no charge, and the character and question you enter are never saved.',
+  disclaimer: 'Character divination is a traditional divination art, for reference only; it is not a basis for decisions.',
+  dataNote: 'Decomposition and lookup are done on this page; dictionary files load on demand. Your character and question are never saved.'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '測字 · ローカル占い',
+  navGroup: '占い',
+  nav_1: '夢占い', nav_2: '六爻占い', nav_3: '梅花易数', navCezi: '測字', nav_4: '小六壬', nav_5: 'タロット',
+  nav_6: 'ルノルマン', nav_7: '北欧ルーン', nav_8: '奇門遁甲', nav_9: 'インド占星術', nav_10: '西洋ホラリー占星術',
+  nav_11: '大六壬', nav_12: '金口訣', nav_13: '太乙神数', nav_14: '占星ダイス',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  langLabel: '言語',
+  eyebrow: '第一幕 · 一字を書く',
+  slogan: '一字を拆けば、<br>吉凶自ずと現れる。',
+  subtitle: '測字 無料オンライン占い',
+  labelChar: '測る字',
+  phChar: '一字を書く、例：安',
+  labelQuestion: '質問（任意）',
+  phQuestion: '例：この件はうまくいく？',
+  btnSubmit: '測字する',
+  btnLoading: '字庫を読み込み中…',
+  errNotSingle: '漢字を一字だけ入力してください。',
+  errLoad: '字庫の読み込みに失敗しました。しばらくしてからもう一度お試しください。',
+  resultTitle: '拆字',
+  ai_interpret: 'AI 解釈',
+  asked: '質問',
+  lblStrokes: '画数',
+  strokesUnit: '画',
+  lblDecomp: '拆字',
+  lblDict: '字例の断語',
+  lblRelated: 'この字を含む字',
+  lblSource: '出典',
+  lblOriginal: '原文',
+  lblPlain: '白話訳',
+  lblPrinciple: '拆字の原理',
+  lblNature: '断語の性質',
+  lblScene: '適用場面',
+  noDecomp: 'この字の拆字は収録されていません。',
+  noStrokes: 'この字の画数は収録されていません。',
+  noDict: 'この字は収録されていません。',
+  noRelated: '',
+  unknownPart: '部件未収録',
+  classicalNote: '原文は中国語のまま表示しています。',
+  moreChars: 'ほか、計',
+  moreCharsUnit: '字',
+  'struct_⿰': '左右構造', 'struct_⿱': '上下構造', 'struct_⿲': '左中右構造', 'struct_⿳': '上中下構造',
+  'struct_⿴': '全包囲構造', 'struct_⿵': '上三包囲', 'struct_⿶': '下三包囲', 'struct_⿷': '左三包囲',
+  'struct_⿸': '左上包囲', 'struct_⿹': '右上包囲', 'struct_⿺': '左下包囲', 'struct_⿻': '嵌め込み構造',
+  nature_吉: '吉', nature_凶: '凶', nature_中: '中',
+  nature_字库直查: '字庫直查', nature_六书测义: '六書測義',
+  faqTitle: '測字：無料占いとよくある質問',
+  faqQ1: '測字とは？',
+  faqA1: '測字は中国の伝統占術の一つです。問う人が手で一字を書き、占者は字形を拆き、画数と部件の増減離合を見て、古人の残した字例の断語に照らして、問う事柄の吉凶を推し量ります。字を書くときの心念と筆致が、問う事柄に対応すると考えられています。',
+  faqQ2: 'なぜ一字で事が断じられるのですか？',
+  faqA2: '測字では「字は心の画」と言います。一字がどの部件から成るか、画数がいくつか、構造が左右か上下か——そのすべてが、問う人の今の境遇の投影と見なされます。例えば「安」は宀の下に女があり、古人はそこに「屋根の下に女あり、身を安んずる」という象を読みました。このページではまず字を拆いて見せ、次に古籍の字例の原文断語を引きます。',
+  faqQ3: '測字と姓名学の違いは？',
+  faqA3: '姓名学は名前そのものを断じます——画数の数理と五格で、対象は固定され、一生ひとつの名前です。測字はその場で手書きした一字を断じます。字は問う事柄とともに変わります。今日「安」と書き、明日「愁」と書けば、断語も変わります。測字が問うのは目の前の一件であり、命ではありません。',
+  faqQ4: 'なぜ断語がない字があるのですか？',
+  faqA4: 'このページの断語は、『古今図書集成・拆字部彙考』と清代『測字秘牒』の二つの古籍から整理された字庫によるもので、約二千四百字を収めています。古人が断語を残したのは、よく問われた字だけです。珍しい字や新しく作られた字は収録されていません。収録のない字については、拆字と画数をあるがままに表示し、断語をでっち上げることはしません。',
+  faqQ5: '測字は無料ですか？入力は保存されますか？',
+  faqA5: '無料です。拆字と照会はこのページで完結し、料金はかかりません。入力した字や質問が保存されることもありません。',
+  disclaimer: '測字は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  dataNote: '拆字と照会はこのページで完結し、字庫ファイルは必要時に読み込まれます。入力した字や質問は保存されません。'
+}
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function natureI18n(v) {
+  var k = 'nature_' + v;
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (k in d) return d[k];
+  return v;
+}
+function structI18n(op) {
+  var k = 'struct_' + op;
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (k in d) return d[k];
+  return '';
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('navCezi');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var err = document.getElementById('char-error'); if (err) err.textContent = '';
+  var btn = document.getElementById('submit-btn');
+  if (btn && !btn.disabled) btn.textContent = t('btnSubmit');
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// 字库按需懒加载：首次测字时才请求，不在页面启动时加载。
+// /data/cezi_dict.json   { source, meta, entries: [{编号, 条目字, 来源篇名, 原文, 白话翻译, 拆字原理·取象, 断语性质, 应用场景, 备注}, …] }
+// /data/decomp.json      { 字: IDS拆字串, … }，如 安 → "⿱宀女"；"？" 表示部件未收录
+// /data/hanzi_strokes.json { 字: 笔画数, … }，如 安 → 6
+// /data/rev_decomp.json  { 部件: [含该部件的字, …], … }，如 安 → [按, 晏, 案, …]
+var DATA = null;
+var DATA_PROMISE = null;
+
+function loadData() {
+  if (DATA_PROMISE) return DATA_PROMISE;
+  DATA_PROMISE = Promise.all([
+    fetch('/data/cezi_dict.json').then(function (r) { if (!r.ok) throw new Error('cezi_dict'); return r.json(); }),
+    fetch('/data/decomp.json').then(function (r) { if (!r.ok) throw new Error('decomp'); return r.json(); }),
+    fetch('/data/hanzi_strokes.json').then(function (r) { if (!r.ok) throw new Error('strokes'); return r.json(); }),
+    fetch('/data/rev_decomp.json').then(function (r) { if (!r.ok) throw new Error('rev'); return r.json(); }).catch(function () { return null; })
+  ]).then(function (parts) {
+    var dict = parts[0], decomp = parts[1], strokes = parts[2], rev = parts[3];
+    var byChar = {};
+    (dict.entries || []).forEach(function (e) {
+      var ch = e['条目字'];
+      if (!ch) return;
+      if (!byChar[ch]) byChar[ch] = [];
+      byChar[ch].push(e);
+    });
+    DATA = { byChar: byChar, decomp: decomp || {}, strokes: strokes || {}, rev: rev || {} };
+    return DATA;
+  });
+  return DATA_PROMISE;
+}
+
+// IDS（表意文字描述序列）解析：⿰/⿱ 取 2 元，⿲/⿳ 取 3 元，⿴–⿻ 取 2 元，其余为叶部件。
+var IDS_ARITY = { '⿰': 2, '⿱': 2, '⿲': 3, '⿳': 3, '⿴': 2, '⿵': 2, '⿶': 2, '⿷': 2, '⿸': 2, '⿹': 2, '⿺': 2, '⿻': 2 };
+function parseIDS(ids) {
+  var i = 0;
+  function rec() {
+    var ch = ids[i++];
+    if (ch === undefined) return null;
+    if (IDS_ARITY[ch]) {
+      var parts = [];
+      for (var k = 0; k < IDS_ARITY[ch]; k++) { var p = rec(); if (p) parts.push(p); }
+      return { op: ch, parts: parts };
+    }
+    return { leaf: ch };
+  }
+  return rec();
+}
+function idsLeaves(node, out) {
+  out = out || [];
+  if (!node) return out;
+  if (node.leaf !== undefined) { out.push(node.leaf); return out; }
+  for (var i = 0; i < node.parts.length; i++) idsLeaves(node.parts[i], out);
+  return out;
+}
+
+var HAN_RE = /^[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u{20000}-\u{2A6DF}]$/u;
+function isSingleHan(s) {
+  if (!s) return false;
+  var chars = Array.from(s.trim());
+  if (chars.length !== 1) return false;
+  try { return HAN_RE.test(chars[0]); } catch (e) { return false; }
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function doCezi() {
+  var err = document.getElementById('char-error');
+  var input = document.getElementById('char-input');
+  var btn = document.getElementById('submit-btn');
+  var raw = input.value.trim();
+  if (!isSingleHan(raw)) { err.textContent = t('errNotSingle'); return; }
+  err.textContent = '';
+  var ch = Array.from(raw)[0];
+  var question = document.getElementById('question').value.trim();
+  btn.disabled = true;
+  btn.textContent = t('btnLoading');
+  loadData().then(function () {
+    btn.disabled = false;
+    btn.textContent = t('btnSubmit');
+    var decompRaw = DATA.decomp[ch];
+    var tree = (decompRaw && decompRaw !== '？') ? parseIDS(decompRaw) : null;
+    var leaves = tree ? idsLeaves(tree) : [];
+    var strokes = DATA.strokes[ch];
+    LAST_RESULT = {
+      ch: ch,
+      question: question,
+      decompRaw: decompRaw || null,
+      structOp: tree ? tree.op : null,
+      leaves: leaves,
+      strokes: (typeof strokes === 'number') ? strokes : null,
+      entries: DATA.byChar[ch] || [],
+      related: DATA.rev[ch] || []
+    };
+    showResult(LAST_RESULT);
+    document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }).catch(function () {
+    btn.disabled = false;
+    btn.textContent = t('btnSubmit');
+    err.textContent = t('errLoad');
+  });
+}
+
+function queryChar(ch) {
+  document.getElementById('char-input').value = ch;
+  doCezi();
+}
+
+function showResult(r) {
+  document.getElementById('result-card').classList.remove('hidden');
+  document.getElementById('result-char').textContent = r.ch;
+  var meta = '';
+  if (r.question) meta += esc(t('asked')) + '：' + esc(r.question) + '<br>';
+  if (r.strokes !== null) {
+    meta += esc(t('lblStrokes')) + '：<b>' + r.strokes + esc(t('strokesUnit')) + '</b>';
+  } else {
+    meta += esc(t('noStrokes'));
+  }
+  document.getElementById('result-meta').innerHTML = meta;
+
+  // 拆字链：字 → 部件 + 部件 …
+  var dc = document.getElementById('result-decomp');
+  var dn = document.getElementById('result-decomp-note');
+  if (r.leaves.length > 0) {
+    var html = '<span class="part src">' + esc(r.ch) + '</span><span class="op">→</span>';
+    r.leaves.forEach(function (leaf, idx) {
+      if (idx > 0) html += '<span class="op">+</span>';
+      if (leaf === '？') {
+        html += '<span class="part unknown" title="' + esc(t('unknownPart')) + '">？</span>';
+      } else {
+        html += '<span class="part">' + esc(leaf) + '</span>';
+      }
+    });
+    dc.innerHTML = html;
+    var note = '';
+    if (r.structOp) note += esc(structI18n(r.structOp));
+    if (r.decompRaw) note += (note ? ' · ' : '') + '<span class="ids">' + esc(r.decompRaw) + '</span>';
+    if (r.leaves.indexOf('？') !== -1) note += (note ? '<br>' : '') + esc(t('unknownPart'));
+    dn.innerHTML = note;
+  } else {
+    dc.innerHTML = '';
+    dn.innerHTML = '<span class="missing">' + esc(t('noDecomp')) + '</span>';
+  }
+
+  // 字例断语：逐条展示字典实际字段，缺失不编造
+  var ec = document.getElementById('result-entries');
+  var classicalNote = t('classicalNote');
+  if (r.entries.length > 0) {
+    var eh = '<div class="section-title" style="margin-top:1.6rem">' + esc(t('lblDict')) + '</div>';
+    r.entries.forEach(function (e) {
+      eh += '<div class="entry-card"><h3><span class="entry-id">' + esc(e['编号'] || '') + '</span>' +
+        '<span class="entry-source">' + esc(e['来源篇名'] || '') + '</span></h3>';
+      if (e['原文']) {
+        eh += '<div class="entry-text">' + esc(e['原文']) + '</div>';
+        if (classicalNote) eh += '<div class="classical-note">' + esc(classicalNote) + '</div>';
+      }
+      if (e['白话翻译']) {
+        eh += '<div class="entry-plain">' + esc(t('lblPlain')) + '：' + esc(e['白话翻译']) + '</div>';
+        if (classicalNote) eh += '<div class="classical-note">' + esc(classicalNote) + '</div>';
+      }
+      if (e['拆字原理·取象']) {
+        eh += '<div class="entry-principle"><b>' + esc(t('lblPrinciple')) + '</b>：' + esc(e['拆字原理·取象']) + '</div>';
+      }
+      var meta2 = [];
+      if (e['断语性质']) meta2.push('<b>' + esc(t('lblNature')) + '</b>：<span class="nature">' + esc(natureI18n(e['断语性质'])) + '</span>');
+      if (e['应用场景']) meta2.push('<b>' + esc(t('lblScene')) + '</b>：' + esc(e['应用场景']));
+      if (meta2.length) eh += '<div class="entry-meta">' + meta2.join('　') + '</div>';
+      eh += '</div>';
+    });
+    ec.innerHTML = eh;
+  } else {
+    ec.innerHTML = '<div class="section-title" style="margin-top:1.6rem">' + esc(t('lblDict')) + '</div>' +
+      '<p class="missing">' + esc(t('noDict')) + '</p>';
+  }
+
+  // 含此字的字（rev_decomp）：点按可直接测该字
+  var rc = document.getElementById('result-related');
+  if (r.related.length > 0) {
+    var shown = r.related.slice(0, 12);
+    var rh = '<div class="section-title" style="margin-top:1.6rem">' + esc(t('lblRelated')) + '</div><div class="chip-row">';
+    shown.forEach(function (c) {
+      rh += '<button type="button" class="chip" onclick="queryChar(' + JSON.stringify(c) + ')">' + esc(c) + '</button>';
+    });
+    if (r.related.length > 12) {
+      rh += '<span class="chip-more">' + esc(t('moreChars')) + ' ' + r.related.length + esc(t('moreCharsUnit')) + '</span>';
+    }
+    rc.innerHTML = rh + '</div>';
+  } else {
+    rc.innerHTML = '';
+  }
+}
+
+document.getElementById('char-input').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') doCezi();
+});
+document.getElementById('question').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') doCezi();
+});
+
+applyI18n();
+// ==LOGIC-END==
+
+// ==AI-INTERPRET==
+// Shared AI 解读 button (/js/ai-jiegua.js). Summary comes from this page's
+// own result state; null/'' means "no result yet" and the button only shows
+// a hint instead of calling the backend.
+function aiTrunc(s, n) { s = String(s == null ? '' : s); return s.length > n ? s.slice(0, n) + '…' : s; }
+window.getJieguaSummary = function() {
+if (!LAST_RESULT) return null;
+var r = LAST_RESULT;
+var parts = [];
+parts.push('测字：' + r.ch);
+if (r.strokes!== null && r.strokes!== undefined) parts.push('笔画：' + r.strokes + '画');
+if (r.leaves && r.leaves.length) parts.push('拆字：' + r.ch + ' → ' + r.leaves.join(' + ') + (r.structOp? '（' + structI18n(r.structOp) + '）': ''));
+if (r.decompRaw) parts.push('拆字式：' + r.decompRaw);
+(r.entries || []).slice(0, 2).forEach(function (e) {
+var bits = [];
+if (e['来源篇名']) bits.push('来源：' + e['来源篇名']);
+if (e['原文']) bits.push('原文：' + aiTrunc(e['原文'], 200));
+if (e['白话翻译']) bits.push('白话：' + aiTrunc(e['白话翻译'], 200));
+if (e['拆字原理·取象']) bits.push('取象：' + aiTrunc(e['拆字原理·取象'], 150));
+if (e['断语性质']) bits.push('断语性质：' + natureI18n(e['断语性质']));
+if (e['应用场景']) bits.push('应用场景：' + e['应用场景']);
+if (bits.length) parts.push('【字例】' + bits.join('；'));
+});
+if (r.related && r.related.length) parts.push('含此字的字：' + r.related.slice(0, 12).join('、'));
+return parts.join('\n');
+};
+window.getJieguaQuestion = function() { var el = document.getElementById('question'); return el ? el.value.trim() : ''; };
+if (window.AIInterpret) { window.AIInterpret.attach(); }
+else { document.addEventListener('DOMContentLoaded', function () { if (window.AIInterpret) window.AIInterpret.attach(); }); }
+</script>
+<script src="/js/ai-jiegua.js"></script>
+</body>
+</html>

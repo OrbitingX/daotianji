@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 解梦</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select {
+    width: auto; flex: 1; min-width: 0; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: .9rem; padding: .3rem .1rem; outline: none; border-radius: 0; font-family: inherit; cursor: pointer;
+  }
+  .lang-switch select:focus { border-bottom-color: #c9a962; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"] {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus { border-bottom-color: #c9a962; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+  .status-line { font-size: .8rem; color: #6f6f80; margin-top: 1.2rem; line-height: 1.9; text-align: center; }
+
+  /* ---- 分类 chips ---- */
+  .mode-toggle { display: flex; gap: 1.6rem; margin-bottom: 1rem; }
+  .mode-btn { background: none; border: none; border-bottom: 1px solid transparent; color: #9a9aab; font-size: .85rem; letter-spacing: .2em; cursor: pointer; font-family: inherit; padding: .3rem 0; }
+  .mode-btn.active { color: #c9a962; border-bottom-color: #c9a962; }
+  .chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .chip {
+    background: transparent; border: 1px solid rgba(201,169,98,.4); color: #9a9aab;
+    border-radius: 999px; padding: .35rem .95rem; font-size: .85rem; cursor: pointer;
+    font-family: inherit; letter-spacing: .05em;
+  }
+  .chip:hover { color: #c9a962; border-color: #c9a962; }
+  .chip.active { color: #c9a962; border-color: #c9a962; background: rgba(201,169,98,.08); }
+
+  /* ---- 结果 ---- */
+  .result-count { font-size: .85rem; color: #c9a962; letter-spacing: .15em; margin: 1.4rem 0 .2rem; }
+  .result-count:first-child { margin-top: 0; }
+  .dream-card { border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1.1rem 1.2rem; margin-top: 1rem; }
+  .dream-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: .8rem; }
+  .dream-card h3 { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.15rem; color: #f0ead8; font-weight: 400; line-height: 1.5; }
+  .src-tag { font-size: .68rem; color: #c9a962; border: 1px solid rgba(201,169,98,.6); border-radius: 999px; padding: .08rem .55rem; letter-spacing: .1em; white-space: nowrap; flex-shrink: 0; margin-top: .2rem; }
+  .dream-read { color: #c8c2ae; font-size: .95rem; line-height: 1.8; margin-top: .6rem; }
+  .dream-read b { color: #f0ead8; font-weight: 600; }
+  .dream-head { color: #c8c2ae; font-size: .92rem; line-height: 1.8; margin-top: .6rem; }
+  .dream-sec { font-size: .78rem; color: #6f6f80; margin-top: .6rem; letter-spacing: .08em; }
+  .dream-cn { font-size: .85rem; color: #9a9aab; margin-top: .5rem; line-height: 1.7; }
+  .classic-note { font-size: .75rem; color: #6f6f80; margin-top: .4rem; line-height: 1.6; }
+  .full-text { color: #c8c2ae; font-size: .92rem; line-height: 1.9; margin-top: .9rem; border-top: 1px dashed rgba(201,169,98,.35); padding-top: .9rem; white-space: pre-wrap; }
+  .mini-btn {
+    background: none; border: 1px solid rgba(201,169,98,.6); color: #c9a962; border-radius: 999px;
+    padding: .28rem .95rem; font-size: .8rem; cursor: pointer; font-family: inherit; margin-top: .9rem; letter-spacing: .1em;
+  }
+  .mini-btn:hover { background: rgba(201,169,98,.08); }
+  .mini-btn:disabled { opacity: .55; cursor: default; }
+  .no-result { color: #9a9aab; font-size: .95rem; line-height: 1.9; margin-top: 1rem; }
+  .cap-note { font-size: .8rem; color: #6f6f80; margin-top: 1rem; line-height: 1.8; }
+  .hint { color: #9a9aab; font-size: .95rem; line-height: 1.9; margin-top: .4rem; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">解梦 · 本地占卜</div>
+    </div>
+  </a>
+                <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></span>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">第一幕 · 说出你的梦</div>
+  <h1 class="slogan" data-i18n-html="slogan">梦里见过什么，<br>醒来就查什么。</h1>
+  <p class="subtitle" data-i18n="subtitle">解梦免费在线查询 · 古周公解梦 + 现代解梦辞典</p>
+
+  <section class="section">
+    <noscript><p class="error">本页需要启用 JavaScript 才能搜索解梦辞典。</p></noscript>
+    <div class="field">
+      <label for="dream-input" data-i18n="labelDream">梦见了什么</label>
+      <input type="text" id="dream-input" placeholder="例如：蛇、水、掉牙……" data-i18n-ph="phDream" autocomplete="off">
+    </div>
+    <button class="submit-btn" id="search-btn" onclick="doSearch()" data-i18n="btnSearch">解梦</button>
+    <div class="status-line" id="status-line"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-title" data-i18n="browseTitle">按分类浏览</div>
+    <div class="mode-toggle">
+      <button type="button" class="mode-btn active" id="mode-modern" onclick="switchMode('modern')" data-i18n="modeModern">现代分类</button>
+      <button type="button" class="mode-btn" id="mode-classic" onclick="switchMode('classic')" data-i18n="modeClassic">古周公 27 类</button>
+    </div>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">解梦结果</div>
+    <div id="result-body"></div>
+      <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="jiemeng" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+</section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">解梦：常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">解梦准吗？</summary>
+      <p data-i18n="faqA1">解梦不是预言，是把梦里的意象对照传统解梦书与现代心理学来解读，供反思参考，不是关于未来的判定。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">梦的解析从哪来？</summary>
+      <p data-i18n="faqA2">古周公版来自《周公解梦》（维基文库本，988 条），每条拆成梦象与断语；现代版来自现代解梦辞典（9,467 条），篇幅更长，结合心理学解读。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">为什么搜不到我的梦？</summary>
+      <p data-i18n="faqA3">试试只搜梦里最关键的一个意象——蛇、水、掉牙。梦境组合千变万化，辞典只收常见意象，先搜印象最深的那一个。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">现代版和古周公版有什么区别？</summary>
+      <p data-i18n="faqA4">古周公版一条一句话，重吉凶兆应；现代版篇幅更长，结合心理学，常附案例分析。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">梦见不好的梦怎么办？</summary>
+      <p data-i18n="faqA5">梦多半是日有所思、夜有所梦。吓人的梦通常是压力，不是预警。睡好一点，把解读当作提醒休息的参考就好。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">解梦属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="offlineNote">本页搜索在本地完成，不会保存你输入的梦境；现代辞典全文按需加载一次后缓存。</span>
+  </footer>
+</div>
+</main>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。古典中文原文一律保留中文，见 classicNote。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '解梦 · 本地占卜',
+  navGroup: '占卜',
+  nav_1: '解梦', nav_2: '六爻占卜', nav_3: '梅花易数', nav_4: '小六壬', nav_5: '塔罗牌',
+  nav_6: '雷诺曼', nav_7: '北欧卢恩符文', nav_8: '奇门遁甲', nav_9: '印度占星卜卦', nav_10: '西方卜卦占星',
+  nav_11: '大六壬', nav_12: '金口诀', nav_13: '太乙神数', nav_14: '占星骰子',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  langLabel: '语言',
+  eyebrow: '第一幕 · 说出你的梦',
+  slogan: '梦里见过什么，<br>醒来就查什么。',
+  subtitle: '解梦免费在线查询 · 古周公解梦 + 现代解梦辞典',
+  labelDream: '梦见了什么',
+  phDream: '例如：蛇、水、掉牙……',
+  btnSearch: '解梦',
+  browseTitle: '按分类浏览',
+  modeModern: '现代分类',
+  modeClassic: '古周公 27 类',
+  catAll: '全部',
+  cat_生活: '生活', cat_物品: '物品', cat_活动: '活动', cat_人物: '人物', cat_动物: '动物',
+  cat_自然: '自然', cat_植物: '植物', cat_其它: '其它', cat_建筑: '建筑', cat_鬼神: '鬼神',
+  statusClassicalReady: '古周公解梦 988 条已就绪',
+  statusModernLoading: '现代解梦辞典加载中……',
+  statusModernReady: '现代解梦辞典已就绪 · 9,467 条',
+  statusModernFail: '现代解梦辞典加载失败，仅显示古周公解梦',
+  resultTitle: '解梦结果',
+  ai_interpret: 'AI 解读',
+  foundClassic: '古周公 · 找到 {n} 条',
+  foundModern: '现代 · 找到 {n} 条',
+  srcClassic: '古周公',
+  srcModern: '现代',
+  viewFull: '查看全文',
+  hideFull: '收起全文',
+  loadingFull: '全文加载中……',
+  fullFail: '全文加载失败，请稍后再试。',
+  noResult: '没有找到相关梦境，试试换个关键词（如 蛇、水、掉牙）。',
+  noResultHint: '也可以试试这些热门梦境：',
+  emptyHint: '输入关键词，或点一个分类看看。',
+  showMore: '仅显示前 {n} 条，换个更具体的关键词可以缩小范围。',
+  classicNote: '',
+  modernNote: '',
+  dreamWord: '梦',
+  sectionLabel: '分类',
+  browseCount: '「{cat}」共 {n} 条',
+  modernLoadingShort: '现代辞典尚在加载中……',
+  faqTitle: '解梦：常见问题',
+  faqQ1: '解梦准吗？',
+  faqA1: '解梦不是预言，是把梦里的意象对照传统解梦书与现代心理学来解读，供反思参考，不是关于未来的判定。',
+  faqQ2: '梦的解析从哪来？',
+  faqA2: '古周公版来自《周公解梦》（维基文库本，988 条），每条拆成梦象与断语；现代版来自现代解梦辞典（9,467 条），篇幅更长，结合心理学解读。',
+  faqQ3: '为什么搜不到我的梦？',
+  faqA3: '试试只搜梦里最关键的一个意象——蛇、水、掉牙。梦境组合千变万化，辞典只收常见意象，先搜印象最深的那一个。',
+  faqQ4: '现代版和古周公版有什么区别？',
+  faqA4: '古周公版一条一句话，重吉凶兆应；现代版篇幅更长，结合心理学，常附案例分析。',
+  faqQ5: '梦见不好的梦怎么办？',
+  faqA5: '梦多半是日有所思、夜有所梦。吓人的梦通常是压力，不是预警。睡好一点，把解读当作提醒休息的参考就好。',
+  disclaimer: '解梦属传统术数，仅供参考，不构成决策依据。',
+  offlineNote: '本页搜索在本地完成，不会保存你输入的梦境；现代辞典全文按需加载一次后缓存。'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '解夢 · 本地占卜',
+  navGroup: '占卜',
+  nav_1: '解夢', nav_2: '六爻占卜', nav_3: '梅花易數', nav_4: '小六壬', nav_5: '塔羅牌',
+  nav_6: '雷諾曼', nav_7: '北歐盧恩符文', nav_8: '奇門遁甲', nav_9: '印度占星卜卦', nav_10: '西方卜卦占星',
+  nav_11: '大六壬', nav_12: '金口訣', nav_13: '太乙神數', nav_14: '占星骰子',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  langLabel: '語言',
+  eyebrow: '第一幕 · 說出你的夢',
+  slogan: '夢裡見過什麼，<br>醒來就查什麼。',
+  subtitle: '解夢免費線上查詢 · 古周公解夢 + 現代解夢辭典',
+  labelDream: '夢見了什麼',
+  phDream: '例如：蛇、水、掉牙……',
+  btnSearch: '解夢',
+  browseTitle: '按分類瀏覽',
+  modeModern: '現代分類',
+  modeClassic: '古周公 27 類',
+  catAll: '全部',
+  cat_生活: '生活', cat_物品: '物品', cat_活动: '活動', cat_人物: '人物', cat_动物: '動物',
+  cat_自然: '自然', cat_植物: '植物', cat_其它: '其它', cat_建筑: '建築', cat_鬼神: '鬼神',
+  statusClassicalReady: '古周公解夢 988 條已就緒',
+  statusModernLoading: '現代解夢辭典載入中……',
+  statusModernReady: '現代解夢辭典已就緒 · 9,467 條',
+  statusModernFail: '現代解夢辭典載入失敗，僅顯示古周公解夢',
+  resultTitle: '解夢結果',
+  ai_interpret: 'AI 解讀',
+  foundClassic: '古周公 · 找到 {n} 條',
+  foundModern: '現代 · 找到 {n} 條',
+  srcClassic: '古周公',
+  srcModern: '現代',
+  viewFull: '查看全文',
+  hideFull: '收起全文',
+  loadingFull: '全文載入中……',
+  fullFail: '全文載入失敗，請稍後再試。',
+  noResult: '沒有找到相關夢境，試試換個關鍵詞（如 蛇、水、掉牙）。',
+  noResultHint: '也可以試試這些熱門夢境：',
+  emptyHint: '輸入關鍵詞，或點一個分類看看。',
+  showMore: '僅顯示前 {n} 條，換個更具體的關鍵詞可以縮小範圍。',
+  classicNote: '',
+  modernNote: '',
+  dreamWord: '夢',
+  sectionLabel: '分類',
+  browseCount: '「{cat}」共 {n} 條',
+  modernLoadingShort: '現代辭典尚在載入中……',
+  faqTitle: '解夢：常見問題',
+  faqQ1: '解夢準嗎？',
+  faqA1: '解夢不是預言，是把夢裡的意象對照傳統解夢書與現代心理學來解讀，供反思參考，不是關於未來的判定。',
+  faqQ2: '夢的解析從哪來？',
+  faqA2: '古周公版來自《周公解夢》（維基文庫本，988 條），每條拆成夢象與斷語；現代版來自現代解夢辭典（9,467 條），篇幅較長，結合心理學解讀。',
+  faqQ3: '為什麼搜不到我的夢？',
+  faqA3: '試試只搜夢裡最關鍵的一個意象——蛇、水、掉牙。夢境組合千變萬化，辭典只收常見意象，先搜印象最深的那一個。',
+  faqQ4: '現代版和古周公版有什麼區別？',
+  faqA4: '古周公版一條一句話，重吉凶兆應；現代版篇幅更長，結合心理學，常附案例分析。',
+  faqQ5: '夢見不好的夢怎麼辦？',
+  faqA5: '夢多半是日有所思、夜有所夢。嚇人的夢通常是壓力，不是預警。睡好一點，把解讀當作提醒休息的參考就好。',
+  disclaimer: '解夢屬傳統術數，僅供參考，不構成決策依據。',
+  offlineNote: '本頁搜尋在本地完成，不會保存你輸入的夢境；現代辭典全文按需載入一次後快取。'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Dream Interpretation · Local Divination',
+  navGroup: 'Divination',
+  nav_1: 'Dream Interpretation', nav_2: 'Six Lines (Liu Yao)', nav_3: 'Meihua Yishu', nav_4: 'Xiao Liuren', nav_5: 'Tarot',
+  nav_6: 'Lenormand', nav_7: 'Norse Runes', nav_8: 'Qimen Dunjia', nav_9: 'Vedic Astrology', nav_10: 'Western Horary Astrology',
+  nav_11: 'Da Liuren', nav_12: 'Jinkou Jue', nav_13: 'Taiyi Shenshu', nav_14: 'Astrology Dice',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  langLabel: 'Language',
+  eyebrow: 'Act I · Tell Your Dream',
+  slogan: 'Whatever you saw in the dream,<br>look it up when you wake.',
+  subtitle: 'Free online dream interpretation · Classical Zhou Gong + modern dream dictionary',
+  labelDream: 'What did you dream about?',
+  phDream: 'e.g. snake, water, losing a tooth…',
+  btnSearch: 'Interpret the Dream',
+  browseTitle: 'Browse by Category',
+  modeModern: 'Modern Categories',
+  modeClassic: 'Classical · 27 Sections',
+  catAll: 'All',
+  cat_生活: 'Life', cat_物品: 'Objects', cat_活动: 'Activities', cat_人物: 'People', cat_动物: 'Animals',
+  cat_自然: 'Nature', cat_植物: 'Plants', cat_其它: 'Others', cat_建筑: 'Buildings', cat_鬼神: 'Ghosts & Deities',
+  statusClassicalReady: 'Classical Zhou Gong: 988 entries ready',
+  statusModernLoading: 'Loading the modern dream dictionary…',
+  statusModernReady: 'Modern dream dictionary ready · 9,467 entries',
+  statusModernFail: 'Modern dictionary failed to load — showing classical entries only',
+  resultTitle: 'Dream Meanings',
+  ai_interpret: 'AI Reading',
+  foundClassic: 'Classical · {n} found',
+  foundModern: 'Modern · {n} found',
+  srcClassic: 'Classical',
+  srcModern: 'Modern',
+  viewFull: 'Read full text',
+  hideFull: 'Hide full text',
+  loadingFull: 'Loading full text…',
+  fullFail: 'Failed to load the full text. Please try again later.',
+  noResult: 'No matching dream found. Try another keyword (e.g. snake, water, losing a tooth).',
+  noResultHint: 'Or try these popular dreams:',
+  emptyHint: 'Type a keyword, or pick a category to browse.',
+  showMore: 'Showing the first {n} results — try a more specific keyword to narrow it down.',
+  classicNote: 'Classical text shown in Chinese.',
+  modernNote: 'Shown in Chinese; the dictionary has no English text.',
+  dreamWord: 'Dream',
+  sectionLabel: 'Section',
+  browseCount: '{cat}: {n} entries',
+  modernLoadingShort: 'Modern dictionary still loading…',
+  faqTitle: 'Dream Interpretation: FAQ',
+  faqQ1: 'How accurate is dream interpretation?',
+  faqA1: 'Dream interpretation is not a prediction. It matches the images in your dream against traditional dream books and modern psychology — a reference for reflection, not a verdict on the future.',
+  faqQ2: 'Where do the interpretations come from?',
+  faqA2: 'The classical entries come from Zhou Gong Jie Meng (Wikisource edition, 988 entries), each split into the dream image and its reading. The modern entries come from a modern dream dictionary (9,467 entries) with longer, psychology-based readings.',
+  faqQ3: 'Why can\u2019t I find my dream?',
+  faqA3: 'Try searching only the single most important image in the dream — a snake, water, falling teeth. Dreams combine images endlessly, and no dictionary covers every combination; search the strongest image first.',
+  faqQ4: 'What is the difference between the modern and the classical Zhou Gong versions?',
+  faqA4: 'The classical version gives one short reading per image, focused on fortune and omens. The modern version is longer, draws on psychology, and often adds a case analysis.',
+  faqQ5: 'What should I do after a bad dream?',
+  faqA5: 'Most dreams are the day\u2019s thoughts continuing into the night. A frightening dream is usually stress, not a warning. Sleep well, and take the reading as a reminder to rest — not as a sign of what is coming.',
+  disclaimer: 'Dream interpretation is a traditional divination art, for reference only; it is not a basis for decisions.',
+  offlineNote: 'Search runs locally in your browser and your dream is never saved. The modern dictionary\u2019s full texts load on demand, once, and are then cached.'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '夢占い · ローカル占い',
+  navGroup: '占い',
+  nav_1: '夢占い', nav_2: '六爻占い', nav_3: '梅花易数', nav_4: '小六壬', nav_5: 'タロット',
+  nav_6: 'ルノルマン', nav_7: '北欧ルーン', nav_8: '奇門遁甲', nav_9: 'インド占星術', nav_10: '西洋ホラリー占星術',
+  nav_11: '大六壬', nav_12: '金口訣', nav_13: '太乙神数', nav_14: '占星ダイス',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  langLabel: '言語',
+  eyebrow: '第一幕 · 夢を語る',
+  slogan: '夢で見たものは、<br>目覚めたら調べる。',
+  subtitle: '夢占い無料オンライン検索 · 古周公解夢 + 現代夢辞典',
+  labelDream: '何を夢見ましたか',
+  phDream: '例：蛇、水、歯が抜ける……',
+  btnSearch: '夢占い',
+  browseTitle: 'カテゴリから探す',
+  modeModern: '現代分類',
+  modeClassic: '古周公 27類',
+  catAll: 'すべて',
+  cat_生活: '生活', cat_物品: '物品', cat_活动: '活動', cat_人物: '人物', cat_动物: '動物',
+  cat_自然: '自然', cat_植物: '植物', cat_其它: 'その他', cat_建筑: '建物', cat_鬼神: '鬼神',
+  statusClassicalReady: '古周公解夢 988件 準備完了',
+  statusModernLoading: '現代夢辞典を読み込み中……',
+  statusModernReady: '現代夢辞典 準備完了 · 9,467件',
+  statusModernFail: '現代夢辞典の読み込みに失敗しました。古周公解夢のみ表示します',
+  resultTitle: '夢の意味',
+  ai_interpret: 'AI 解釈',
+  foundClassic: '古典 · {n}件',
+  foundModern: '現代 · {n}件',
+  srcClassic: '古典',
+  srcModern: '現代',
+  viewFull: '全文を読む',
+  hideFull: '全文を閉じる',
+  loadingFull: '全文を読み込み中……',
+  fullFail: '全文の読み込みに失敗しました。後でもう一度お試しください。',
+  noResult: '関連する夢が見つかりませんでした。別のキーワードで試してください（例：蛇、水、歯が抜ける）。',
+  noResultHint: '人気の夢から試すこともできます：',
+  emptyHint: 'キーワードを入力するか、カテゴリを選んでください。',
+  showMore: '最初の{n}件のみ表示しています。より具体的なキーワードで絞り込めます。',
+  classicNote: '原文は中国語のまま表示しています。',
+  modernNote: '中国語のまま表示しています。',
+  dreamWord: '夢',
+  sectionLabel: '分類',
+  browseCount: '「{cat}」{n}件',
+  modernLoadingShort: '現代辞典はまだ読み込み中です……',
+  faqTitle: '夢占い：よくある質問',
+  faqQ1: '夢占いは当たりますか？',
+  faqA1: '夢占いは予言ではありません。夢の中のイメージを伝統的な夢占いの書や現代心理学に照らし合わせるもので、振り返りの参考であり、未来の判定ではありません。',
+  faqQ2: '解釈はどこから来たものですか？',
+  faqA2: '古典版は『周公解夢』（ウィキソース版、988件）から、夢のイメージとその読みに分けたものです。現代版は現代夢辞典（9,467件）で、より長く心理学に基づいた解釈です。',
+  faqQ3: '自分の夢が見つからないのはなぜですか？',
+  faqA3: '夢の中で最も印象的なイメージひとつだけで検索してみてください。蛇、水、歯が抜ける、などです。夢はイメージの組み合わせが無限にあるため、辞典にない組み合わせもあります。最も強いイメージから探してください。',
+  faqQ4: '現代版と古周公版の違いは何ですか？',
+  faqA4: '古典版はイメージごとに短い読みをひとつ付け、吉凶や前兆を中心とします。現代版はより長く、心理学を取り入れ、事例分析が付くこともあります。',
+  faqQ5: '悪い夢を見たらどうすればいいですか？',
+  faqA5: '夢の多くは昼の思いが夜に続いたものです。怖い夢はたいていストレスによるもので、警告ではありません。よく眠り、解釈は休息のきっかけとして受け取ってください。',
+  disclaimer: '夢占いは伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  offlineNote: '検索はブラウザ内でローカルに行われ、夢の内容は保存されません。現代辞典の全文は必要時に一度だけ読み込み、キャッシュします。'
+}
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function fmt(key, n) { return t(key).replace('{n}', String(n)); }
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('nav_1');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  updateStatus();
+  renderChips();
+  if (LAST_VIEW) renderView(LAST_VIEW, true);
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// 数据约定（/data/，站根相对路径）：
+// - dream_988.json：{sections:[{t,s,en}×27], entries:[{id,sec,t,s,k,en:{k,i}}×988]}
+// 每条 s/t 为“梦象+断语”连写，k 为梦象字数：梦象 = s.slice(0,k)，断语 = s.slice(k)。
+// - dream_modern_idx.json：[{id,title,big,small,zm,head}×9467]，后台懒加载。
+// - dream_modern_msg.json：{id: 全文}，仅在点“查看全文”时加载一次并缓存。
+// - dream_guji.json：13 章古籍长文（古今图书集成·梦部），非按条检索结构，本页未用。
+var DREAM988 = null; // {sections, entries}
+var MODERN = null; // [{id,title,big,small,zm,head}]
+var MODERN_MSG = null; // {id: text}
+var MODERN_MSG_PROMISE = null;
+var MODERN_STATE = 'idle'; // idle | loading | ready | fail
+var CLASSIC_STATE = 'loading';
+var BROWSE_MODE = 'modern';
+var ACTIVE_CHIP = null; // {mode:'modern'|'classic', key}
+var LAST_VIEW = null;
+var CLASSIC_LIMIT = 20;
+var MODERN_LIMIT = 30;
+var BROWSE_LIMIT = 50;
+var MODERN_CATS = ['生活', '物品', '活动', '人物', '动物', '自然', '植物', '其它', '建筑', '鬼神'];
+var POPULAR = ['蛇', '水', '火', '掉牙', '飞', '追赶', '考试', '钱'];
+
+function esc(s) {
+return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function $(id) { return document.getElementById(id);}
+
+function catName(cat) { return t('cat_' + cat) || cat;}
+function sectionName(idx) {
+if (!DREAM988 ||!DREAM988.sections[idx]) return '';
+var s = DREAM988.sections[idx];
+if (LANG === 'en') return s.en || s.s;
+if (LANG === 'zh-TW') return s.t || s.s;
+return s.s;
+}
+function splitClassic(e) {
+var txt = (LANG === 'zh-TW')? (e.t || e.s): e.s;
+var k = (typeof e.k === 'number' && e.k > 0 && e.k < txt.length)? e.k: Math.ceil(txt.length / 2);
+return { dream: txt.slice(0, k), read: txt.slice(k)};
+}
+function searchClassic(q) {
+if (!DREAM988) return [];
+var ql = q.toLowerCase();
+return DREAM988.entries.filter(function (e) {
+if (e.s.indexOf(q)!== -1 || (e.t && e.t.indexOf(q)!== -1)) return true;
+if (e.en && ((e.en.k && e.en.k.toLowerCase().indexOf(ql)!== -1) ||
+(e.en.i && e.en.i.toLowerCase().indexOf(ql)!== -1))) return true;
+return false;
+});
+}
+function searchModern(q) {
+if (!MODERN) return [];
+return MODERN.filter(function (e) {
+return e.title.indexOf(q)!== -1 || (e.head && e.head.indexOf(q)!== -1);
+});
+}
+
+function updateStatus() {
+var el = $('status-line');
+if (!el) return;
+var parts = [];
+if (CLASSIC_STATE === 'ready') parts.push(t('statusClassicalReady'));
+if (MODERN_STATE === 'loading') parts.push(t('statusModernLoading'));
+else if (MODERN_STATE === 'ready') parts.push(t('statusModernReady'));
+else if (MODERN_STATE === 'fail') parts.push(t('statusModernFail'));
+el.textContent = parts.join('　·　');
+}
+
+function renderChips() {
+var box = $('chips');
+if (!box) return;
+var html = '';
+if (BROWSE_MODE === 'modern') {
+html += chipHtml('modern', null, t('catAll'));
+for (var i = 0; i < MODERN_CATS.length; i++) {
+html += chipHtml('modern', MODERN_CATS[i], catName(MODERN_CATS[i]));
+}
+} else {
+if (DREAM988) {
+for (var j = 0; j < DREAM988.sections.length; j++) {
+html += chipHtml('classic', j, sectionName(j));
+}
+}
+}
+box.innerHTML = html;
+markActiveChip();
+}
+function chipHtml(mode, key, label) {
+var fn = (mode === 'modern')
+? 'browseModern(' + (key === null? 'null': "'" + key + "'") + ')'
+: 'browseClassic(' + key + ')';
+var active = (ACTIVE_CHIP && ACTIVE_CHIP.mode === mode && ACTIVE_CHIP.key === key)? ' active': '';
+return '<button type="button" class="chip' + active + '" data-mode="' + mode + '" data-key="' + esc(key === null? '': String(key)) + '" onclick="' + fn + '">' + esc(label) + '</button>';
+}
+function markActiveChip() {
+var chips = document.querySelectorAll('#chips.chip');
+for (var i = 0; i < chips.length; i++) {
+var c = chips[i];
+var on = ACTIVE_CHIP && c.getAttribute('data-mode') === ACTIVE_CHIP.mode &&
+c.getAttribute('data-key') === (ACTIVE_CHIP.key === null? '': String(ACTIVE_CHIP.key));
+if (on) c.classList.add('active'); else c.classList.remove('active');
+}
+}
+function switchMode(mode) {
+BROWSE_MODE = mode;
+ACTIVE_CHIP = null;
+var m = $('mode-modern'), c = $('mode-classic');
+if (m) m.classList.toggle('active', mode === 'modern');
+if (c) c.classList.toggle('active', mode === 'classic');
+renderChips();
+}
+
+function classicCard(e) {
+var parts = splitClassic(e);
+var title, read, cnLine = '', note = t('classicNote');
+if (LANG === 'en' && e.en && e.en.k) {
+title = e.en.k;
+read = e.en.i || '';
+cnLine = '<div class="dream-cn">' + esc('Dream: ' + parts.dream + ' — ' + parts.read) + '</div>';
+} else {
+title = parts.dream;
+read = parts.read;
+}
+var sec = sectionName(e.sec);
+var secSep = (LANG === 'en'? ': ': '：');
+var html = '<div class="dream-card"><div class="dream-card-head"><h3>' + esc(title) + '</h3>' +
+'<span class="src-tag">' + esc(t('srcClassic')) + '</span></div>' +
+(read? '<div class="dream-read">' + esc(read) + '</div>': '') + cnLine +
+(note? '<div class="classic-note">' + esc(note) + '</div>': '') +
+(sec? '<div class="dream-sec">' + esc(t('sectionLabel') + secSep + sec) + '</div>': '') + '</div>';
+return html;
+}
+function modernCard(e) {
+var note = t('modernNote');
+var html = '<div class="dream-card"><div class="dream-card-head"><h3>' + esc(e.title) + '</h3>' +
+'<span class="src-tag">' + esc(t('srcModern')) + '</span></div>' +
+'<div class="dream-head">' + esc(e.head || '') + '</div>' +
+(note? '<div class="classic-note">' + esc(note) + '</div>': '') +
+'<button type="button" class="mini-btn" onclick="showFull(' + e.id + ', this)">' + esc(t('viewFull')) + '</button>' +
+'<div class="full-text hidden" id="full-' + e.id + '"></div></div>';
+return html;
+}
+function popularChipsHtml() {
+var html = '';
+for (var i = 0; i < POPULAR.length; i++) {
+html += '<button type="button" class="chip" onclick="searchKeyword(' + "'" + POPULAR[i] + "'" + ')">' + esc(POPULAR[i]) + '</button>';
+}
+return '<div class="chips" style="margin-top:.8rem">' + html + '</div>';
+}
+function searchKeyword(q) {
+var input = $('dream-input');
+if (input) input.value = q;
+doSearch();
+}
+
+function renderView(view, noScroll) {
+LAST_VIEW = view;
+var body = $('result-body');
+var card = $('result-card');
+if (!body ||!card) return;
+var html = '';
+if (view.type === 'search') {
+var q = view.q;
+var classic = searchClassic(q);
+var modern = (MODERN_STATE === 'ready')? searchModern(q): [];
+if (classic.length === 0 && modern.length === 0 && MODERN_STATE!== 'loading') {
+html = '<p class="no-result">' + esc(t('noResult')) + '</p>' +
+'<p class="no-result" style="margin-top:.6rem">' + esc(t('noResultHint')) + '</p>' + popularChipsHtml();
+} else {
+if (classic.length > 0) {
+html += '<div class="result-count">' + esc(fmt('foundClassic', classic.length)) + '</div>';
+var cl = classic.slice(0, CLASSIC_LIMIT);
+for (var i = 0; i < cl.length; i++) html += classicCard(cl[i]);
+if (classic.length > CLASSIC_LIMIT) html += '<div class="cap-note">' + esc(fmt('showMore', CLASSIC_LIMIT)) + '</div>';
+}
+if (MODERN_STATE === 'ready' && modern.length > 0) {
+html += '<div class="result-count">' + esc(fmt('foundModern', modern.length)) + '</div>';
+var ml = modern.slice(0, MODERN_LIMIT);
+for (var j = 0; j < ml.length; j++) html += modernCard(ml[j]);
+if (modern.length > MODERN_LIMIT) html += '<div class="cap-note">' + esc(fmt('showMore', MODERN_LIMIT)) + '</div>';
+} else if (MODERN_STATE === 'loading') {
+html += '<div class="cap-note">' + esc(t('modernLoadingShort')) + '</div>';
+}
+if (classic.length === 0 && modern.length === 0 && MODERN_STATE === 'loading') {
+html = '<p class="no-result">' + esc(t('noResult')) + '</p>' +
+'<p class="no-result" style="margin-top:.6rem">' + esc(t('noResultHint')) + '</p>' + popularChipsHtml() +
+'<div class="cap-note">' + esc(t('modernLoadingShort')) + '</div>';
+}
+}
+} else if (view.type === 'browseModern') {
+if (MODERN_STATE!== 'ready') {
+html = '<p class="no-result">' + esc(t('modernLoadingShort')) + '</p>';
+} else {
+var list = (view.cat === null)? MODERN.slice(): MODERN.filter(function (e) { return e.big === view.cat;});
+var label = (view.cat === null)? t('catAll'): catName(view.cat);
+html += '<div class="result-count">' + esc(t('browseCount').replace('{cat}', label).replace('{n}', String(list.length))) + '</div>';
+var bl = list.slice(0, BROWSE_LIMIT);
+for (var k = 0; k < bl.length; k++) html += modernCard(bl[k]);
+if (list.length > BROWSE_LIMIT) html += '<div class="cap-note">' + esc(fmt('showMore', BROWSE_LIMIT)) + '</div>';
+}
+} else if (view.type === 'browseClassic') {
+var entries = DREAM988? DREAM988.entries.filter(function (e) { return e.sec === view.sec;}): [];
+var secName = sectionName(view.sec);
+html += '<div class="result-count">' + esc(t('browseCount').replace('{cat}', secName).replace('{n}', String(entries.length))) + '</div>';
+var sl = entries.slice(0, BROWSE_LIMIT);
+for (var m = 0; m < sl.length; m++) html += classicCard(sl[m]);
+if (entries.length > BROWSE_LIMIT) html += '<div class="cap-note">' + esc(fmt('showMore', BROWSE_LIMIT)) + '</div>';
+} else if (view.type === 'hint') {
+html = '<p class="hint">' + esc(t('emptyHint')) + '</p>' +
+'<p class="no-result" style="margin-top:.6rem">' + esc(t('noResultHint')) + '</p>' + popularChipsHtml();
+}
+body.innerHTML = html;
+card.classList.remove('hidden');
+if (!noScroll) card.scrollIntoView({ behavior: 'smooth', block: 'start'});
+}
+
+function doSearch() {
+var input = $('dream-input');
+var q = input? input.value.trim(): '';
+if (!q) { renderView({ type: 'hint'}); return;}
+renderView({ type: 'search', q: q});
+}
+function browseModern(cat) {
+ACTIVE_CHIP = { mode: 'modern', key: cat};
+markActiveChip();
+renderView({ type: 'browseModern', cat: cat});
+}
+function browseClassic(secIdx) {
+ACTIVE_CHIP = { mode: 'classic', key: secIdx};
+markActiveChip();
+renderView({ type: 'browseClassic', sec: secIdx});
+}
+
+// 全文：按需加载一次 dream_modern_msg.json（14.5MB），之后缓存；
+// 并去掉原文末尾的“大师特色梦境分析”引流段（本站无推广）。
+function cleanFullText(txt) {
+var marker = '大师特色梦境分析';
+var i = txt.indexOf(marker);
+if (i!== -1) txt = txt.slice(0, i);
+return txt.replace(/\s+$/, '');
+}
+function loadModernMsg() {
+if (MODERN_MSG) return Promise.resolve(MODERN_MSG);
+if (!MODERN_MSG_PROMISE) {
+MODERN_MSG_PROMISE = fetch('/data/dream_modern_msg.json').then(function (r) {
+if (!r.ok) throw new Error('HTTP ' + r.status);
+return r.json();
+}).then(function (data) {
+MODERN_MSG = data;
+return data;
+}).catch(function (err) {
+MODERN_MSG_PROMISE = null;
+throw err;
+});
+}
+return MODERN_MSG_PROMISE;
+}
+function showFull(id, btn) {
+var box = $('full-' + id);
+if (!box ||!btn) return;
+if (!box.classList.contains('hidden')) {
+box.classList.add('hidden');
+btn.textContent = t('viewFull');
+return;
+}
+if (box.getAttribute('data-loaded') === '1') {
+box.classList.remove('hidden');
+btn.textContent = t('hideFull');
+return;
+}
+btn.disabled = true;
+btn.textContent = t('loadingFull');
+loadModernMsg().then(function (data) {
+var txt = data[String(id)] || data[id] || '';
+box.textContent = txt? cleanFullText(txt): '';
+box.setAttribute('data-loaded', '1');
+box.classList.remove('hidden');
+btn.disabled = false;
+btn.textContent = t('hideFull');
+}).catch(function () {
+btn.disabled = false;
+btn.textContent = t('viewFull');
+box.textContent = t('fullFail');
+box.classList.remove('hidden');
+});
+}
+
+// ---- 数据加载：古周公 988 条随首屏加载；现代索引首屏后后台加载 ----
+function loadClassic() {
+return fetch('/data/dream_988.json').then(function (r) {
+if (!r.ok) throw new Error('HTTP ' + r.status);
+return r.json();
+}).then(function (data) {
+DREAM988 = data;
+CLASSIC_STATE = 'ready';
+updateStatus();
+renderChips();
+}).catch(function () {
+CLASSIC_STATE = 'fail';
+updateStatus();
+});
+}
+function loadModern() {
+if (MODERN_STATE === 'loading' || MODERN_STATE === 'ready') return;
+MODERN_STATE = 'loading';
+updateStatus();
+fetch('/data/dream_modern_idx.json').then(function (r) {
+if (!r.ok) throw new Error('HTTP ' + r.status);
+return r.json();
+}).then(function (data) {
+MODERN = data;
+MODERN_STATE = 'ready';
+updateStatus();
+if (LAST_VIEW && (LAST_VIEW.type === 'search' || LAST_VIEW.type === 'browseModern')) {
+renderView(LAST_VIEW, true);
+}
+}).catch(function () {
+MODERN_STATE = 'fail';
+updateStatus();
+});
+}
+function scheduleModernLoad() {
+if (typeof requestIdleCallback === 'function') {
+requestIdleCallback(function () { loadModern();}, { timeout: 2000});
+} else {
+setTimeout(loadModern, 400);
+}
+}
+
+(function init() {
+var input = $('dream-input');
+if (input) {
+input.addEventListener('keydown', function (ev) {
+if (ev.key === 'Enter') { ev.preventDefault(); doSearch();}
+});
+var timer = null;
+input.addEventListener('input', function () {
+if (timer) clearTimeout(timer);
+timer = setTimeout(doSearch, 250);
+});
+}
+applyI18n();
+loadClassic();
+scheduleModernLoad();
+})();
+// ==LOGIC-END==
+
+// ==AI-INTERPRET==
+// Shared AI 解读 button (/js/ai-jiegua.js). Summary comes from this page's
+// own result state; null/'' means "no result yet" and the button only shows
+// a hint instead of calling the backend.
+function aiTrunc(s, n) { s = String(s == null ? '' : s); return s.length > n ? s.slice(0, n) + '…' : s; }
+window.getJieguaSummary = function() {
+if (!LAST_VIEW || LAST_VIEW.type === 'hint') return null;
+var parts = [];
+if (LAST_VIEW.type === 'search') {
+var q = LAST_VIEW.q;
+var classic = searchClassic(q).slice(0, 5);
+var modern = (MODERN_STATE === 'ready')? searchModern(q).slice(0, 5): [];
+if (!classic.length &&!modern.length) return null;
+parts.push('梦境关键词：' + q);
+classic.forEach(function (e) { var p = splitClassic(e); parts.push('【古周公】' + p.dream + '：' + p.read);});
+modern.forEach(function (e) { parts.push('【现代】' + e.title + '：' + (e.head || ''));});
+} else if (LAST_VIEW.type === 'browseModern') {
+if (MODERN_STATE!== 'ready') return null;
+var list = (LAST_VIEW.cat === null)? MODERN.slice(): MODERN.filter(function (e) { return e.big === LAST_VIEW.cat;});
+parts.push('浏览分类：' + (LAST_VIEW.cat === null? '全部': LAST_VIEW.cat) + '（共' + list.length + '条）');
+list.slice(0, 5).forEach(function (e) { parts.push('【现代】' + e.title + '：' + (e.head || ''));});
+} else if (LAST_VIEW.type === 'browseClassic') {
+if (!DREAM988) return null;
+var entries = DREAM988.entries.filter(function (e) { return e.sec === LAST_VIEW.sec;});
+parts.push('浏览古周公分类：' + sectionName(LAST_VIEW.sec) + '（共' + entries.length + '条）');
+entries.slice(0, 5).forEach(function (e) { var p = splitClassic(e); parts.push('【古周公】' + p.dream + '：' + p.read);});
+} else { return null;}
+var s = parts.join('\n');
+return s.length > 1800? s.slice(0, 1800): s;
+};
+window.getJieguaQuestion = function() { var el = document.getElementById('dream-input'); return el ? el.value.trim() : ''; };
+if (window.AIInterpret) { window.AIInterpret.attach(); }
+else { document.addEventListener('DOMContentLoaded', function () { if (window.AIInterpret) window.AIInterpret.attach(); }); }
+</script>
+<script src="/js/ai-jiegua.js"></script>
+</body>
+</html>

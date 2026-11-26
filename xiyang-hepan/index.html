@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 西洋合盘</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  input[type="date"]::-webkit-calendar-picker-indicator, input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(.8) sepia(.4) saturate(3) hue-rotate(5deg); cursor: pointer; }
+  .num-row { display: flex; gap: 2rem; }
+  .num-row > .field { flex: 1; min-width: 0; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+  .person-block { border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1.3rem 1.3rem .2rem; margin-bottom: 1.5rem; }
+  .person-block h3 { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.1rem; font-weight: 400; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .verdict { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .level { color: #c9a962; font-weight: 700; }
+  .result-note { font-size: .85rem; color: #9a9aab; line-height: 1.8; margin-top: 1rem; }
+  .planet-table { width: 100%; border-collapse: collapse; margin-top: 1.2rem; font-size: .95rem; }
+  .planet-table th { text-align: left; font-size: .8rem; color: #b08d3e; letter-spacing: .2em; font-weight: 400; padding: .6rem .5rem; border-bottom: 1px solid rgba(201,169,98,.45); }
+  .planet-table td { padding: .6rem .5rem; border-bottom: 1px solid rgba(201,169,98,.12); color: #f0ead8; line-height: 1.6; }
+  .planet-table td .sub { color: #9a9aab; font-size: .85rem; }
+  .planet-table td.deg { color: #c9a962; white-space: nowrap; }
+  .sub-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin: 1.8rem 0 .4rem; }
+  .aspect-list { list-style: none; margin-top: .6rem; }
+  .aspect-list li { padding: .55rem .1rem; border-bottom: 1px solid rgba(201,169,98,.12); font-size: .95rem; color: #f0ead8; line-height: 1.7; }
+  .aspect-list li b { color: #c9a962; font-weight: 600; }
+  .aspect-list li .orb { color: #9a9aab; font-size: .85rem; }
+  .reading-list { list-style: none; margin-top: .6rem; }
+  .reading-list li { padding: .6rem .1rem; border-bottom: 1px solid rgba(201,169,98,.12); font-size: .95rem; color: #c8c2ae; line-height: 1.8; }
+  .reading-list li b { color: #f0ead8; font-weight: 600; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .num-row { flex-direction: column; gap: 0; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">西洋合盘 · 本地排盘</div>
+    </div>
+  </a>
+          <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></span>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">两人之间 · 双人星盘</div>
+  <h1 class="slogan" data-i18n-html="slogan">两星相照，<br>方见彼此。</h1>
+  <p class="subtitle" data-i18n="subtitle">西洋合盘免费在线：比较两张出生星盘</p>
+
+  <section class="section">
+    <div class="person-block">
+      <h3 data-i18n="personA">本人</h3>
+      <div class="num-row">
+        <div class="field">
+          <label for="a-date" data-i18n="labelDate">出生日期</label>
+          <input type="date" id="a-date" value="1990-01-01">
+        </div>
+        <div class="field">
+          <label for="a-time" data-i18n="labelTime">出生时间</label>
+          <input type="time" id="a-time" value="12:00">
+        </div>
+        <div class="field">
+          <label for="a-offset" data-i18n="labelOffset">时区（UTC 偏移）</label>
+          <input type="number" id="a-offset" value="8" step="0.5" min="-12" max="14">
+        </div>
+      </div>
+      <div class="num-row">
+        <div class="field">
+          <label for="a-lat" data-i18n="labelLat">纬度（可选，用于上升与宫位）</label>
+          <input type="number" id="a-lat" step="0.01" min="-90" max="90" placeholder="例如 39.9（北纬为正）" data-i18n-ph="phLat">
+        </div>
+        <div class="field">
+          <label for="a-lon" data-i18n="labelLon">经度（可选，用于上升与宫位）</label>
+          <input type="number" id="a-lon" step="0.01" min="-180" max="180" placeholder="例如 116.4（东经为正）" data-i18n-ph="phLon">
+        </div>
+      </div>
+    </div>
+    <div class="person-block">
+      <h3 data-i18n="personB">对方</h3>
+      <div class="num-row">
+        <div class="field">
+          <label for="b-date" data-i18n="labelDate">出生日期</label>
+          <input type="date" id="b-date" value="1990-07-01">
+        </div>
+        <div class="field">
+          <label for="b-time" data-i18n="labelTime">出生时间</label>
+          <input type="time" id="b-time" value="12:00">
+        </div>
+        <div class="field">
+          <label for="b-offset" data-i18n="labelOffset">时区（UTC 偏移）</label>
+          <input type="number" id="b-offset" value="8" step="0.5" min="-12" max="14">
+        </div>
+      </div>
+      <div class="num-row">
+        <div class="field">
+          <label for="b-lat" data-i18n="labelLat">纬度（可选，用于上升与宫位）</label>
+          <input type="number" id="b-lat" step="0.01" min="-90" max="90" placeholder="例如 39.9（北纬为正）" data-i18n-ph="phLat">
+        </div>
+        <div class="field">
+          <label for="b-lon" data-i18n="labelLon">经度（可选，用于上升与宫位）</label>
+          <input type="number" id="b-lon" step="0.01" min="-180" max="180" placeholder="例如 116.4（东经为正）" data-i18n-ph="phLon">
+        </div>
+      </div>
+    </div>
+    <div class="error" id="form-error"></div>
+    <button class="submit-btn" onclick="doSynastry()" data-i18n="btnSubmit">排合盘</button>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">合盘</div>
+    <div class="result-head" id="result-head"></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="sub-title" data-i18n="bigThreeTitle">日月升 · 两人对照</div>
+    <table class="planet-table" id="bigthree-table"></table>
+    <div class="sub-title" data-i18n="crossTitleA">本人的行星落在对方的星座与宫位</div>
+    <table class="planet-table" id="cross-a-table"></table>
+    <div class="sub-title" data-i18n="crossTitleB">对方的行星落在本人方的星座与宫位</div>
+    <table class="planet-table" id="cross-b-table"></table>
+    <div class="sub-title" data-i18n="interTitle">两人之间的相位</div>
+    <ul class="aspect-list" id="aspect-list"></ul>
+    <div class="result-note" id="aspects-note"></div>
+    <div class="sub-title" data-i18n="readingsTitle">合盘解读</div>
+    <ul class="reading-list" id="reading-list"></ul>
+    <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="xiyang-hepan" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+  </section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">西洋合盘：免费排盘与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">合盘的相位容许度是多少？</summary>
+      <p data-i18n="faqA1">合相、冲相、三分相、四分相四种。太阳或月亮参与时容许度 8°，其余行星之间容许度 6°，与本站西洋占星单盘相同。六分相不在合盘相位之列——合盘只看最能决定关系走向的四种主相位。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">宫位为什么用整宫制？</summary>
+      <p data-i18n="faqA2">整宫制以整个星座为一宫，上升星座即第一宫，简单且历史悠久。本页不用 Placidus 等不等宫制；不同分宫制下同一行星可能落入不同宫位，解读时请注意。若只填了一方的出生地，则只有该方的宫位可以确定。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">契合度分数是怎么算出来的？</summary>
+      <p data-i18n="faqA3">模板计分，仅供参考：三分相 +2 分，合相 +2 分（日月金星参与）或 +1 分，四分相 −2 分，冲相 −1 分；太阳同元素 +1 分，月亮同元素 +1 分。总分 8 分及以上为契合度高，3 至 7 分为中等，2 分及以下为需磨合。这不是科学测量，只是把相位清单折成一个便于比较的数字。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">出生时间记不准，合盘还准吗？</summary>
+      <p data-i18n="faqA4">太阳、水星、金星等移动较慢，几小时误差影响很小；月亮每天移动约 13°，几小时误差可达数度；上升点每小时移动约 15°，对时间最敏感。不知道准确时间时可填 12:00，但上升与宫位不可信，相位中涉及月亮与上升的部分也要打折扣。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">合盘免费吗？我的出生信息会被上传吗？</summary>
+      <p data-i18n="faqA5">免费。两张星盘都在浏览器本地计算，出生信息不会发送给任何服务器；只有点击「AI 解读」时，结果摘要才会被发给后端生成解读。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">西洋合盘属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="offlineNote">本页合盘在本地计算，不向任何服务器发送出生信息；点击「AI 解读」时才会把结果摘要发给后端。</span>
+  </footer>
+</div>
+</main>
+
+<script src="/js/astronomy.browser.js"></script>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。行星与星座名保留中文 + 英文，见 SIGNS / PLANETS。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问', 'navGroup2': '一生之图', 'navGroup3': '两人之间', 'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦', 'nav_liuyao': '六爻占卜', 'nav_meihua': '梅花易数', 'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌', 'nav_leinuoman': '雷诺曼', 'nav_lunen': '北欧卢恩符文', 'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬', 'nav_jinkoujue': '金口诀', 'nav_taiyi': '太乙神数', 'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数', 'nav_lingqi': '灵棋经', 'nav_cezi': '测字', 'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字', 'nav_ziwei': '紫微斗数', 'nav_tieban': '铁板神数', 'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易', 'nav_taixuan': '太玄经', 'nav_huangji': '皇极经世', 'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命', 'nav_xiyang': '西洋占星', 'nav_yindu': '印度占星', 'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘', 'nav_bazi-hepan': '八字合盘', 'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘', 'nav_liunian': '流年流月', 'nav_maya': '玛雅历法',
+  brandSub: '西洋合盘 · 本地排盘',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '两人之间 · 双人星盘',
+  slogan: '两星相照，<br>方见彼此。',
+  subtitle: '西洋合盘免费在线：比较两张出生星盘',
+  personA: '本人', personB: '对方',
+  labelDate: '出生日期', labelTime: '出生时间', labelOffset: '时区（UTC 偏移）',
+  labelLat: '纬度（可选，用于上升与宫位）', labelLon: '经度（可选，用于上升与宫位）',
+  phLat: '例如 39.9（北纬为正）', phLon: '例如 116.4（东经为正）',
+  btnSubmit: '排合盘',
+  errNoDate: '请先选择双方的出生日期。',
+  errBadOffset: '时区偏移须在 -12 到 +14 之间。',
+  errBadLat: '纬度须在 -90 到 90 之间。',
+  errBadLon: '经度须在 -180 到 180 之间。',
+  errNoLib: '星历库未加载，请刷新页面重试。',
+  resultTitle: '合盘',
+  bigThreeTitle: '日月升 · 两人对照',
+  colPoint: '要点', colPersonA: '本人', colPersonB: '对方',
+  crossTitleA: '本人的行星落在对方的星座与宫位',
+  crossTitleB: '对方的行星落在本人方的星座与宫位',
+  colPlanet: '行星', colSign: '星座', colDegree: '度数', colHouse: '宫位',
+  interTitle: '两人之间的相位',
+  noAspects: '在容许度内未找到两人之间的主要相位。',
+  aspectsNote: '相位按容许度从小到大排列；容许度越小，相位越精确。只列合相、冲相、三分相、四分相。',
+  readingsTitle: '合盘解读',
+  verdictHigh: '契合度高', verdictMid: '契合度中等', verdictLow: '需磨合',
+  scoreLine: '合盘分数', harmonyLine: '和谐相位', tensionLine: '紧张相位',
+  ascLabel: '上升',
+  housesNote: '宫位为整宫制：上升星座即第一宫，依序排列。',
+  noPlaceNote: '未填出生地经纬度，故不显示该方的上升与宫位；行星位置与相位不受影响。',
+  birthLabel: '出生', utcLabel: 'UTC', orb: '容许度', house: '宫',
+  faqTitle: '西洋合盘：免费排盘与使用常见问题',
+  faqQ1: '合盘的相位容许度是多少？',
+  faqA1: '合相、冲相、三分相、四分相四种。太阳或月亮参与时容许度 8°，其余行星之间容许度 6°，与本站西洋占星单盘相同。六分相不在合盘相位之列——合盘只看最能决定关系走向的四种主相位。',
+  faqQ2: '宫位为什么用整宫制？',
+  faqA2: '整宫制以整个星座为一宫，上升星座即第一宫，简单且历史悠久。本页不用 Placidus 等不等宫制；不同分宫制下同一行星可能落入不同宫位，解读时请注意。若只填了一方的出生地，则只有该方的宫位可以确定。',
+  faqQ3: '契合度分数是怎么算出来的？',
+  faqA3: '模板计分，仅供参考：三分相 +2 分，合相 +2 分（日月金星参与）或 +1 分，四分相 −2 分，冲相 −1 分；太阳同元素 +1 分，月亮同元素 +1 分。总分 8 分及以上为契合度高，3 至 7 分为中等，2 分及以下为需磨合。这不是科学测量，只是把相位清单折成一个便于比较的数字。',
+  faqQ4: '出生时间记不准，合盘还准吗？',
+  faqA4: '太阳、水星、金星等移动较慢，几小时误差影响很小；月亮每天移动约 13°，几小时误差可达数度；上升点每小时移动约 15°，对时间最敏感。不知道准确时间时可填 12:00，但上升与宫位不可信，相位中涉及月亮与上升的部分也要打折扣。',
+  faqQ5: '合盘免费吗？我的出生信息会被上传吗？',
+  faqA5: '免费。两张星盘都在浏览器本地计算，出生信息不会发送给任何服务器；只有点击「AI 解读」时，结果摘要才会被发给后端生成解读。',
+  disclaimer: '西洋合盘属传统术数，仅供参考，不构成决策依据。',
+  offlineNote: '本页合盘在本地计算，不向任何服务器发送出生信息；点击「AI 解读」时才会把结果摘要发给后端。',
+  langLabel: '语言',
+  ai_interpret: 'AI 解读',
+  aspConj: '合相', aspSquare: '四分相', aspTrine: '三分相', aspOpp: '冲相'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問', 'navGroup2': '一生之圖', 'navGroup3': '兩人之間', 'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢', 'nav_liuyao': '六爻占卜', 'nav_meihua': '梅花易數', 'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌', 'nav_leinuoman': '雷諾曼', 'nav_lunen': '北歐盧恩符文', 'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬', 'nav_jinkoujue': '金口訣', 'nav_taiyi': '太乙神數', 'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數', 'nav_lingqi': '靈棋經', 'nav_cezi': '測字', 'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字', 'nav_ziwei': '紫微斗數', 'nav_tieban': '鐵板神數', 'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易', 'nav_taixuan': '太玄經', 'nav_huangji': '皇極經世', 'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命', 'nav_xiyang': '西洋占星', 'nav_yindu': '印度占星', 'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤', 'nav_bazi-hepan': '八字合盤', 'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤', 'nav_liunian': '流年流月', 'nav_maya': '瑪雅曆法',
+  brandSub: '西洋合盤 · 本地排盤',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '兩人之間 · 雙人星盤',
+  slogan: '兩星相照，<br>方見彼此。',
+  subtitle: '西洋合盤免費線上：比較兩張出生星盤',
+  personA: '本人', personB: '對方',
+  labelDate: '出生日期', labelTime: '出生時間', labelOffset: '時區（UTC 偏移）',
+  labelLat: '緯度（可選，用於上升與宮位）', labelLon: '經度（可選，用於上升與宮位）',
+  phLat: '例如 39.9（北緯為正）', phLon: '例如 116.4（東經為正）',
+  btnSubmit: '排合盤',
+  errNoDate: '請先選擇雙方的出生日期。',
+  errBadOffset: '時區偏移須在 -12 到 +14 之間。',
+  errBadLat: '緯度須在 -90 到 90 之間。',
+  errBadLon: '經度須在 -180 到 180 之間。',
+  errNoLib: '星曆庫未載入，請重新整理頁面再試。',
+  resultTitle: '合盤',
+  bigThreeTitle: '日月升 · 兩人對照',
+  colPoint: '要點', colPersonA: '本人', colPersonB: '對方',
+  crossTitleA: '本人的行星落在對方的星座與宮位',
+  crossTitleB: '對方的行星落在本人的星座與宮位',
+  colPlanet: '行星', colSign: '星座', colDegree: '度數', colHouse: '宮位',
+  interTitle: '兩人之間的相位',
+  noAspects: '在容許度內未找到兩人之間的主要相位。',
+  aspectsNote: '相位按容許度從小到大排列；容許度越小，相位越精確。只列合相、衝相、三分相、四分相。',
+  readingsTitle: '合盤解讀',
+  verdictHigh: '契合度高', verdictMid: '契合度中等', verdictLow: '需磨合',
+  scoreLine: '合盤分數', harmonyLine: '和諧相位', tensionLine: '緊張相位',
+  ascLabel: '上升',
+  housesNote: '宮位為整宮制：上升星座即第一宮，依序排列。',
+  noPlaceNote: '未填出生地經緯度，故不顯示該方的上升與宮位；行星位置與相位不受影響。',
+  birthLabel: '出生', utcLabel: 'UTC', orb: '容許度', house: '宮',
+  faqTitle: '西洋合盤：免費排盤與使用常見問題',
+  faqQ1: '合盤的相位容許度是多少？',
+  faqA1: '合相、衝相、三分相、四分相四種。太陽或月亮參與時容許度 8°，其餘行星之間容許度 6°，與本站西洋占星單盤相同。六分相不在合盤相位之列——合盤只看最能決定關係走向的四種主相位。',
+  faqQ2: '宮位為什麼用整宮制？',
+  faqA2: '整宮制以整個星座為一宮，上升星座即第一宮，簡單且歷史悠久。本頁不用 Placidus 等不等宮制；不同分宮制下同一行星可能落入不同宮位，解讀時請注意。若只填了一方的出生地，則只有該方的宮位可以確定。',
+  faqQ3: '契合度分數是怎麼算出來的？',
+  faqA3: '模板計分，僅供參考：三分相 +2 分，合相 +2 分（日月金星參與）或 +1 分，四分相 −2 分，衝相 −1 分；太陽同元素 +1 分，月亮同元素 +1 分。總分 8 分及以上為契合度高，3 至 7 分為中等，2 分及以下為需磨合。這不是科學測量，只是把相位清單折成一個便於比較的數字。',
+  faqQ4: '出生時間記不準，合盤還準嗎？',
+  faqA4: '太陽、水星、金星等移動較慢，幾小時誤差影響很小；月亮每天移動約 13°，幾小時誤差可達數度；上升點每小時移動約 15°，對時間最敏感。不知道準確時間時可填 12:00，但上升與宮位不可信，相位中涉及月亮與上升的部分也要打折扣。',
+  faqQ5: '合盤免費嗎？我的出生資訊會被上傳嗎？',
+  faqA5: '免費。兩張星盤都在瀏覽器本地計算，出生資訊不會發送給任何伺服器；只有點擊「AI 解讀」時，結果摘要才會被發給後端生成解讀。',
+  disclaimer: '西洋合盤屬傳統術數，僅供參考，不構成決策依據。',
+  offlineNote: '本頁合盤在本地計算，不向任何伺服器發送出生資訊；點擊「AI 解讀」時才會把結果摘要發給後端。',
+  langLabel: '語言',
+  ai_interpret: 'AI 解讀',
+  aspConj: '合相', aspSquare: '四分相', aspTrine: '三分相', aspOpp: '衝相'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question', 'navGroup2': 'Life Chart', 'navGroup3': 'Between Two', 'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation', 'nav_liuyao': 'Six Lines Divination', 'nav_meihua': 'Meihua Yishu', 'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot', 'nav_leinuoman': 'Lenormand', 'nav_lunen': 'Norse Runes', 'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren', 'nav_jinkoujue': 'Jinkou Jue', 'nav_taiyi': 'Taiyi Shenshu', 'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles', 'nav_lingqi': 'Lingqi Jing', 'nav_cezi': 'Character Divination', 'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)', 'nav_ziwei': 'Ziwei Doushu', 'nav_tieban': 'Tieban Shenshu', 'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi', 'nav_taixuan': 'Taixuan Jing', 'nav_huangji': 'Huangji Jingshi', 'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing', 'nav_xiyang': 'Western Astrology', 'nav_yindu': 'Vedic Astrology', 'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry', 'nav_bazi-hepan': 'Bazi Compatibility', 'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility', 'nav_liunian': 'Annual & Monthly Fortune', 'nav_maya': 'Maya Calendar',
+  brandSub: 'Western Synastry · Local Chart',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'Between Two · Two Natal Charts',
+  slogan: 'Two stars shine on each other,<br>and only then do we see one another.',
+  subtitle: 'Free online Western synastry: compare two natal charts',
+  personA: 'Person A (you)', personB: 'Person B (partner)',
+  labelDate: 'Birth date', labelTime: 'Birth time', labelOffset: 'Time zone (UTC offset)',
+  labelLat: 'Latitude (optional, for Ascendant & houses)', labelLon: 'Longitude (optional, for Ascendant & houses)',
+  phLat: 'e.g. 39.9 (north is positive)', phLon: 'e.g. 116.4 (east is positive)',
+  btnSubmit: 'Cast the Synastry',
+  errNoDate: 'Please choose a birth date for both people first.',
+  errBadOffset: 'The UTC offset must be between -12 and +14.',
+  errBadLat: 'Latitude must be between -90 and 90.',
+  errBadLon: 'Longitude must be between -180 and 180.',
+  errNoLib: 'The ephemeris library failed to load. Please refresh the page.',
+  resultTitle: 'The Synastry',
+  bigThreeTitle: 'Sun · Moon · Ascendant — Side by Side',
+  colPoint: 'Point', colPersonA: 'Person A', colPersonB: 'Person B',
+  crossTitleA: 'Person A’s planets in Person B’s signs & houses',
+  crossTitleB: 'Person B’s planets in Person A’s signs & houses',
+  colPlanet: 'Planet', colSign: 'Sign', colDegree: 'Degree', colHouse: 'House',
+  interTitle: 'Aspects Between the Two Charts',
+  noAspects: 'No major inter-chart aspects found within the allowed orb.',
+  aspectsNote: 'Aspects are listed from the smallest orb to the largest; the smaller the orb, the more exact the aspect. Only conjunction, opposition, trine and square are listed.',
+  readingsTitle: 'Synastry Reading',
+  verdictHigh: 'High compatibility', verdictMid: 'Moderate compatibility', verdictLow: 'Needs work',
+  scoreLine: 'Synastry score', harmonyLine: 'Harmonious aspects', tensionLine: 'Tense aspects',
+  ascLabel: 'Ascendant',
+  housesNote: 'Whole-sign houses: the Ascendant sign is the 1st house, in order.',
+  noPlaceNote: 'No birth-place coordinates given for this person, so no Ascendant or houses are shown; planet positions and aspects are unaffected.',
+  birthLabel: 'Born', utcLabel: 'UTC', orb: 'orb', house: 'House',
+  faqTitle: 'Western Synastry: Free Chart & FAQ',
+  faqQ1: 'What orbs are used for synastry aspects?',
+  faqA1: 'Four aspects only: conjunction, opposition, trine and square. The orb is 8° when the Sun or Moon is involved, 6° otherwise — the same as the single Western astrology chart on this site. Sextile is not used in synastry here: only the four major aspects that most shape a relationship are listed.',
+  faqQ2: 'Why whole-sign houses?',
+  faqA2: 'Whole-sign houses take one whole sign per house, with the Ascendant sign as the 1st house — simple and ancient. This page does not use unequal-house systems such as Placidus; under different house systems the same planet can fall in a different house, so keep that in mind when reading. If only one person’s birth place is given, only that person’s houses can be fixed.',
+  faqQ3: 'How is the compatibility score calculated?',
+  faqA3: 'A template score, for reference only: trine +2, conjunction +2 (Sun, Moon or Venus involved) or +1, square −2, opposition −1; same element for the Suns +1, same element for the Moons +1. A total of 8 or more is high compatibility, 3–7 moderate, 2 or less needs work. This is not a scientific measurement — it only folds the aspect list into one comparable number.',
+  faqQ4: 'My birth time is uncertain. Is the synastry still usable?',
+  faqA4: 'The Sun, Mercury, Venus and the other slow movers barely shift over a few hours. The Moon moves about 13° a day, so a few hours of error can shift it by several degrees, and the Ascendant moves about 15° per hour, making it the most time-sensitive point. If you do not know the exact time, use 12:00, but do not trust the Ascendant or houses, and discount any aspect involving the Moon or the Ascendant.',
+  faqQ5: 'Is the synastry free? Is my birth data uploaded?',
+  faqA5: 'Yes, free. Both charts are computed locally in your browser and your birth data is never sent to any server; only when you click “AI Reading” is a summary of the result sent to the backend to generate the reading.',
+  disclaimer: 'Western synastry is a traditional divination art, for reference only; it is not a basis for decisions.',
+  offlineNote: 'This page computes the synastry locally and sends no birth data to any server; only clicking “AI Reading” sends a result summary to the backend.',
+  langLabel: 'Language',
+  ai_interpret: 'AI Reading',
+  aspConj: 'Conjunction', aspSquare: 'Square', aspTrine: 'Trine', aspOpp: 'Opposition'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問', 'navGroup2': '一生之図', 'navGroup3': '二人の間', 'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い', 'nav_liuyao': '六爻占い', 'nav_meihua': '梅花易数', 'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット', 'nav_leinuoman': 'ルノルマン', 'nav_lunen': '北欧ルーン', 'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬', 'nav_jinkoujue': '金口訣', 'nav_taiyi': '太乙神数', 'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数', 'nav_lingqi': '霊棋経', 'nav_cezi': '測字', 'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字', 'nav_ziwei': '紫微斗数', 'nav_tieban': '鉄板神数', 'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易', 'nav_taixuan': '太玄経', 'nav_huangji': '皇極経世', 'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い', 'nav_xiyang': '西洋占星術', 'nav_yindu': 'インド占星術', 'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤', 'nav_bazi-hepan': '八字合盤', 'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤', 'nav_liunian': '流年流月', 'nav_maya': 'マヤ暦',
+  brandSub: '西洋占星合盤 · ローカル排盤',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '二人の間 · 二人の出生図',
+  slogan: '二つの星が照らし合い、<br>はじめて互いが見える。',
+  subtitle: '西洋占星合盤 無料オンライン：二つの出生図を比較',
+  personA: '本人（あなた）', personB: '相手',
+  labelDate: '生年月日', labelTime: '出生時刻', labelOffset: 'タイムゾーン（UTC との差）',
+  labelLat: '緯度（任意、アセンダントとハウス用）', labelLon: '経度（任意、アセンダントとハウス用）',
+  phLat: '例 39.9（北緯は正）', phLon: '例 116.4（東経は正）',
+  btnSubmit: '合盤を作成',
+  errNoDate: 'まず二人の生年月日を選択してください。',
+  errBadOffset: 'UTC との差は -12 から +14 の範囲で入力してください。',
+  errBadLat: '緯度は -90 から 90 の範囲で入力してください。',
+  errBadLon: '経度は -180 から 180 の範囲で入力してください。',
+  errNoLib: '星暦ライブラリが読み込めませんでした。ページを更新してください。',
+  resultTitle: '合盤',
+  bigThreeTitle: '太陽・月・アセンダント — 二人対照',
+  colPoint: '要点', colPersonA: '本人', colPersonB: '相手',
+  crossTitleA: '本人の天体が相手の星座とハウスに入る位置',
+  crossTitleB: '相手の天体が本人の星座とハウスに入る位置',
+  colPlanet: '天体', colSign: '星座', colDegree: '度数', colHouse: 'ハウス',
+  interTitle: '二人の間のアスペクト',
+  noAspects: '許容オーブ内に二人の主要アスペクトは見つかりませんでした。',
+  aspectsNote: 'アスペクトはオーブの小さい順に並んでいます。オーブが小さいほど正確です。合・オポジション・トライン・スクエアのみを表示します。',
+  readingsTitle: '合盤の読み解き',
+  verdictHigh: '相性が高い', verdictMid: '相性は普通', verdictLow: 'すり合わせが必要',
+  scoreLine: '合盤スコア', harmonyLine: '調和的なアスペクト', tensionLine: '緊張のあるアスペクト',
+  ascLabel: 'アセンダント',
+  housesNote: 'ホールサイン・ハウス制です。アセンダントの星座が第1ハウスとなり、順に並びます。',
+  noPlaceNote: '出生地の経緯度が未入力のため、この方のアセンダントとハウスは表示されません。惑星の位置とアスペクトには影響ありません。',
+  birthLabel: '出生', utcLabel: 'UTC', orb: 'オーブ', house: 'ハウス',
+  faqTitle: '西洋占星合盤：無料チャートとよくある質問',
+  faqQ1: '合盤のアスペクトの許容オーブは？',
+  faqA1: '合・オポジション・トライン・スクエアの4種類です。太陽または月が関わる場合はオーブ 8°、それ以外の天体間は 6°で、本サイトの西洋占星単盤と同じです。セクスタイルは合盤では使いません。関係の行方を最も左右する4つの主アスペクトだけを見ます。',
+  faqQ2: 'ハウスはなぜホールサイン制なのですか？',
+  faqA2: 'ホールサイン制は一つの星座を丸ごと一つのハウスとし、アセンダントの星座を第1ハウスとする、シンプルで歴史ある方式です。本ページでは Placidus などの不等ハウス制は使いません。ハウス制が変われば同じ惑星でも入るハウスが変わることがあるので、読む際はご注意ください。片方の出生地だけが入力されている場合、その方のハウスだけが決まります。',
+  faqQ3: '相性スコアはどう計算されますか？',
+  faqA3: 'テンプレートによる採点で、参考までです。トライン +2 点、合 +2 点（太陽・月・金星が関わる場合）または +1 点、スクエア −2 点、オポジション −1 点。太陽が同じエレメントなら +1 点、月が同じエレメントなら +1 点。合計 8 点以上は相性が高い、3〜7 点は普通、2 点以下はすり合わせが必要です。これは科学的な測定ではなく、アスペクト一覧を比較しやすい一つの数字に折りたたんだものです。',
+  faqQ4: '出生時刻があいまいでも合盤は使えますか？',
+  faqA4: '太陽・水星・金星などの動きは遅いため、数時間の誤差はほとんど影響しません。月は1日に約13°動くので、数時間の誤差で数度ずれます。アセンダントは1時間に約15°動くため、時刻に最も敏感です。正確な時刻が分からない場合は 12:00 を使ってください。ただしアセンダントとハウスは信用できず、月やアセンダントが関わるアスペクトも割り引いて読んでください。',
+  faqQ5: '合盤は無料ですか？出生データは送信されますか？',
+  faqA5: '無料です。二つのチャートはブラウザ内でローカルに計算され、出生データは外部サーバーに送信されません。「AI 解釈」をクリックした場合のみ、結果の要約が解釈生成のためバックエンドに送信されます。',
+  disclaimer: '西洋占星合盤は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  offlineNote: 'このページは合盤をローカルで計算し、出生データを外部サーバーに送信しません。「AI 解釈」をクリックした場合のみ、結果の要約がバックエンドに送信されます。',
+  langLabel: '言語',
+  ai_interpret: 'AI 解釈',
+  aspConj: '合', aspSquare: 'スクエア', aspTrine: 'トライン', aspOpp: 'オポジション'
+}
+};
+
+// 十二星座：中文名 / 繁体 / 英文 / 日文 + 元素（四语）——与西洋占星单盘一致
+var SIGNS = [
+  { zh: '白羊座', tw: '白羊座', en: 'Aries', ja: '牡羊座', elZh: '火', elTw: '火', elEn: 'Fire', elJa: '火' },
+  { zh: '金牛座', tw: '金牛座', en: 'Taurus', ja: '牡牛座', elZh: '土', elTw: '土', elEn: 'Earth', elJa: '土' },
+  { zh: '双子座', tw: '雙子座', en: 'Gemini', ja: '双子座', elZh: '风', elTw: '風', elEn: 'Air', elJa: '風' },
+  { zh: '巨蟹座', tw: '巨蟹座', en: 'Cancer', ja: '蟹座', elZh: '水', elTw: '水', elEn: 'Water', elJa: '水' },
+  { zh: '狮子座', tw: '獅子座', en: 'Leo', ja: '獅子座', elZh: '火', elTw: '火', elEn: 'Fire', elJa: '火' },
+  { zh: '处女座', tw: '處女座', en: 'Virgo', ja: '乙女座', elZh: '土', elTw: '土', elEn: 'Earth', elJa: '土' },
+  { zh: '天秤座', tw: '天秤座', en: 'Libra', ja: '天秤座', elZh: '风', elTw: '風', elEn: 'Air', elJa: '風' },
+  { zh: '天蝎座', tw: '天蠍座', en: 'Scorpio', ja: '蠍座', elZh: '水', elTw: '水', elEn: 'Water', elJa: '水' },
+  { zh: '射手座', tw: '射手座', en: 'Sagittarius', ja: '射手座', elZh: '火', elTw: '火', elEn: 'Fire', elJa: '火' },
+  { zh: '摩羯座', tw: '摩羯座', en: 'Capricorn', ja: '山羊座', elZh: '土', elTw: '土', elEn: 'Earth', elJa: '土' },
+  { zh: '水瓶座', tw: '水瓶座', en: 'Aquarius', ja: '水瓶座', elZh: '风', elTw: '風', elEn: 'Air', elJa: '風' },
+  { zh: '双鱼座', tw: '雙魚座', en: 'Pisces', ja: '魚座', elZh: '水', elTw: '水', elEn: 'Water', elJa: '水' }
+];
+
+// 十曜：键 / 中文 / 繁体 / 英文 / 日文——与西洋占星单盘一致
+var PLANETS = [
+  { key: 'Sun', zh: '太阳', tw: '太陽', en: 'Sun', ja: '太陽' },
+  { key: 'Moon', zh: '月亮', tw: '月亮', en: 'Moon', ja: '月' },
+  { key: 'Mercury', zh: '水星', tw: '水星', en: 'Mercury', ja: '水星' },
+  { key: 'Venus', zh: '金星', tw: '金星', en: 'Venus', ja: '金星' },
+  { key: 'Mars', zh: '火星', tw: '火星', en: 'Mars', ja: '火星' },
+  { key: 'Jupiter', zh: '木星', tw: '木星', en: 'Jupiter', ja: '木星' },
+  { key: 'Saturn', zh: '土星', tw: '土星', en: 'Saturn', ja: '土星' },
+  { key: 'Uranus', zh: '天王星', tw: '天王星', en: 'Uranus', ja: '天王星' },
+  { key: 'Neptune', zh: '海王星', tw: '海王星', en: 'Neptune', ja: '海王星' },
+  { key: 'Pluto', zh: '冥王星', tw: '冥王星', en: 'Pluto', ja: '冥王星' }
+];
+
+// 行星对的含义（无序对，键为较小的行星序号-较大的行星序号）：模板解读的“一半”
+var PAIR_MEANING = {
+  'zh-CN': {
+    '0-1': '核心自我与情绪需求的呼应', '0-3': '自我表达与爱意的互相吸引', '0-4': '意志与行动力的互相激发',
+    '1-3': '情绪安全感与爱意的共鸣', '1-4': '情绪需求与欲望行动的拉扯', '3-4': '爱与欲望的化学反应',
+    'generic': '两位行星的互动'
+  },
+  'zh-TW': {
+    '0-1': '核心自我與情緒需求的呼應', '0-3': '自我表達與愛意的互相吸引', '0-4': '意志與行動力的互相激發',
+    '1-3': '情緒安全感與愛意的共鳴', '1-4': '情緒需求與慾望行動的拉扯', '3-4': '愛與慾望的化學反應',
+    'generic': '兩顆行星的互動'
+  },
+  'en': {
+    '0-1': 'how core self meets emotional needs', '0-3': 'mutual attraction between self-expression and affection',
+    '0-4': 'how will and drive spark each other', '1-3': 'resonance between emotional security and affection',
+    '1-4': 'the pull between emotional needs and desire in action', '3-4': 'the chemistry between love and desire',
+    'generic': 'the interaction of the two planets'
+  },
+  'ja': {
+    '0-1': '中核的な自己と感情のニーズの響き合い', '0-3': '自己表現と愛情の惹かれ合い', '0-4': '意志と行動力の刺激し合い',
+    '1-3': '感情の安心感と愛情の共鳴', '1-4': '感情のニーズと欲望の行動の引き合い', '3-4': '愛と欲望の化学反応',
+    'generic': '二つの天体の関わり'
+  }
+};
+
+// 相位修饰语（四语）：模板解读的“另一半”
+var ASPECT_MOD = {
+  'zh-CN': {
+    aspConj: '融合强烈、界限模糊：既互相放大，也容易互相牵制。',
+    aspOpp: '张力与互补并存：差异明显，需要协商与平衡。',
+    aspTrine: '顺畅自然，容易互相支持，是关系中的助力。',
+    aspSquare: '摩擦与成长动力并存：容易起冲突，也是磨合后最能成长的地方。'
+  },
+  'zh-TW': {
+    aspConj: '融合強烈、界限模糊：既互相放大，也容易互相牽制。',
+    aspOpp: '張力與互補並存：差異明顯，需要協商與平衡。',
+    aspTrine: '順暢自然，容易互相支持，是關係中的助力。',
+    aspSquare: '摩擦與成長動力並存：容易起衝突，也是磨合後最能成長的地方。'
+  },
+  'en': {
+    aspConj: 'A strong fusion with blurred boundaries: it magnifies each other, and can also pull each other in.',
+    aspOpp: 'Tension and complementarity together: the differences are clear, and need negotiation and balance.',
+    aspTrine: 'Smooth and natural, easy mutual support — a real help in the relationship.',
+    aspSquare: 'Friction and growth drive together: conflict comes easily, and this is also where the most growth happens after working through it.'
+  },
+  'ja': {
+    aspConj: '融合が強く境界が曖昧。互いを増幅し合う一方、互いを縛り合うこともあります。',
+    aspOpp: '緊張と補い合いが共存します。違いがはっきりし、交渉とバランスが必要です。',
+    aspTrine: 'なめらかで自然、互いを支えやすい関係の助けとなります。',
+    aspSquare: '摩擦と成長の力が共存します。衝突しやすい一方、すり合わせの後に最も成長できる場所でもあります。'
+  }
+};
+
+// 十二宫含义（短句，四语）：用于“行星落入对方宫位”的解读行
+var HOUSE_MEANING = {
+  'zh-CN': ['自我与第一印象', '价值与物质安全', '沟通与日常往来', '家庭与情感根基', '恋爱与创造', '日常习惯与责任', '伴侣与一对一关系', '亲密与共享资源', '信念与远方', '事业与社会形象', '朋友与共同愿景', '潜意识与隐秘联结'],
+  'zh-TW': ['自我與第一印象', '價值與物質安全', '溝通與日常往來', '家庭與情感根基', '戀愛與創造', '日常習慣與責任', '伴侶與一對一關係', '親密與共享資源', '信念與遠方', '事業與社會形象', '朋友與共同願景', '潛意識與隱秘聯結'],
+  'en': ['self and first impressions', 'values and material security', 'communication and everyday contact', 'home and emotional roots', 'romance and creativity', 'daily habits and duties', 'partnership and one-to-one relating', 'intimacy and shared resources', 'beliefs and horizons', 'career and public image', 'friends and shared vision', 'the subconscious and hidden bonds'],
+  'ja': ['自己と第一印象', '価値観と物質的な安心', 'コミュニケーションと日常のやり取り', '家庭と感情の土台', '恋愛と創造', '日常の習慣と責任', 'パートナーシップと一対一の関係', '親密さと共有する資源', '信念と遠方', '仕事と社会的な顔', '友人と共通のビジョン', '潜在意識と隠れた結びつき']
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function signName(i) {
+  var s = SIGNS[i];
+  if (LANG === 'en') return s.en;
+  if (LANG === 'ja') return s.ja;
+  if (LANG === 'zh-TW') return s.tw;
+  return s.zh;
+}
+function signElement(i) {
+  var s = SIGNS[i];
+  if (LANG === 'en') return s.elEn;
+  if (LANG === 'ja') return s.elJa;
+  if (LANG === 'zh-TW') return s.elTw;
+  return s.elZh;
+}
+function planetName(i) {
+  var p = PLANETS[i];
+  if (LANG === 'en') return p.en;
+  if (LANG === 'ja') return p.ja;
+  if (LANG === 'zh-TW') return p.tw;
+  return p.zh;
+}
+function planetNameZh(i) { return PLANETS[i].zh; }
+function signNameZh(i) { return SIGNS[i].zh; }
+function pairMeaning(a, b) {
+  var m = PAIR_MEANING[LANG] || PAIR_MEANING['zh-CN'];
+  var key = Math.min(a, b) + '-' + Math.max(a, b);
+  return m[key] || m['generic'];
+}
+function aspectMod(key) {
+  var m = ASPECT_MOD[LANG] || ASPECT_MOD['zh-CN'];
+  return m[key] || '';
+}
+function houseMeaning(n) {
+  var m = HOUSE_MEANING[LANG] || HOUSE_MEANING['zh-CN'];
+  return m[n - 1] || '';
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var fe = document.getElementById('form-error'); if (fe) fe.textContent = '';
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// 行星位置：astronomy-engine（地心黄道经度），与西洋占星单盘完全相同的函数。
+// 太阳用 SunPosition；其余九曜用 Ecliptic(GeoVector(body, time, true))。
+// 注意：EclipticLongitude 是日心经度且对太阳会抛错，本页不用它。
+var EPSILON = 23.44; // 黄赤交角（度），用于上升点计算
+
+function norm360(x) { x = x % 360; return x < 0? x + 360: x;}
+
+function bodyLongitude(bodyKey, time) {
+if (bodyKey === 'Sun') return norm360(Astronomy.SunPosition(time).elon);
+return norm360(Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body[bodyKey], time, true)).elon);
+}
+
+// 上升点：RAMC 用地方恒星时（格林尼治恒星时 + 经度），标准公式
+// ASC = atan2(-cos RAMC, sin RAMC · cos ε + tan φ · sin ε)
+// 已用暴力扫描（沿黄道找东地平交点）核对：北京 1990-01-01 12:00+8，
+// 公式 191.82°，暴力扫描 191.85°，一致。
+function ascendantLon(ramcDeg, latDeg) {
+var eps = EPSILON * Math.PI / 180;
+var ramc = ramcDeg * Math.PI / 180;
+var lat = latDeg * Math.PI / 180;
+var asc = Math.atan2(-Math.cos(ramc), Math.sin(ramc) * Math.cos(eps) + Math.tan(lat) * Math.sin(eps));
+return norm360(asc * 180 / Math.PI);
+}
+
+function fmtDeg(lon) {
+var d = Math.floor(lon);
+var m = Math.floor((lon - d) * 60 + 0.5);
+if (m === 60) { d = (d + 1) % 360; m = 0;}
+return d + '°' + (m < 10? '0': '') + m + '′';
+}
+function fmtDegInSign(lon) {
+var within = lon % 30;
+return fmtDeg(within);
+}
+function houseLabel(n) {
+if (LANG === 'en') return t('house') + ' ' + n;
+return '第' + n + t('house');
+}
+
+function computeChart(y, mo, d, hh, mm, offset, lat, lon) {
+// 出生地地方时 → UTC：UTC 分钟 = 地方分钟 - offset×60（Date 会自动处理跨日）
+var utcDate = new Date(Date.UTC(y, mo - 1, d, 0, 0));
+utcDate.setUTCMinutes(hh * 60 + mm - offset * 60);
+var time = new Astronomy.AstroTime(utcDate);
+var positions = [];
+for (var i = 0; i < PLANETS.length; i++) {
+positions.push(bodyLongitude(PLANETS[i].key, time));
+}
+var asc = null, ramc = null;
+if (lat!== null && lon!== null) {
+var gstHours = Astronomy.SiderealTime(time); // 格林尼治恒星时（小时）
+var lstHours = gstHours + lon / 15;
+lstHours = ((lstHours % 24) + 24) % 24;
+ramc = norm360(lstHours * 15);
+asc = ascendantLon(ramc, lat);
+}
+return {
+dateStr: y + '-' + (mo < 10? '0': '') + mo + '-' + (d < 10? '0': '') + d,
+timeStr: (hh < 10? '0': '') + hh + ':' + (mm < 10? '0': '') + mm,
+offset: offset, lat: lat, lon: lon,
+positions: positions, asc: asc
+};
+}
+
+// 合盘相位：只取合相 / 冲相 / 三分相 / 四分相（六分相不在合盘之列）。
+// 容许度与单盘相同：太阳或月亮参与时 8°，其余 6°。
+var SYNASTRY_ASPECTS = [
+{ angle: 0, key: 'aspConj'},
+{ angle: 90, key: 'aspSquare'},
+{ angle: 120, key: 'aspTrine'},
+{ angle: 180, key: 'aspOpp'}
+];
+
+function findInterAspects(posA, posB) {
+var out = [];
+for (var i = 0; i < posA.length; i++) {
+for (var j = 0; j < posB.length; j++) {
+var diff = Math.abs(posA[i] - posB[j]) % 360;
+if (diff > 180) diff = 360 - diff;
+var involvesLuminary = (i <= 1 || j <= 1); // 太阳或月亮参与时容许度 8°，否则 6°
+var maxOrb = involvesLuminary? 8: 6;
+for (var k = 0; k < SYNASTRY_ASPECTS.length; k++) {
+var orb = Math.abs(diff - SYNASTRY_ASPECTS[k].angle);
+if (orb <= maxOrb) {
+out.push({ a: i, b: j, def: SYNASTRY_ASPECTS[k], orb: orb});
+break;
+}
+}
+}
+}
+out.sort(function (x, y) { return x.orb - y.orb;});
+return out;
+}
+
+// 整宫制：行星所在宫 =（行星星座 - 上升星座 + 12) % 12 + 1；无上升时返回 null
+function houseOf(lon, asc) {
+if (asc === null) return null;
+var sIdx = Math.floor(lon / 30);
+var ascIdx = Math.floor(asc / 30);
+return ((sIdx - ascIdx + 12) % 12) + 1;
+}
+
+// 契合度模板计分（见 FAQ Q3）：三分相 +2；合相 +2（日月金星参与）或 +1；
+// 四分相 −2；冲相 −1；太阳同元素 +1；月亮同元素 +1。
+function scoreSynastry(aspects, chartA, chartB) {
+var score = 0, harmony = 0, tension = 0;
+for (var k = 0; k < aspects.length; k++) {
+var a = aspects[k];
+if (a.def.key === 'aspTrine') { score += 2; harmony++;}
+else if (a.def.key === 'aspConj') { score += (a.a <= 1 || a.b <= 1 || a.a === 3 || a.b === 3)? 2: 1; harmony++;}
+else if (a.def.key === 'aspSquare') { score -= 2; tension++;}
+else if (a.def.key === 'aspOpp') { score -= 1; tension++;}
+}
+if (signElement(Math.floor(chartA.positions[0] / 30)) === signElement(Math.floor(chartB.positions[0] / 30))) score += 1;
+if (signElement(Math.floor(chartA.positions[1] / 30)) === signElement(Math.floor(chartB.positions[1] / 30))) score += 1;
+var verdict = score >= 8? 'verdictHigh': (score >= 3? 'verdictMid': 'verdictLow');
+return { score: score, harmony: harmony, tension: tension, verdict: verdict};
+}
+
+function esc(s) {
+return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function readPerson(prefix) {
+var dv = document.getElementById(prefix + '-date').value;
+var tv = document.getElementById(prefix + '-time').value || '12:00';
+if (!dv) return { error: 'errNoDate'};
+var dp = dv.split('-');
+var y = parseInt(dp[0], 10), mo = parseInt(dp[1], 10), d = parseInt(dp[2], 10);
+var tp = tv.split(':');
+var hh = parseInt(tp[0], 10), mm = parseInt(tp[1], 10);
+if (isNaN(y) || isNaN(mo) || isNaN(d)) return { error: 'errNoDate'};
+var offset = parseFloat(document.getElementById(prefix + '-offset').value);
+if (isNaN(offset) || offset < -12 || offset > 14) return { error: 'errBadOffset'};
+var latRaw = document.getElementById(prefix + '-lat').value.trim();
+var lonRaw = document.getElementById(prefix + '-lon').value.trim();
+var lat = null, lon = null;
+if (latRaw!== '' || lonRaw!== '') {
+lat = parseFloat(latRaw); lon = parseFloat(lonRaw);
+if (latRaw === '' || isNaN(lat) || lat < -90 || lat > 90) return { error: 'errBadLat'};
+if (lonRaw === '' || isNaN(lon) || lon < -180 || lon > 180) return { error: 'errBadLon'};
+}
+return { chart: computeChart(y, mo, d, hh, mm, offset, lat, lon)};
+}
+
+function doSynastry() {
+var err = document.getElementById('form-error');
+err.textContent = '';
+if (typeof Astronomy === 'undefined') { err.textContent = t('errNoLib'); return;}
+var ra = readPerson('a');
+if (ra.error) { err.textContent = t(ra.error); return;}
+var rb = readPerson('b');
+if (rb.error) { err.textContent = t(rb.error); return;}
+var aspects = findInterAspects(ra.chart.positions, rb.chart.positions);
+var score = scoreSynastry(aspects, ra.chart, rb.chart);
+showResult({ a: ra.chart, b: rb.chart, aspects: aspects, score: score});
+}
+
+function personHead(r, who) {
+var offStr = (r.offset >= 0? '+': '') + r.offset;
+var s = t(who) + ' ' + t('birthLabel') + ' <b>' + esc(r.dateStr) + ' ' + esc(r.timeStr) + ' ' + t('utcLabel') + offStr + '</b>';
+if (r.asc!== null) {
+var ascSign = Math.floor(r.asc / 30);
+s += ' · ' + t('ascLabel') + ' <b>' + signName(ascSign) + ' ' + fmtDegInSign(r.asc) + '</b>';
+}
+return s;
+}
+
+function crossRows(chartFrom, chartTo) {
+// 日月金火四曜：落在对方星座与宫位
+var rows = '<tr><th>' + t('colPlanet') + '</th><th>' + t('colSign') + '</th><th>' + t('colDegree') + '</th><th>' + t('colHouse') + '</th></tr>';
+var keys = [0, 1, 3, 4];
+for (var k = 0; k < keys.length; k++) {
+var i = keys[k];
+var lon = chartFrom.positions[i];
+var sIdx = Math.floor(lon / 30);
+var house = houseOf(lon, chartTo.asc);
+var sub = (LANG === 'zh-CN' || LANG === 'zh-TW')? '': ' <span class="sub">' + planetNameZh(i) + ' · ' + signNameZh(sIdx) + '</span>';
+rows += '<tr><td><b>' + planetName(i) + '</b>' + sub + '</td><td>' + signName(sIdx) + ' · ' + signElement(sIdx) + '</td><td class="deg">' + fmtDegInSign(lon) + '</td><td>' + (house === null? '—': houseLabel(house)) + '</td></tr>';
+}
+return rows;
+}
+
+function showResult(r, noScroll) {
+LAST_RESULT = r;
+document.getElementById('result-head').innerHTML = personHead(r.a, 'personA') + '<br>' + personHead(r.b, 'personB');
+var sc = r.score;
+document.getElementById('verdict').innerHTML =
+t(sc.verdict) + ' · <span class="level">' + t('scoreLine') + ' ' + sc.score + '</span>——' +
+t('harmonyLine') + ' ' + sc.harmony + ' · ' + t('tensionLine') + ' ' + sc.tension;
+
+var bt = '<tr><th>' + t('colPoint') + '</th><th>' + t('colPersonA') + '</th><th>' + t('colPersonB') + '</th></tr>';
+// 日 / 月 / 上升三行：行星名用行星表第 0、1 项，上升单独处理
+bt += '<tr><td><b>' + planetName(0) + '</b></td><td>' + bigThreeCell(r.a.positions[0]) + '</td><td>' + bigThreeCell(r.b.positions[0]) + '</td></tr>';
+bt += '<tr><td><b>' + planetName(1) + '</b></td><td>' + bigThreeCell(r.a.positions[1]) + '</td><td>' + bigThreeCell(r.b.positions[1]) + '</td></tr>';
+bt += '<tr><td><b>' + t('ascLabel') + '</b></td><td>' + (r.a.asc === null? '—': bigThreeCell(r.a.asc)) + '</td><td>' + (r.b.asc === null? '—': bigThreeCell(r.b.asc)) + '</td></tr>';
+document.getElementById('bigthree-table').innerHTML = bt;
+
+document.getElementById('cross-a-table').innerHTML = crossRows(r.a, r.b);
+document.getElementById('cross-b-table').innerHTML = crossRows(r.b, r.a);
+
+var alist = document.getElementById('aspect-list');
+if (r.aspects.length === 0) {
+alist.innerHTML = '<li>' + t('noAspects') + '</li>';
+} else {
+var html = '';
+for (var k = 0; k < r.aspects.length; k++) {
+var a = r.aspects[k];
+html += '<li><b>' + t('personA') + ' ' + planetName(a.a) + '</b> ' + t(a.def.key) + ' <b>' + t('personB') + ' ' + planetName(a.b) + '</b> <span class="orb">（' + t('orb') + ' ' + a.orb.toFixed(1) + '°）</span></li>';
+}
+alist.innerHTML = html;
+}
+document.getElementById('aspects-note').textContent = t('aspectsNote');
+
+// 模板解读：取容许度最小的 6 个相位 + 太阳/月亮落入对方宫位的亮点
+var rhtml = '';
+var top = r.aspects.slice(0, 6);
+for (var m = 0; m < top.length; m++) {
+var asp = top[m];
+var title = '<b>' + t('personA') + ' ' + planetName(asp.a) + ' · ' + t(asp.def.key) + ' · ' + t('personB') + ' ' + planetName(asp.b) + '</b>';
+var body;
+if (LANG === 'en') body = pairMeaning(asp.a, asp.b) + ' — ' + aspectMod(asp.def.key);
+else if (LANG === 'ja') body = pairMeaning(asp.a, asp.b) + '。' + aspectMod(asp.def.key);
+else body = pairMeaning(asp.a, asp.b) + '：' + aspectMod(asp.def.key);
+rhtml += '<li>' + title + '——' + body + '</li>';
+}
+// 亮点：双方太阳落入对方宫位（有宫位时）
+var spots = [];
+var hASun = houseOf(r.a.positions[0], r.b.asc);
+var hBSun = houseOf(r.b.positions[0], r.a.asc);
+var hAVen = houseOf(r.a.positions[3], r.b.asc);
+var hBVen = houseOf(r.b.positions[3], r.a.asc);
+if (hASun!== null) spots.push([0, 'a', hASun]);
+if (hBSun!== null) spots.push([0, 'b', hBSun]);
+if (hAVen!== null) spots.push([3, 'a', hAVen]);
+if (hBVen!== null) spots.push([3, 'b', hBVen]);
+for (var s = 0; s < spots.length; s++) {
+var sp = spots[s];
+var who = sp[1] === 'a'? t('personA'): t('personB');
+var whom = sp[1] === 'a'? t('personB'): t('personA');
+var line;
+if (LANG === 'en') line = who + '’s ' + planetName(sp[0]) + ' falls in ' + whom + '’s ' + houseLabel(sp[2]) + ' (' + houseMeaning(sp[2]) + ').';
+else if (LANG === 'ja') line = who + 'の' + planetName(sp[0]) + 'は' + whom + 'の' + houseLabel(sp[2]) + '（' + houseMeaning(sp[2]) + '）に入ります。';
+else line = who + '的' + planetName(sp[0]) + '落在' + whom + '的' + houseLabel(sp[2]) + '（' + houseMeaning(sp[2]) + '）。';
+rhtml += '<li><b>' + who + ' ' + planetName(sp[0]) + ' · ' + houseLabel(sp[2]) + '</b>——' + line + '</li>';
+}
+if (!rhtml) rhtml = '<li>' + t('noAspects') + '</li>';
+document.getElementById('reading-list').innerHTML = rhtml;
+
+document.getElementById('result-card').classList.remove('hidden');
+if (!noScroll) document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function bigThreeCell(lon) {
+var sIdx = Math.floor(lon / 30);
+var sub = (LANG === 'zh-CN' || LANG === 'zh-TW')? '': ' <span class="sub">' + signNameZh(sIdx) + '</span>';
+return '<b>' + signName(sIdx) + '</b>' + sub + ' <span class="sub">' + fmtDegInSign(lon) + '</span>';
+}
+
+// ---- AI 解读：供 /js/ai-jiegua.js 调用 ----
+// 优先读 JS 状态变量 LAST_RESULT（不改任何排盘计算逻辑），
+// 未排盘时返回 null，共享脚本会提示先排盘。
+window.getJieguaQuestion = function() {
+return '';
+};
+window.getJieguaSummary = function() {
+if (!LAST_RESULT) return null;
+var r = LAST_RESULT;
+function chartLine(who, c) {
+var offStr = (c.offset >= 0? '+': '') + c.offset;
+var parts = [];
+for (var i = 0; i < PLANETS.length; i++) {
+var lon = c.positions[i];
+parts.push(planetNameZh(i) + signNameZh(Math.floor(lon / 30)) + fmtDegInSign(lon));
+}
+var s = who + '出生' + c.dateStr + ' ' + c.timeStr + ' UTC' + offStr + '：' + parts.join('、') + '；';
+if (c.asc!== null) s += '上升' + signNameZh(Math.floor(c.asc / 30)) + fmtDegInSign(c.asc) + '（整宫制）。';
+else s += '未提供出生地，无上升与宫位。';
+return s;
+}
+var lines = [];
+lines.push('');
+lines.push(chartLine('本人', r.a));
+lines.push(chartLine('对方', r.b));
+var aspParts = [];
+for (var k = 0; k < Math.min(r.aspects.length, 10); k++) {
+var a = r.aspects[k];
+aspParts.push('本人' + planetNameZh(a.a) + I18N['zh-CN'][a.def.key] + '对方' + planetNameZh(a.b) + '（容许度' + a.orb.toFixed(1) + '°）');
+}
+lines.push('两人之间的相位：' + (aspParts.length? aspParts.join('、'): '无') + '。');
+var sc = r.score;
+lines.push('合盘分数' + sc.score + '（' + I18N['zh-CN'][sc.verdict] + '；和谐相位' + sc.harmony + '个，紧张相位' + sc.tension + '个）。计分：三分相+2，合相+2（日月金星参与）或+1，四分相−2，冲相−1，太阳同元素+1，月亮同元素+1；8分及以上高，3–7分中等，2分及以下需磨合。');
+return lines.join('\n');
+};
+
+// 初始化界面语言（localStorage 优先，否则按浏览器语言自动检测）
+applyI18n();
+// ==LOGIC-END==
+</script>
+<script src="/js/ai-jiegua.js"></script>
+<script>
+// 共享脚本与本页主脚本都已加载后再挂接（getJieguaSummary 已定义）。
+if (window.AIInterpret) window.AIInterpret.attach();
+</script>
+</body>
+</html>

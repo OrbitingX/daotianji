@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 称骨算命</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .hint { font-size: .82rem; color: #9a9aab; line-height: 1.8; margin-top: .5rem; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .total-big { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.6rem; line-height: 1.4; color: #c9a962; text-align: center; letter-spacing: .12em; margin: .4rem 0 .2rem; }
+  .total-num { text-align: center; color: #9a9aab; font-size: .9rem; margin-bottom: 1.4rem; letter-spacing: .1em; }
+  .comp-row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: .6rem .1rem; border-bottom: 1px solid rgba(201,169,98,.18); font-size: .95rem; color: #c8c2ae; }
+  .comp-row b { color: #f0ead8; font-weight: 600; }
+  .comp-row .w { color: #c9a962; white-space: nowrap; }
+  .poem-title { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.2rem; color: #f0ead8; text-align: center; margin: .4rem 0 .9rem; line-height: 1.7; }
+  .poem { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.12rem; line-height: 2.1; color: #f0ead8; text-align: center; }
+  .poem-note { font-size: .78rem; color: #6f6f80; margin-top: .6rem; text-align: center; line-height: 1.6; }
+  .gloss { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .sub-block { margin-top: 1.8rem; }
+  .sub-block:first-child { margin-top: 0; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .total-big { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">称骨算命 · 本地占卜</div>
+    </div>
+  </a>
+                <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></span>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">第一幕 · 生辰八字</div>
+  <h1 class="slogan" data-i18n-html="slogan">骨重几两，<br>命有多重。</h1>
+  <p class="subtitle" data-i18n="subtitle">称骨算命免费在线排盘</p>
+
+  <section class="section">
+    <div class="field">
+      <label for="birthtime" data-i18n="labelBirth">出生时间</label>
+      <input type="datetime-local" id="birthtime">
+      <div class="hint" data-i18n="birthNote">出生时间按农历换算：年干支以立春为界；闰月上半月算本月、下半月算下月。</div>
+      <div class="error" id="birth-error"></div>
+    </div>
+    <button class="submit-btn" onclick="doChenggu()" data-i18n="btnSubmit">称骨</button>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">称骨结果</div>
+    <div class="total-big" id="total-big"></div>
+    <div class="total-num" id="total-num"></div>
+    <div class="result-head" id="result-head"></div>
+    <div class="sub-block">
+      <div class="section-title" data-i18n="compTitle">骨重明细</div>
+      <div id="comp-rows"></div>
+    </div>
+    <div class="sub-block">
+      <div class="section-title" data-i18n="verseLabel">称骨歌</div>
+      <div class="poem-title" id="poem-title"></div>
+      <div class="poem" id="poem-text"></div>
+      <div class="poem-note" id="poem-note"></div>
+    </div>
+    <div class="sub-block">
+      <div class="section-title" data-i18n="glossLabel">歌诀大意</div>
+      <div class="gloss" id="gloss-text"></div>
+    </div>
+      <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="chenggu" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+</section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">称骨算命：免费排盘与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">称骨算命是什么？</summary>
+      <p data-i18n="faqA1">称骨算命相传为唐代袁天罡所创，以农历出生年、月、日、时的骨重相加，按总骨重查称骨歌断命。本页按通行版骨重表排盘。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">骨重越重命越好吗？</summary>
+      <p data-i18n="faqA2">歌诀里骨重轻的命格多言劳碌辛苦，骨重重的多言福禄丰厚。但称骨只是传统术数的一种说法，骨重只是歌诀的索引，不是命运的定量，不必以轻重论高下。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">为什么用农历？</summary>
+      <p data-i18n="faqA3">称骨表以农历年月日时为准，公历出生时间须先换算成农历，再查年干支、月份、日期与时辰；年干支以立春为界，与排盘口径一致。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">出生在闰月怎么算？</summary>
+      <p data-i18n="faqA4">按通行口径，闰月上半月算本月、下半月算下月；本页已按此规则换算。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">称骨算命免费吗？</summary>
+      <p data-i18n="faqA5">免费。本页排盘在本地完成，不联网、不收费，也不会保存你输入的出生时间。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">称骨算命属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="offlineNote">本页完全离线运行，农历换算使用本地 lunar.js，骨重数据取自本站 /data/chenggu.json，不向任何服务器发送数据。</span>
+  </footer>
+</div>
+</main>
+
+<script src="lunar.js"></script>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。称骨歌原文一律保留中文，见 verseNote。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '称骨算命 · 本地占卜',
+  navGroup: '占卜',
+  nav_1: '解梦', nav_2: '六爻占卜', nav_3: '梅花易数', nav_4: '小六壬', nav_5: '塔罗牌',
+  nav_6: '雷诺曼', nav_7: '北欧卢恩符文', nav_8: '奇门遁甲', nav_9: '印度占星卜卦', nav_10: '西方卜卦占星',
+  nav_11: '大六壬', nav_12: '金口诀', nav_13: '太乙神数', nav_14: '占星骰子', nav_15: '称骨算命',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  langLabel: '语言',
+  eyebrow: '第一幕 · 生辰八字',
+  slogan: '骨重几两，<br>命有多重。',
+  subtitle: '称骨算命免费在线排盘',
+  labelBirth: '出生时间',
+  birthNote: '出生时间按农历换算：年干支以立春为界；闰月上半月算本月、下半月算下月。',
+  btnSubmit: '称骨',
+  errNoTime: '请先选择出生时间。',
+  errBadTime: '时间格式不正确。',
+  errNoData: '骨重数据加载失败，请刷新页面重试。',
+  errNoPoem: '未找到该骨重的歌诀。',
+  resultTitle: '称骨结果',
+  ai_interpret: 'AI 解读',
+  compTitle: '骨重明细',
+  year: '年', month: '月', day: '日', hour: '时',
+  unit: '两',
+  totalNum: '共',
+  lunarLabel: '农历生辰',
+  verseLabel: '称骨歌',
+  verseNote: '',
+  glossLabel: '歌诀大意',
+  gloss1: '此档歌诀多言早年劳碌、六亲少靠，须凭自立勤俭立身。',
+  gloss2: '此档歌诀多言先苦后甘，中年以后衣食渐丰。',
+  gloss3: '此档歌诀多言衣禄绵长，历尽风霜后晚景安稳。',
+  gloss4: '此档歌诀多言福禄渐厚，勤俭成家、衣食无亏。',
+  gloss5: '此档歌诀多言福禄丰厚、荣华显达。',
+  leapPrefix: '闰',
+  leapApplied: '本次生于闰月下半月，按下月（{M}月）计重。',
+  faqTitle: '称骨算命：免费排盘与使用常见问题',
+  faqQ1: '称骨算命是什么？',
+  faqA1: '称骨算命相传为唐代袁天罡所创，以农历出生年、月、日、时的骨重相加，按总骨重查称骨歌断命。本页按通行版骨重表排盘。',
+  faqQ2: '骨重越重命越好吗？',
+  faqA2: '歌诀里骨重轻的命格多言劳碌辛苦，骨重重的多言福禄丰厚。但称骨只是传统术数的一种说法，骨重只是歌诀的索引，不是命运的定量，不必以轻重论高下。',
+  faqQ3: '为什么用农历？',
+  faqA3: '称骨表以农历年月日时为准，公历出生时间须先换算成农历，再查年干支、月份、日期与时辰；年干支以立春为界，与排盘口径一致。',
+  faqQ4: '出生在闰月怎么算？',
+  faqA4: '按通行口径，闰月上半月算本月、下半月算下月；本页已按此规则换算。',
+  faqQ5: '称骨算命免费吗？',
+  faqA5: '免费。本页排盘在本地完成，不联网、不收费，也不会保存你输入的出生时间。',
+  disclaimer: '称骨算命属传统术数，仅供参考，不构成决策依据。',
+  offlineNote: '本页完全离线运行，农历换算使用本地 lunar.js，骨重数据取自本站 /data/chenggu.json，不向任何服务器发送数据。'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '稱骨算命 · 本地占卜',
+  navGroup: '占卜',
+  nav_1: '解夢', nav_2: '六爻占卜', nav_3: '梅花易數', nav_4: '小六壬', nav_5: '塔羅牌',
+  nav_6: '雷諾曼', nav_7: '北歐盧恩符文', nav_8: '奇門遁甲', nav_9: '印度占星卜卦', nav_10: '西方卜卦占星',
+  nav_11: '大六壬', nav_12: '金口訣', nav_13: '太乙神數', nav_14: '占星骰子', nav_15: '稱骨算命',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  langLabel: '語言',
+  eyebrow: '第一幕 · 生辰八字',
+  slogan: '骨重幾兩，<br>命有多重。',
+  subtitle: '稱骨算命免費線上排盤',
+  labelBirth: '出生時間',
+  birthNote: '出生時間按農曆換算：年干支以立春為界；閏月上半月算本月、下半月算下月。',
+  btnSubmit: '稱骨',
+  errNoTime: '請先選擇出生時間。',
+  errBadTime: '時間格式不正確。',
+  errNoData: '骨重數據加載失敗，請刷新頁面重試。',
+  errNoPoem: '未找到該骨重的歌訣。',
+  resultTitle: '稱骨結果',
+  ai_interpret: 'AI 解讀',
+  compTitle: '骨重明細',
+  year: '年', month: '月', day: '日', hour: '時',
+  unit: '兩',
+  totalNum: '共',
+  lunarLabel: '農曆生辰',
+  verseLabel: '稱骨歌',
+  verseNote: '',
+  glossLabel: '歌訣大意',
+  gloss1: '此檔歌訣多言早年勞碌、六親少靠，須憑自立勤儉立身。',
+  gloss2: '此檔歌訣多言先苦後甘，中年以後衣食漸豐。',
+  gloss3: '此檔歌訣多言衣祿綿長，歷盡風霜後晚景安穩。',
+  gloss4: '此檔歌訣多言福祿漸厚，勤儉成家、衣食無虧。',
+  gloss5: '此檔歌訣多言福祿豐厚、榮華顯達。',
+  leapPrefix: '閏',
+  leapApplied: '本次生於閏月下半月，按下月（{M}月）計重。',
+  faqTitle: '稱骨算命：免費排盤與使用常見問題',
+  faqQ1: '稱骨算命是什麼？',
+  faqA1: '稱骨算命相傳為唐代袁天罡所創，以農曆出生年、月、日、時的骨重相加，按總骨重查稱骨歌斷命。本頁按通行版骨重表排盤。',
+  faqQ2: '骨重越重命越好嗎？',
+  faqA2: '歌訣裡骨重輕的命格多言勞碌辛苦，骨重重的多言福祿豐厚。但稱骨只是傳統術數的一種說法，骨重只是歌訣的索引，不是命運的定量，不必以輕重論高下。',
+  faqQ3: '為什麼用農曆？',
+  faqA3: '稱骨表以農曆年月日時為準，公曆出生時間須先換算成農曆，再查年干支、月份、日期與時辰；年干支以立春為界，與排盤口徑一致。',
+  faqQ4: '出生在閏月怎麼算？',
+  faqA4: '按通行口徑，閏月上半月算本月、下半月算下月；本頁已按此規則換算。',
+  faqQ5: '稱骨算命免費嗎？',
+  faqA5: '免費。本頁排盤在本地完成，不聯網、不收費，也不會保存你輸入的出生時間。',
+  disclaimer: '稱骨算命屬傳統術數，僅供參考，不構成決策依據。',
+  offlineNote: '本頁完全離線運行，農曆換算使用本地 lunar.js，骨重數據取自本站 /data/chenggu.json，不向任何伺服器發送數據。'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Bone Weighing · Local Divination',
+  navGroup: 'Divination',
+  nav_1: 'Dream Interpretation', nav_2: 'Six Lines (Liu Yao)', nav_3: 'Meihua Yishu', nav_4: 'Xiao Liuren', nav_5: 'Tarot',
+  nav_6: 'Lenormand', nav_7: 'Norse Runes', nav_8: 'Qimen Dunjia', nav_9: 'Vedic Astrology', nav_10: 'Western Horary Astrology',
+  nav_11: 'Da Liuren', nav_12: 'Jinkou Jue', nav_13: 'Taiyi Shenshu', nav_14: 'Astrology Dice', nav_15: 'Bone Weighing',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  langLabel: 'Language',
+  eyebrow: 'Act I · Birth Time',
+  slogan: 'How heavy are the bones,<br>how heavy is the fate.',
+  subtitle: 'Free online bone-weighing (Yuan Tiangang) chart',
+  labelBirth: 'Birth time',
+  birthNote: 'Your birth time is converted to the lunar calendar: the year stem-branch follows Lichun (the start of spring); for a leap month, the first half counts as that month and the second half as the next.',
+  btnSubmit: 'Weigh the bones',
+  errNoTime: 'Please choose a birth time first.',
+  errBadTime: 'The time format is invalid.',
+  errNoData: 'Bone-weight data failed to load. Please refresh the page and try again.',
+  errNoPoem: 'No verse was found for this bone weight.',
+  resultTitle: 'Your Bone Weight',
+  ai_interpret: 'AI Reading',
+  compTitle: 'Breakdown',
+  year: 'Year', month: 'Month', day: 'Day', hour: 'Hour',
+  unit: 'liang',
+  totalNum: 'Total',
+  lunarLabel: 'Lunar birth date',
+  verseLabel: 'Bone-Weighing Verse',
+  verseNote: 'Classical verse shown in Chinese.',
+  glossLabel: 'In brief',
+  gloss1: "Verses in this range mostly speak of hardship in early years and little help from family, with standing on one's own feet through diligence and thrift.",
+  gloss2: 'Verses in this range mostly speak of hardship first and ease later, with food and clothing growing plentiful from middle age on.',
+  gloss3: 'Verses in this range mostly speak of a lasting livelihood, with a settled and comfortable later life after weathering hard times.',
+  gloss4: 'Verses in this range mostly speak of growing fortune, building a home through diligence and thrift, with no lack of food and clothing.',
+  gloss5: 'Verses in this range mostly speak of abundant fortune and honor.',
+  leapPrefix: 'Leap ',
+  leapApplied: 'Born in the second half of a leap month, so the following month ({M}) is used for the weight.',
+  faqTitle: 'Bone Weighing: Free Chart & FAQ',
+  faqQ1: 'What is bone weighing (chenggu)?',
+  faqA1: 'Bone weighing is traditionally attributed to Yuan Tiangang of the Tang dynasty: the bone weights of the lunar birth year, month, day and hour are added up, and the total weight is looked up in the bone-weighing verses. This page uses the commonly circulated weight tables.',
+  faqQ2: 'Is a heavier bone weight always a better fate?',
+  faqA2: 'In the verses, lighter weights mostly speak of toil and hardship, and heavier weights mostly speak of fortune and abundance. But bone weighing is only one traditional art; the weight is an index into the verses, not a measure of fate, so it should not be read as a ranking.',
+  faqQ3: 'Why is the lunar calendar used?',
+  faqA3: 'The bone-weight tables are based on the lunar year, month, day and hour, so a Gregorian birth time must first be converted to the lunar calendar. The year stem-branch follows Lichun, the start of spring, the same convention used in charting.',
+  faqQ4: 'What if I was born in a leap month?',
+  faqA4: 'By the commonly used rule, the first half of a leap month counts as that month and the second half as the next month. This page applies that rule automatically.',
+  faqQ5: 'Is the bone-weighing chart free?',
+  faqA5: 'Yes, free. The chart is computed locally in your browser — no internet, no charge, and your birth time is never saved.',
+  disclaimer: 'Bone weighing is a traditional divination art, for reference only; it is not a basis for decisions.',
+  offlineNote: 'This page runs fully offline. Lunar conversion uses the local lunar.js, bone-weight data comes from this site at /data/chenggu.json, and no data is sent to any server.'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '称骨算命 · ローカル占い',
+  navGroup: '占い',
+  nav_1: '夢占い', nav_2: '六爻占い', nav_3: '梅花易数', nav_4: '小六壬', nav_5: 'タロット',
+  nav_6: 'ルノルマン', nav_7: '北欧ルーン', nav_8: '奇門遁甲', nav_9: 'インド占星術', nav_10: '西洋ホラリー占星術',
+  nav_11: '大六壬', nav_12: '金口訣', nav_13: '太乙神数', nav_14: '占星ダイス', nav_15: '称骨算命',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  langLabel: '言語',
+  eyebrow: '第一幕 · 生辰八字',
+  slogan: '骨の重さ幾両、<br>命の重さもまた。',
+  subtitle: '称骨算命 無料オンライン排盤',
+  labelBirth: '出生時間',
+  birthNote: '出生時間は旧暦に換算します：年の干支は立春を境とし、閏月は上半月を当月、下半月を翌月として扱います。',
+  btnSubmit: '称骨する',
+  errNoTime: 'まず出生時間を選択してください。',
+  errBadTime: '時間の形式が正しくありません。',
+  errNoData: '骨重データの読み込みに失敗しました。ページを更新してもう一度お試しください。',
+  errNoPoem: 'この骨重の歌が見つかりませんでした。',
+  resultTitle: '称骨の結果',
+  ai_interpret: 'AI 解釈',
+  compTitle: '骨重の内訳',
+  year: '年', month: '月', day: '日', hour: '時',
+  unit: '両',
+  totalNum: '合計',
+  lunarLabel: '旧暦の生辰',
+  verseLabel: '称骨歌',
+  verseNote: '原文は中国語のまま表示しています。',
+  glossLabel: '大意',
+  gloss1: 'この範囲の歌は、早年の苦労と六親の助けの少なさを語り、自立と勤倹で身を立てることを説くものが多いです。',
+  gloss2: 'この範囲の歌は、先苦後甘を語り、中年以降に衣食が次第に豊かになるものが多いです。',
+  gloss3: 'この範囲の歌は、衣禄が綿々と続き、風霜を経て晩年が安穏であることを語るものが多いです。',
+  gloss4: 'この範囲の歌は、福禄が次第に厚くなり、勤倹で家を成し、衣食に困らないことを語るものが多いです。',
+  gloss5: 'この範囲の歌は、福禄が豊かで栄華に恵まれることを語るものが多いです。',
+  leapPrefix: '閏',
+  leapApplied: '閏月の下半月に生まれたため、翌月（{M}月）の重さで計算しています。',
+  faqTitle: '称骨算命：無料排盤とよくある質問',
+  faqQ1: '称骨算命とは？',
+  faqA1: '称骨算命は唐代の袁天罡に由来すると伝えられ、旧暦の出生年・月・日・時の骨重を合計し、その総骨重で称骨歌を引く占いです。このページは通行版の骨重表で排盤します。',
+  faqQ2: '骨が重いほど命は良いのですか？',
+  faqA2: '歌では、骨の軽い命は労苦を、重い命は福禄の豊かさを語るものが多いです。ただ称骨は伝統的な占術の一つで、骨重は歌を引くための目安にすぎず、運命の優劣を量るものではありません。',
+  faqQ3: 'なぜ旧暦を使うのですか？',
+  faqA3: '骨重表は旧暦の年月日時にもとづくため、西暦の出生時間はまず旧暦に換算し、年干支・月・日・時辰を調べます。年干支は立春を境とし、排盤の口径と一致しています。',
+  faqQ4: '閏月に生まれた場合はどうなりますか？',
+  faqA4: '通行の口径では、閏月の上半月は当月、下半月は翌月として扱います。このページはその規則で自動換算します。',
+  faqQ5: '称骨算命は無料ですか？',
+  faqA5: '無料です。このページの排盤はローカルで計算され、ネット接続も料金も不要で、出生時間は保存されません。',
+  disclaimer: '称骨算命は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  offlineNote: 'このページは完全オフラインで動作します。旧暦換算はローカルの lunar.js を使い、骨重データは当サイトの /data/chenggu.json から読み込み、データは外部サーバーに送信されません。'
+}
+};
+
+var BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var BRANCH_EN = {'子':'Zi','丑':'Chou','寅':'Yin','卯':'Mao','辰':'Chen','巳':'Si','午':'Wu','未':'Wei','申':'Shen','酉':'You','戌':'Xu','亥':'Hai'};
+var CN_NUM = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+var MONTH_CN = ['', '正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊'];
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var CG_DATA = null;
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('nav_15');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var te = document.getElementById('birth-error'); if (te) te.textContent = '';
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// 时辰地支：23-1 子，1-3 丑，3-5 寅，5-7 卯，7-9 辰，9-11 巳，
+// 11-13 午，13-15 未，15-17 申，17-19 酉，19-21 戌，21-23 亥
+function hourBranch(hour) {
+  if (hour >= 23 || hour < 1) return '子';
+  return BRANCHES[Math.floor((hour + 1) / 2)];
+}
+
+// 总骨重（数字，如 3.5）→ 歌诀键名，如 三两五钱 → "三两五"；4.0 → "四两"
+function weightKey(total) {
+  var liang = Math.floor(total + 1e-9);
+  var qian = Math.round((total - liang) * 10);
+  return CN_NUM[liang] + '两' + (qian ? CN_NUM[qian] : '');
+}
+
+// 总骨重中文写法，如 3.5 → 三两五钱；4.0 → 四两（繁体：三兩五錢）
+function weightChinese(total) {
+  var liang = Math.floor(total + 1e-9);
+  var qian = Math.round((total - liang) * 10);
+  var liangCh = (LANG === 'zh-TW') ? '兩' : '两';
+  var qianCh = (LANG === 'zh-TW') ? '錢' : '钱';
+  return CN_NUM[liang] + liangCh + (qian ? CN_NUM[qian] + qianCh : '');
+}
+
+function fmtWeight(w) {
+  // 1.0 → "1"，0.8 → "0.8"；与数据文件写法一致
+  return (Math.round(w * 10) / 10).toString();
+}
+
+function ordinal(n) {
+  if (n === 1) return '1st';
+  if (n === 2) return '2nd';
+  if (n === 3) return '3rd';
+  return n + 'th';
+}
+
+function monthDisplay(monthNum, monthCN) {
+  if (LANG === 'en') return ordinal(monthNum) + ' month';
+  return monthCN + t('month');
+}
+function dayDisplay(dayNum, dayCN) {
+  if (LANG === 'en') return ordinal(dayNum) + ' day';
+  return dayCN + t('day');
+}
+function hourDisplay(branch) {
+  if (LANG === 'en') return BRANCH_EN[branch] + ' hour (' + branch + ')';
+  return branch + t('hour');
+}
+function branchName(b) { return LANG === 'en' ? BRANCH_EN[b] : b; }
+
+// 骨重档位解说：按总骨重分五档，均为对歌诀总体倾向的中性概括
+function glossFor(total) {
+  if (total < 3) return t('gloss1');
+  if (total < 4) return t('gloss2');
+  if (total < 5) return t('gloss3');
+  if (total < 6) return t('gloss4');
+  return t('gloss5');
+}
+
+// 纯计算：公历出生 Date → 农历换算 + 四柱骨重 + 总重 + 歌诀
+function calcChenggu(date) {
+  var solar = Solar.fromYmd(date.getFullYear(), date.getMonth() + 1, date.getDate());
+  var lunar = solar.getLunar();
+  // 年干支以立春为界（数据口径，与排盘一致）
+  var ganzhi = lunar.getYearInGanZhiByLiChun();
+  // lunar.js 里闰月月份返回负数（如 -6 为闰六月）
+  var rawMonth = lunar.getMonth();
+  var isLeap = rawMonth < 0;
+  var month = Math.abs(rawMonth);
+  var day = lunar.getDay();
+  var monthForWeight = month;
+  var leapShifted = false;
+  if (isLeap && day > 15) {
+    monthForWeight = month % 12 + 1;
+    leapShifted = true;
+  }
+  var branch = hourBranch(date.getHours());
+  var yW = CG_DATA.cgYear[ganzhi];
+  var mW = CG_DATA.cgMonth[monthForWeight - 1];
+  var dW = CG_DATA.cgDay[day - 1];
+  var hW = CG_DATA.cgHour[branch];
+  var total = Math.round((yW + mW + dW + hW) * 10) / 10;
+  var key = weightKey(total);
+  return {
+    ganzhi: ganzhi,
+    month: month, monthForWeight: monthForWeight, isLeap: isLeap, leapShifted: leapShifted,
+    monthCN: lunar.getMonthInChinese(), dayCN: lunar.getDayInChinese(),
+    day: day, branch: branch,
+    yW: yW, mW: mW, dW: dW, hW: hW,
+    total: total, key: key,
+    poem: CG_DATA.cgPoems[key] || null,
+    date: date
+  };
+}
+// ==LOGIC-END==
+
+// ---- UI ----
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function doChenggu() {
+  var err = document.getElementById('birth-error');
+  var v = document.getElementById('birthtime').value;
+  if (!v) { err.textContent = t('errNoTime'); return; }
+  var d = new Date(v);
+  if (isNaN(d.getTime())) { err.textContent = t('errBadTime'); return; }
+  if (!CG_DATA) { err.textContent = t('errNoData'); return; }
+  err.textContent = '';
+  showResult(calcChenggu(d));
+}
+
+function showResult(r, noScroll) {
+  LAST_RESULT = r;
+  var unit = t('unit');
+  var unitSuffix = (LANG === 'en') ? ' ' + unit : unit;
+
+  document.getElementById('total-big').textContent = weightChinese(r.total);
+  document.getElementById('total-num').textContent = t('totalNum') + ' ' + fmtWeight(r.total) + unitSuffix;
+
+  var leapMark = r.isLeap ? t('leapPrefix') : '';
+  var lunarLine;
+  if (LANG === 'en') {
+    lunarLine = t('lunarLabel') + ': <b>' + r.ganzhi + ' year, ' + ordinal(r.month) + ' month' + (r.isLeap ? ' (leap)' : '') + ', ' + ordinal(r.day) + ' day, ' + BRANCH_EN[r.branch] + ' hour</b>';
+  } else if (LANG === 'ja') {
+    lunarLine = t('lunarLabel') + '：<b>' + r.ganzhi + '年' + leapMark + r.monthCN + '月' + r.dayCN + '日' + r.branch + '時</b>';
+  } else if (LANG === 'zh-TW') {
+    lunarLine = t('lunarLabel') + '：<b>' + r.ganzhi + '年' + leapMark + r.monthCN + '月' + r.dayCN + '日' + r.branch + '時</b>';
+  } else {
+    lunarLine = t('lunarLabel') + '：<b>' + r.ganzhi + '年' + leapMark + r.monthCN + '月' + r.dayCN + '日' + r.branch + '时</b>';
+  }
+  if (r.leapShifted) lunarLine += '<br>' + esc(t('leapApplied').replace('{M}', String(r.monthForWeight)));
+  document.getElementById('result-head').innerHTML = lunarLine;
+
+  function compRow(label, value, w) {
+    return '<div class="comp-row"><span>' + label + ' <b>' + esc(value) + '</b></span><span class="w">' + fmtWeight(w) + unitSuffix + '</span></div>';
+  }
+  document.getElementById('comp-rows').innerHTML =
+    compRow(t('year'), r.ganzhi, r.yW) +
+    compRow(t('month'), monthDisplay(r.monthForWeight, MONTH_CN[r.monthForWeight]) + (r.leapShifted ? '（' + t('leapPrefix') + r.monthCN + t('month') + '）' : (r.isLeap ? '（' + t('leapPrefix') + '）' : '')), r.mW) +
+    compRow(t('day'), dayDisplay(r.day, r.dayCN), r.dW) +
+    compRow(t('hour'), hourDisplay(r.branch), r.hW);
+
+  if (r.poem) {
+    document.getElementById('poem-title').textContent = r.poem.title;
+    document.getElementById('poem-text').textContent = r.poem.poem;
+  } else {
+    document.getElementById('poem-title').textContent = '';
+    document.getElementById('poem-text').textContent = t('errNoPoem');
+  }
+  var pn = document.getElementById('poem-note');
+  pn.textContent = t('verseNote');
+  pn.style.display = t('verseNote') ? '' : 'none';
+
+  document.getElementById('gloss-text').textContent = glossFor(r.total);
+
+  document.getElementById('result-card').classList.remove('hidden');
+  if (!noScroll) document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// 骨重数据取自本站 /data/chenggu.json（与各工具页共用的数据目录）
+function loadData() {
+  if (typeof fetch !== 'function') return;
+  fetch('/data/chenggu.json').then(function (resp) {
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    return resp.json();
+  }).then(function (data) {
+    CG_DATA = data;
+  }).catch(function () {
+    CG_DATA = null;
+  });
+}
+
+loadData();
+applyI18n();
+
+// ==AI-INTERPRET==
+// Shared AI 解读 button (/js/ai-jiegua.js). Summary comes from this page's
+// own result state; null/'' means "no result yet" and the button only shows
+// a hint instead of calling the backend.
+function aiTrunc(s, n) { s = String(s == null ? '' : s); return s.length > n ? s.slice(0, n) + '…' : s; }
+window.getJieguaSummary = function() {
+if (!LAST_RESULT) return null;
+var r = LAST_RESULT;
+var parts = [];
+parts.push('称骨：' + weightChinese(r.total) + '（' + fmtWeight(r.total) + '）');
+parts.push('农历：' + r.ganzhi + '年 ' + r.monthCN + '月' + r.dayCN + '日 ' + r.branch + '时' + (r.isLeap ? '（闰月）' : ''));
+parts.push('骨重明细：年 ' + fmtWeight(r.yW) + ' + 月 ' + fmtWeight(r.mW) + ' + 日 ' + fmtWeight(r.dW) + ' + 时 ' + fmtWeight(r.hW));
+if (r.poem) {
+if (r.poem.title) parts.push('称骨歌标题：' + r.poem.title);
+if (r.poem.poem) parts.push('称骨歌：' + r.poem.poem);
+}
+var gl = glossFor(r.total);
+if (gl) parts.push('歌诀大意：' + aiTrunc(gl, 300));
+return parts.join('\n');
+};
+
+if (window.AIInterpret) { window.AIInterpret.attach(); }
+else { document.addEventListener('DOMContentLoaded', function () { if (window.AIInterpret) window.AIInterpret.attach(); }); }
+</script>
+<script src="/js/ai-jiegua.js"></script>
+</body>
+</html>

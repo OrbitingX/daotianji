@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 玛雅历法</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+  .gua-name-cn { display: block; font-size: .85rem; color: #9a9aab; font-weight: 400; margin-top: .2rem; letter-spacing: .05em; }
+  .guaci-note { font-size: .78rem; color: #6f6f80; margin-top: .5rem; line-height: 1.6; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="date"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .method-row { display: flex; gap: 2rem; }
+  .method-row > .field { flex: 1; min-width: 0; }
+  .num-row { display: flex; gap: 2rem; }
+  .num-row > .field { flex: 1; min-width: 0; }
+  .link-btn { background: none; border: none; color: #c9a962; font-size: .75rem; cursor: pointer; letter-spacing: .1em; padding: 0; margin-left: .5rem; font-family: inherit; }
+  .link-btn:hover { text-decoration: underline; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .verdict { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .level { color: #c9a962; font-weight: 700; }
+  .hex-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-top: 1.4rem; }
+  .hex-card { background: transparent; border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1.1rem 1.2rem; }
+  .hex-card h3 { font-size: .8rem; color: #b08d3e; font-weight: 400; letter-spacing: .25em; margin-bottom: .6rem; }
+  .hex-card .gua-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.25rem; font-weight: 700; color: #f0ead8; }
+  .hex-card .tri-info { font-size: .85rem; color: #9a9aab; margin: .4rem 0 .8rem; line-height: 1.7; }
+  .hex-card .tri-info b { color: #f0ead8; font-weight: 600; }
+  .hex-card .guaci { font-size: .88rem; color: #c8c2ae; line-height: 1.7; border-top: 1px dashed rgba(201,169,98,.35); padding-top: .7rem; margin-top: .7rem; }
+  .hex-diagram { width: 170px; margin: .2rem auto .7rem; }
+  .hex-row { display: flex; align-items: center; height: 13px; margin: 7px 0; }
+  .hex-row .bar { flex: 1; height: 13px; display: flex; }
+  .hex-row .bar .seg { flex: 1; background: #c9a962; border-radius: 2px; }
+  .hex-row.yin .bar { gap: 14px; }
+  .hex-row.changing .bar .seg { background: #e8c97a; box-shadow: 0 0 10px rgba(201,169,98,.7); }
+  .hex-row .mark { width: 22px; text-align: right; color: #c9a962; font-size: .8rem; flex-shrink: 0; }
+  .hex-row .mark .dot { font-size: .7rem; }
+  .hex-row .lbl { width: 22px; color: #6f6f80; font-size: .7rem; flex-shrink: 0; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .method-row, .num-row { flex-direction: column; gap: 0; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">玛雅历法 · 本地换算</div>
+    </div>
+  </a>
+                <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></span>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">时机之轮 · 玛雅历法</div>
+  <h1 class="slogan" data-i18n-html="slogan">长纪历转，<br>日符有灵。</h1>
+  <p class="subtitle" data-i18n="subtitle">玛雅历法免费在线换算</p>
+
+  <section class="section">
+    <div class="field">
+      <label for="question" data-i18n="labelQuestion">所问之事（可选）</label>
+      <input type="text" id="question" placeholder="例如：今天适合开始新计划吗？" data-i18n-ph="phQuestion">
+    </div>
+    <div class="field">
+      <label for="date"><span data-i18n="labelDate">公历日期</span> <button type="button" class="link-btn" onclick="useToday()" data-i18n="btnToday">用今天</button></label>
+      <input type="date" id="date">
+      <div class="error" id="date-error"></div>
+    </div>
+    <button class="submit-btn" onclick="doConvert()" data-i18n="btnSubmit">换算 · 看今日玛雅日</button>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">玛雅日</div>
+    <div class="result-head" id="result-head"></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="hex-grid" id="hex-grid"></div>
+    <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="maya" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+  </section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">玛雅历法：免费换算与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">玛雅历法是怎么换算的？</summary>
+      <p data-i18n="faqA1">本页用 GMT 相关常数 584283，把公历日期换算为儒略日数，再从玛雅长纪历起点 0.0.0.0.0 起计数，依次算出长纪历、260 天的卓尔金历与 365 天的哈布历。全部是本地纯数学计算，不联网。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">2012 年 12 月 21 日真的是世界末日吗？</summary>
+      <p data-i18n="faqA2">不是。2012 年 12 月 21 日只是第 13 伯克盾走完、长纪历来到 13.0.0.0.0，相当于一个大周期的翻页，之后历法继续运转到 13.0.0.0.1、13.0.0.0.2……玛雅人自己也没有留下世界末日的说法。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">卓尔金历和哈布历有什么区别？</summary>
+      <p data-i18n="faqA3">卓尔金历是 260 天的神圣历，由 13 个数字与 20 个日符组合而成，用于占卜与仪式；哈布历是 365 天的太阳历，由 18 个月（每月 20 天）加 5 天无名日 Wayeb 组成，用于农事与世俗生活。两者组合，52 年才重合一次，称为历法循环。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">为什么不用其他相关常数？</summary>
+      <p data-i18n="faqA4">公历与玛雅历的对应关系学界仍有争议，GMT 常数 584283 是目前最广泛使用的一种；另一派常用 584285，两者只差两天，换出的长纪历相差 2 金、日符也会顺延。不同来源的结果相差一两天，多半是常数不同，不是算错。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">换算结果免费吗？准吗？</summary>
+      <p data-i18n="faqA5">免费。本页换算在本地完成，不联网、不收费，也不会保存你输入的问题。结果是历法换算，不是预测：它告诉你某一天在玛雅历里叫什么，至于那一天的吉凶含义属于传统解读，仅供参考。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">玛雅历法属传统历法与术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="offlineNote">本页完全离线运行，历法换算使用本地纯数学计算，不向任何服务器发送数据。</span>
+  </footer>
+</div>
+</main>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。玛雅日符与月份名保留原名 + 中文。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '玛雅历法 · 本地换算',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '时机之轮 · 玛雅历法',
+  slogan: '长纪历转，<br>日符有灵。',
+  subtitle: '玛雅历法免费在线换算',
+  labelQuestion: '所问之事（可选）',
+  phQuestion: '例如：今天适合开始新计划吗？',
+  labelDate: '公历日期',
+  btnToday: '用今天',
+  btnSubmit: '换算 · 看今日玛雅日',
+  errNoDate: '请先选择日期。',
+  errBadDate: '日期格式不正确。',
+  resultTitle: '玛雅日',
+  gregDate: '公历',
+  jdnLabel: '儒略日数',
+  daysLabel: '距长纪历起点',
+  dayUnit: '天',
+  cardLong: '长纪历',
+  cardTzolkin: '卓尔金历',
+  cardHaab: '哈布历',
+  baktun: '伯克盾', katun: '卡盾', tun: '盾', uinal: '乌纳', kin: '金',
+  tzNumber: '数字', tzSign: '日符',
+  haabDay: '日', haabMonth: '月',
+  wayebLabel: '无名日',
+  energyLabel: '今日能量',
+  energyTpl: '今日由 {n} {sign}（{cn}）主导——{mean}。哈布{haab}（{gloss}）。',
+  corrNote: '换算采用 GMT 相关常数 584283（0.0.0.0.0 对应儒略日数 584283）。',
+  faqTitle: '玛雅历法：免费换算与使用常见问题',
+  faqQ1: '玛雅历法是怎么换算的？',
+  faqA1: '本页用 GMT 相关常数 584283，把公历日期换算为儒略日数，再从玛雅长纪历起点 0.0.0.0.0 起计数，依次算出长纪历、260 天的卓尔金历与 365 天的哈布历。全部是本地纯数学计算，不联网。',
+  faqQ2: '2012 年 12 月 21 日真的是世界末日吗？',
+  faqA2: '不是。2012 年 12 月 21 日只是第 13 伯克盾走完、长纪历来到 13.0.0.0.0，相当于一个大周期的翻页，之后历法继续运转到 13.0.0.0.1、13.0.0.0.2……玛雅人自己也没有留下世界末日的说法。',
+  faqQ3: '卓尔金历和哈布历有什么区别？',
+  faqA3: '卓尔金历是 260 天的神圣历，由 13 个数字与 20 个日符组合而成，用于占卜与仪式；哈布历是 365 天的太阳历，由 18 个月（每月 20 天）加 5 天无名日 Wayeb 组成，用于农事与世俗生活。两者组合，52 年才重合一次，称为历法循环。',
+  faqQ4: '为什么不用其他相关常数？',
+  faqA4: '公历与玛雅历的对应关系学界仍有争议，GMT 常数 584283 是目前最广泛使用的一种；另一派常用 584285，两者只差两天，换出的长纪历相差 2 金、日符也会顺延。不同来源的结果相差一两天，多半是常数不同，不是算错。',
+  faqQ5: '换算结果免费吗？准吗？',
+  faqA5: '免费。本页换算在本地完成，不联网、不收费，也不会保存你输入的问题。结果是历法换算，不是预测：它告诉你某一天在玛雅历里叫什么，至于那一天的吉凶含义属于传统解读，仅供参考。',
+  disclaimer: '玛雅历法属传统历法与术数，仅供参考，不构成决策依据。',
+  offlineNote: '本页完全离线运行，历法换算使用本地纯数学计算，不向任何服务器发送数据。',
+  langLabel: '语言',
+  ai_interpret: 'AI 解读'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '瑪雅曆法 · 本地換算',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '時機之輪 · 瑪雅曆法',
+  slogan: '長紀曆轉，<br>日符有靈。',
+  subtitle: '瑪雅曆法免費線上換算',
+  labelQuestion: '所問之事（可選）',
+  phQuestion: '例如：今天適合開始新計劃嗎？',
+  labelDate: '公曆日期',
+  btnToday: '用今天',
+  btnSubmit: '換算 · 看今日瑪雅日',
+  errNoDate: '請先選擇日期。',
+  errBadDate: '日期格式不正確。',
+  resultTitle: '瑪雅日',
+  gregDate: '公曆',
+  jdnLabel: '儒略日數',
+  daysLabel: '距長紀曆起點',
+  dayUnit: '天',
+  cardLong: '長紀曆',
+  cardTzolkin: '卓爾金曆',
+  cardHaab: '哈布曆',
+  baktun: '伯克盾', katun: '卡盾', tun: '盾', uinal: '烏納', kin: '金',
+  tzNumber: '數字', tzSign: '日符',
+  haabDay: '日', haabMonth: '月',
+  wayebLabel: '無名日',
+  energyLabel: '今日能量',
+  energyTpl: '今日由 {n} {sign}（{cn}）主導——{mean}。哈布{haab}（{gloss}）。',
+  corrNote: '換算採用 GMT 相關常數 584283（0.0.0.0.0 對應儒略日數 584283）。',
+  faqTitle: '瑪雅曆法：免費換算與使用常見問題',
+  faqQ1: '瑪雅曆法是怎麼換算的？',
+  faqA1: '本頁用 GMT 相關常數 584283，把公曆日期換算為儒略日數，再從瑪雅長紀曆起點 0.0.0.0.0 起計數，依次算出長紀曆、260 天的卓爾金曆與 365 天的哈布曆。全部是本地純數學計算，不聯網。',
+  faqQ2: '2012 年 12 月 21 日真的是世界末日嗎？',
+  faqA2: '不是。2012 年 12 月 21 日只是第 13 伯克盾走完、長紀曆來到 13.0.0.0.0，相當於一個大週期的翻頁，之後曆法繼續運轉到 13.0.0.0.1、13.0.0.0.2……瑪雅人自己也沒有留下世界末日的說法。',
+  faqQ3: '卓爾金曆和哈布曆有什麼區別？',
+  faqA3: '卓爾金曆是 260 天的神聖曆，由 13 個數字與 20 個日符組合而成，用於占卜與儀式；哈布曆是 365 天的太陽曆，由 18 個月（每月 20 天）加 5 天無名日 Wayeb 組成，用於農事與世俗生活。兩者組合，52 年才重合一次，稱為曆法循環。',
+  faqQ4: '為什麼不用其他相關常數？',
+  faqA4: '公曆與瑪雅曆的對應關係學界仍有爭議，GMT 常數 584283 是目前最廣泛使用的一種；另一派常用 584285，兩者只差兩天，換出的長紀曆相差 2 金、日符也會順延。不同來源的結果相差一兩天，多半是常數不同，不是算錯。',
+  faqQ5: '換算結果免費嗎？準嗎？',
+  faqA5: '免費。本頁換算在本地完成，不聯網、不收費，也不會保存你輸入的問題。結果是曆法換算，不是預測：它告訴你某一天在瑪雅曆裡叫什麼，至於那一天的吉凶含義屬於傳統解讀，僅供參考。',
+  disclaimer: '瑪雅曆法屬傳統曆法與術數，僅供參考，不構成決策依據。',
+  offlineNote: '本頁完全離線運行，曆法換算使用本地純數學計算，不向任何伺服器發送數據。',
+  langLabel: '語言',
+  ai_interpret: 'AI 解讀'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': "Zhuge's Oracles",
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Maya Calendar · Local Conversion',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'Wheel of Time · Maya Calendar',
+  slogan: 'The Long Count turns,<br>and the day sign speaks.',
+  subtitle: 'Free online Maya calendar conversion',
+  labelQuestion: 'Your question (optional)',
+  phQuestion: 'e.g. Is today a good day to start a new plan?',
+  labelDate: 'Gregorian date',
+  btnToday: 'Use today',
+  btnSubmit: 'Convert · See today in the Maya calendar',
+  errNoDate: 'Please choose a date first.',
+  errBadDate: 'The date format is invalid.',
+  resultTitle: 'The Maya Day',
+  gregDate: 'Gregorian date',
+  jdnLabel: 'Julian Day Number',
+  daysLabel: 'Days since 0.0.0.0.0',
+  dayUnit: 'days',
+  cardLong: 'Long Count',
+  cardTzolkin: "Tzolk'in",
+  cardHaab: 'Haab',
+  baktun: 'Baktun', katun: 'Katun', tun: 'Tun', uinal: 'Uinal', kin: 'Kin',
+  tzNumber: 'Number', tzSign: 'Day sign',
+  haabDay: 'Day', haabMonth: 'Month',
+  wayebLabel: 'Wayeb (nameless days)',
+  energyLabel: "Today's energy",
+  energyTpl: 'Today is ruled by {n} {sign} ({cn}) — {mean}. Haab {haab} ({gloss}).',
+  corrNote: 'Conversion uses the GMT correlation constant 584283 (0.0.0.0.0 = Julian Day Number 584283).',
+  faqTitle: 'Maya Calendar: Free Conversion & FAQ',
+  faqQ1: 'How is the Maya calendar converted?',
+  faqA1: 'This page uses the GMT correlation constant 584283 to turn a Gregorian date into a Julian Day Number, then counts forward from the Maya Long Count epoch 0.0.0.0.0 to compute the Long Count, the 260-day Tzolk\'in and the 365-day Haab. It is pure local calendar math — no internet.',
+  faqQ2: 'Was 21 December 2012 really the end of the world?',
+  faqA2: 'No. 21 December 2012 was simply the end of the 13th baktun, when the Long Count reached 13.0.0.0.0 — a page turned in a great cycle. The calendar kept running to 13.0.0.0.1, 13.0.0.0.2 and beyond, and the Maya themselves left no prophecy of the world ending.',
+  faqQ3: "What is the difference between the Tzolk'in and the Haab?",
+  faqA3: "The Tzolk'in is a 260-day sacred calendar of 13 numbers combined with 20 day signs, used for divination and ritual. The Haab is a 365-day solar calendar of 18 months of 20 days plus 5 nameless days, the Wayeb, used for farming and everyday life. The two coincide only once every 52 years, the Calendar Round.",
+  faqQ4: 'Why not use another correlation constant?',
+  faqA4: 'How the Gregorian and Maya calendars line up is still debated by scholars. The GMT constant 584283 is the most widely used; another school uses 584285, just two days apart — Long Counts from the two differ by 2 kin and the day signs shift along. If two sources disagree by a day or two, it is usually the constant, not an arithmetic error.',
+  faqQ5: 'Is the conversion free? Is it accurate?',
+  faqA5: 'Yes, free. The conversion is computed locally in your browser — no internet, no charge, and your question is never saved. The result is a calendar conversion, not a prediction: it tells you what a day is called in the Maya calendar, while the fortune attached to that day belongs to traditional interpretation and is for reference only.',
+  disclaimer: 'The Maya calendar is a traditional calendrical and divinatory system, for reference only; it is not a basis for decisions.',
+  offlineNote: 'This page runs fully offline. Calendar conversion uses pure local math and no data is sent to any server.',
+  langLabel: 'Language',
+  ai_interpret: 'AI Reading'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: 'マヤ暦 · ローカル換算',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '時の輪 · マヤ暦',
+  slogan: '長紀暦は巡り、<br>日符は語る。',
+  subtitle: 'マヤ暦 無料オンライン換算',
+  labelQuestion: '質問（任意）',
+  phQuestion: '例：今日は新しい計画を始めるのに良い日？',
+  labelDate: '西暦',
+  btnToday: '今日を使う',
+  btnSubmit: '換算 · 今日のマヤの日を見る',
+  errNoDate: 'まず日付を選択してください。',
+  errBadDate: '日付の形式が正しくありません。',
+  resultTitle: 'マヤの日',
+  gregDate: '西暦',
+  jdnLabel: 'ユリウス日',
+  daysLabel: '長紀暦起点からの日数',
+  dayUnit: '日',
+  cardLong: '長紀暦',
+  cardTzolkin: 'ツォルキン暦',
+  cardHaab: 'ハアブ暦',
+  baktun: 'バクトゥン', katun: 'カトゥン', tun: 'トゥン', uinal: 'ウィナル', kin: 'キン',
+  tzNumber: '数字', tzSign: '日符',
+  haabDay: '日', haabMonth: '月',
+  wayebLabel: 'ワイェブ（無名の日）',
+  energyLabel: '今日のエネルギー',
+  energyTpl: '今日は {n} {sign}（{cn}）が司る——{mean}。ハアブ{haab}（{gloss}）。',
+  corrNote: '換算は GMT 相関定数 584283 を用います（0.0.0.0.0 ＝ユリウス日 584283）。',
+  faqTitle: 'マヤ暦：無料換算とよくある質問',
+  faqQ1: 'マヤ暦はどう換算するのですか？',
+  faqA1: 'このページは GMT 相関定数 584283 を使い、西暦をユリウス日に換算してから、マヤ長紀暦の起点 0.0.0.0.0 からの日数を数え、長紀暦・260 日のツォルキン暦・365 日のハアブ暦を算出します。すべてローカルの純粋な暦数学で、ネット接続は不要です。',
+  faqQ2: '2012 年 12 月 21 日は本当に世界の終わりでしたか？',
+  faqA2: 'いいえ。2012 年 12 月 21 日は第 13 バクトゥンが終わり、長紀暦が 13.0.0.0.0 に達した日にすぎません。大きな周期の区切りで、その後も暦は 13.0.0.0.1、13.0.0.0.2 と進み続けます。マヤ人自身が世界の終わりを予言した記録もありません。',
+  faqQ3: 'ツォルキン暦とハアブ暦の違いは？',
+  faqA3: 'ツォルキン暦は 13 の数字と 20 の日符の組み合わせによる 260 日の神聖暦で、占いや儀式に用います。ハアブ暦は 18 か月（各 20 日）に 5 日の無名日ワイェブを加えた 365 日の太陽暦で、農事や日常生活に用います。両者が一致するのは 52 年に一度で、暦の循環と呼ばれます。',
+  faqQ4: 'なぜ他の相関定数を使わないのですか？',
+  faqA4: '西暦とマヤ暦の対応は学界でも議論が続いています。GMT 定数 584283 が現在もっとも広く使われており、別の一派は 584285 を使います。差はわずか 2 日ですが、長紀暦は 2 キン、日符もずれます。出典によって結果が 1〜2 日違うのは、たいてい定数の違いであり、計算ミスではありません。',
+  faqQ5: '換算は無料ですか？正確ですか？',
+  faqA5: '無料です。このページの換算はローカルで計算され、ネット接続も料金も不要で、入力した質問は保存されません。結果は暦の換算であり予測ではありません。その日がマヤ暦で何と呼ばれるかを示すもので、その日の吉凶は伝統的な解釈に属し、参考までとしてください。',
+  disclaimer: 'マヤ暦は伝統的な暦法と占術です。参考までとし、判断の根拠にはなりません。',
+  offlineNote: 'このページは完全オフラインで動作します。暦換算はローカルの純粋な数学計算で、データは外部サーバーに送信されません。',
+  langLabel: '言語',
+  ai_interpret: 'AI 解釈'
+}
+};
+
+// 卓尔金 20 日符：原名 + 各语短名
+var SIGNS = [
+  { n: "Imix",    cn: '鳄鱼', tw: '鱷魚', en: 'Crocodile', ja: 'ワニ' },
+  { n: "Ik'",      cn: '风',   tw: '風',   en: 'Wind',      ja: '風' },
+  { n: "Ak'b'al",  cn: '黑暗', tw: '黑暗', en: 'Darkness, Night', ja: '闇・夜' },
+  { n: "K'an",     cn: '玉米', tw: '玉米', en: 'Maize, Net', ja: 'トウモロコシ・網' },
+  { n: 'Chikchan', cn: '蛇',   tw: '蛇',   en: 'Serpent',   ja: '蛇' },
+  { n: 'Kimi',     cn: '死亡', tw: '死亡', en: 'Death, Transformation', ja: '死・転換' },
+  { n: "Manik'",   cn: '鹿',   tw: '鹿',   en: 'Deer, Hand', ja: '鹿・手' },
+  { n: 'Lamat',    cn: '星',   tw: '星',   en: 'Star, Rabbit', ja: '星・ウサギ' },
+  { n: 'Muluk',    cn: '水',   tw: '水',   en: 'Water, Jade', ja: '水・ヒスイ' },
+  { n: 'Ok',       cn: '狗',   tw: '狗',   en: 'Dog, Loyalty', ja: '犬・忠誠' },
+  { n: 'Chuwen',   cn: '猴',   tw: '猴',   en: 'Monkey, Artisan', ja: 'サル・職人' },
+  { n: "Eb'",      cn: '草',   tw: '草',   en: 'Grass, Road', ja: '草・道' },
+  { n: "B'en",     cn: '芦苇', tw: '蘆葦', en: 'Reed',      ja: 'アシ' },
+  { n: 'Ix',       cn: '豹',   tw: '豹',   en: 'Jaguar, Maize', ja: 'ジャガー・トウモロコシ' },
+  { n: 'Men',      cn: '鹰',   tw: '鷹',   en: 'Eagle',     ja: 'ワシ' },
+  { n: "Kib'",     cn: '蜡',   tw: '蠟',   en: 'Wax, Sage', ja: 'ロウ・賢者' },
+  { n: "Kab'an",   cn: '土',   tw: '土',   en: 'Earth, Quake', ja: '土・地震' },
+  { n: "Etz'nab'", cn: '燧石', tw: '燧石', en: 'Flint, Knife', ja: '火打石・刃' },
+  { n: 'Kawak',    cn: '雨',   tw: '雨',   en: 'Rain, Storm', ja: '雨・嵐' },
+  { n: 'Ajaw',     cn: '太阳', tw: '太陽', en: 'Sun, Lord', ja: '太陽・王' }
+];
+// 卓尔金日符一句话含义（按索引 0-19）
+var SIGN_MEAN = {
+'zh-CN': ['水的源头，孕育与开端','气流与言语，带来消息','夜与梦境，潜藏的直觉','生长与丰收，编织的网','生命力与直觉，蜕变的蛇','结束与转化，旧去新来','手与行动，以劳作完成','星光与丰盛，播种的时节','水与奉献，情感的流动','忠诚与守护，同伴之谊','手艺与幽默，创造的巧手','道路与指引，草的韧性','生长的芦苇，权威与方向','大地之母，丰饶与直觉','远见与洞察，鹰的眼睛','智慧与祖先的记忆','大地之力，脚踏实地','切割与决断，快刀斩乱','风暴与净化，雨后新生','太阳与王权，光明的顶点'],
+'zh-TW': ['水的源頭，孕育與開端','氣流與言語，帶來消息','夜與夢境，潛藏的直覺','生長與豐收，編織的網','生命力與直覺，蛻變的蛇','結束與轉化，舊去新來','手與行動，以勞作完成','星光與豐盛，播種的時節','水與奉獻，情感的流動','忠誠與守護，同伴之誼','手藝與幽默，創造的巧手','道路與指引，草的韌性','生長的蘆葦，權威與方向','大地之母，豐饒與直覺','遠見與洞察，鷹的眼睛','智慧與祖先的記憶','大地之力，腳踏實地','切割與決斷，快刀斬亂','風暴與淨化，雨後新生','太陽與王權，光明的頂點'],
+'en': ['Source of water; birth and beginnings','Air and speech; messages arrive','Night and dreams; hidden intuition','Growth and harvest; the woven net','Life force and instinct; the shedding serpent','Ending and transformation; the old gives way','The hand and action; work completed','Starlight and abundance; time to sow','Water and offering; the flow of feeling','Loyalty and guardianship; companionship','Craft and humour; the creative hand','The road and guidance; the resilience of grass','The growing reed; authority and direction','Earth mother; fertility and intuition','Foresight and insight; the eagle eye','Wisdom and ancestral memory','Power of the earth; standing firm','Cutting and decision; the sharp blade','Storm and cleansing; renewal after rain','The sun and lordship; the height of light'],
+'ja': ['水の源、誕生と始まり','気流と言葉、便りが届く','夜と夢、隠れた直感','成長と収穫、編まれた網','生命力と直感、脱皮する蛇','終わりと転換、旧きは去る','手と行動、働きで成す','星明かりと豊穣、種まきの時','水と捧げもの、感情の流れ','忠誠と守護、仲間の絆','技芸とユーモア、創造の手','道としるべ、草のしなやかさ','伸びる葦、権威と方向','大地の母、豊穣と直感','遠見と洞察、鷹の目','知恵と祖先の記憶','大地の力、地に足をつける','切断と決断、鋭い刃','嵐と浄化、雨上がりの再生','太陽と王権、光の頂点']
+};
+// 哈布 18 个月：原名 + 各语短释
+var HAAB = [
+  { n: 'Pop',     cn: '新年，播种之始', tw: '新年，播種之始', en: 'New year; time to sow', ja: '新年、種まきの始まり' },
+  { n: 'Wo',      cn: '内省与静默', tw: '內省與靜默', en: 'Introspection and quiet', ja: '内省と静けさ' },
+  { n: 'Sip',     cn: '猎人与庆典', tw: '獵人與慶典', en: 'Hunters and feasting', ja: '狩人と祝宴' },
+  { n: "Sotz'",   cn: '蝙蝠，夜的洞穴', tw: '蝙蝠，夜的洞穴', en: 'The bat; caves of the night', ja: 'コウモリ、夜の洞窟' },
+  { n: 'Sek',     cn: '花与祭献', tw: '花與祭獻', en: 'Flowers and offerings', ja: '花と捧げもの' },
+  { n: 'Xul',     cn: '终结与播种', tw: '終結與播種', en: 'Ending and sowing', ja: '終わりと種まき' },
+  { n: "Yaxk'in", cn: '新太阳，绿色', tw: '新太陽，綠色', en: 'New sun; green', ja: '新しい太陽、緑' },
+  { n: 'Mol',     cn: '水与聚会', tw: '水與聚會', en: 'Water and gathering', ja: '水と集い' },
+  { n: "Ch'en",   cn: '洞穴与井', tw: '洞穴與井', en: 'Caves and wells', ja: '洞窟と井戸' },
+  { n: 'Yax',     cn: '绿色，初生', tw: '綠色，初生', en: 'Green; first growth', ja: '緑、芽生え' },
+  { n: 'Sak',     cn: '白色，纯净', tw: '白色，純淨', en: 'White; purity', ja: '白、清らかさ' },
+  { n: 'Keh',     cn: '鹿与森林', tw: '鹿與森林', en: 'The deer; the forest', ja: '鹿と森' },
+  { n: 'Mak',     cn: '封印与收尾', tw: '封印與收尾', en: 'Sealing and closing', ja: '封印と締めくくり' },
+  { n: "K'ank'in", cn: '黄色太阳，丰收', tw: '黃色太陽，豐收', en: 'Yellow sun; harvest', ja: '黄色い太陽、収穫' },
+  { n: 'Muwan',   cn: '枭，夜的信使', tw: '梟，夜的信使', en: 'The owl; messenger of night', ja: 'フクロウ、夜の使い' },
+  { n: 'Pax',     cn: '音乐与庆典', tw: '音樂與慶典', en: 'Music and celebration', ja: '音楽と祝宴' },
+  { n: "K'ayab'", cn: '乌龟与大海', tw: '烏龜與大海', en: 'The turtle; the sea', ja: 'カメと海' },
+  { n: "Kumk'u",  cn: '谷仓，旧年将尽', tw: '穀倉，舊年將盡', en: 'The granary; the old year ends', ja: '穀倉、旧年の終わり' }
+];
+var WAYEB_GLOSS = {
+  'zh-CN': '五个无名日，旧年与新年之间的空隙，宜静守',
+  'zh-TW': '五個無名日，舊年與新年之間的空隙，宜靜守',
+  'en': 'The five nameless days between the old and new year; a time to keep still',
+  'ja': '旧年と新年の間の五つの無名の日、静かに守る時'
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function signShort(s) { return LANG === 'en' ? s.en : (LANG === 'ja' ? s.ja : (LANG === 'zh-TW' ? s.tw : s.cn)); }
+function signMean(i) { var a = SIGN_MEAN[LANG] || SIGN_MEAN['zh-CN']; return a[i]; }
+function haabGloss(m) { return LANG === 'en' ? m.en : (LANG === 'ja' ? m.ja : (LANG === 'zh-TW' ? m.tw : m.cn)); }
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var de = document.getElementById('date-error'); if (de) de.textContent = '';
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// GMT 相关常数：0.0.0.0.0 的儒略日数 = 584283
+var GMT_CORR = 584283;
+
+// 公历 → 儒略日数（标准算法；1、2 月按上年 13、14 月处理）
+function jdnFromDate(y, m, d) {
+  var a = Math.floor((14 - m) / 12);
+  var yy = y + 4800 - a;
+  var mm = m + 12 * a - 3;
+  return d + Math.floor((153 * mm + 2) / 5) + 365 * yy + Math.floor(yy / 4) - Math.floor(yy / 100) + Math.floor(yy / 400) - 32045;
+}
+function mod(n, m) { var r = n % m; return r < 0 ? r + m : r; }
+
+function convertDate(y, m, d) {
+  var jdn = jdnFromDate(y, m, d);
+  var days = jdn - GMT_CORR;
+  var baktun = Math.floor(days / 144000);
+  var katun = Math.floor(mod(days, 144000) / 7200);
+  var tun = Math.floor(mod(days, 7200) / 360);
+  var uinal = Math.floor(mod(days, 360) / 20);
+  var kin = mod(days, 20);
+  var tzNum = mod(days + 3, 13) + 1;
+  var tzIdx = mod(days + 19, 20);
+  var h = mod(days + 348, 365);
+  var haabDay, haabIdx, wayeb;
+  if (h >= 360) { wayeb = true; haabDay = h - 360; haabIdx = -1; }
+  else { wayeb = false; haabIdx = Math.floor(h / 20); haabDay = h % 20; }
+  var ds = y + '-' + (m < 10 ? '0' : '') + m + '-' + (d < 10 ? '0' : '') + d;
+  return {
+    y: y, m: m, d: d, dateStr: ds, jdn: jdn, days: days,
+    baktun: baktun, katun: katun, tun: tun, uinal: uinal, kin: kin,
+    lcStr: baktun + '.' + katun + '.' + tun + '.' + uinal + '.' + kin,
+    tzNum: tzNum, tzIdx: tzIdx,
+    haabDay: haabDay, haabIdx: haabIdx, wayeb: wayeb
+  };
+}
+function haabStr(r) {
+  if (r.wayeb) return r.haabDay + ' Wayeb';
+  return r.haabDay + ' ' + HAAB[r.haabIdx].n;
+}
+function haabGlossOf(r) {
+  if (r.wayeb) return WAYEB_GLOSS[LANG] || WAYEB_GLOSS['zh-CN'];
+  return haabGloss(HAAB[r.haabIdx]);
+}
+function energyText(r) {
+  var s = SIGNS[r.tzIdx];
+  return t('energyTpl')
+    .replace('{n}', r.tzNum).replace('{sign}', s.n).replace('{cn}', signShort(s))
+    .replace('{mean}', signMean(r.tzIdx)).replace('{haab}', haabStr(r)).replace('{gloss}', haabGlossOf(r));
+}
+// ==LOGIC-END==
+
+// ---- UI ----
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function dateInputValue(d) {
+  function p(n) { return (n < 10 ? '0' : '') + n; }
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+}
+function useToday() {
+  document.getElementById('date').value = dateInputValue(new Date());
+  document.getElementById('date-error').textContent = '';
+}
+function doConvert() {
+  var v = document.getElementById('date').value;
+  var err = document.getElementById('date-error');
+  if (!v) { err.textContent = t('errNoDate'); return; }
+  var parts = v.split('-');
+  if (parts.length !== 3) { err.textContent = t('errBadDate'); return; }
+  var y = parseInt(parts[0], 10), m = parseInt(parts[1], 10), d = parseInt(parts[2], 10);
+  var chk = new Date(y, m - 1, d);
+  if (isNaN(y) || isNaN(m) || isNaN(d) || chk.getFullYear() !== y || chk.getMonth() !== m - 1 || chk.getDate() !== d) {
+    err.textContent = t('errBadDate'); return;
+  }
+  err.textContent = '';
+  showResult(convertDate(y, m, d));
+}
+function mayaCard(title, big, cnSub, info, note) {
+  return '<div class="hex-card"><h3>' + title + '</h3>' +
+    '<div class="gua-name">' + big + '</div>' +
+    (cnSub ? '<span class="gua-name-cn">' + cnSub + '</span>' : '') +
+    '<div class="tri-info">' + info + '</div>' +
+    '<div class="guaci">' + note + '</div></div>';
+}
+function showResult(r, noScroll) {
+  LAST_RESULT = r;
+  var s = SIGNS[r.tzIdx];
+  var q = document.getElementById('question').value.trim();
+
+  var head = '';
+  if (q) head += esc(q) + '<br>';
+  head += t('gregDate') + '：<b>' + r.dateStr + '</b><br>';
+  head += t('jdnLabel') + '：<b>' + r.jdn + '</b> · ' + t('daysLabel') + ' <b>' + r.days + '</b> ' + t('dayUnit') + '<br>';
+  head += t('corrNote');
+  document.getElementById('result-head').innerHTML = head;
+
+  document.getElementById('verdict').innerHTML =
+    '<span class="level">' + t('energyLabel') + '</span>——' + energyText(r);
+
+  var lcInfo = t('baktun') + ' <b>' + r.baktun + '</b> · ' + t('katun') + ' <b>' + r.katun + '</b> · ' +
+    t('tun') + ' <b>' + r.tun + '</b> · ' + t('uinal') + ' <b>' + r.uinal + '</b> · ' + t('kin') + ' <b>' + r.kin + '</b>';
+  var tzInfo = t('tzNumber') + ' <b>' + r.tzNum + '</b> · ' + t('tzSign') + ' <b>' + s.n + '</b>';
+  var haabInfo = r.wayeb
+    ? t('haabDay') + ' <b>' + r.haabDay + '</b> · ' + t('wayebLabel')
+    : t('haabDay') + ' <b>' + r.haabDay + '</b> · ' + t('haabMonth') + ' <b>' + HAAB[r.haabIdx].n + '</b>';
+
+  document.getElementById('hex-grid').innerHTML =
+    mayaCard(t('cardLong'), r.lcStr, '', lcInfo, t('corrNote')) +
+    mayaCard(t('cardTzolkin'), r.tzNum + ' ' + s.n, signShort(s), tzInfo, signMean(r.tzIdx)) +
+    mayaCard(t('cardHaab'), haabStr(r), r.wayeb ? '' : haabGloss(HAAB[r.haabIdx]), haabInfo, haabGlossOf(r));
+
+  document.getElementById('result-card').classList.remove('hidden');
+  if (!noScroll) document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ---- AI 解读：供 /js/ai-jiegua.js 调用 ----
+window.getJieguaQuestion = function() {
+  var el = document.getElementById('question');
+  return el ? el.value.trim() : '';
+};
+window.getJieguaSummary = function() {
+  if (!LAST_RESULT) return null;
+  var r = LAST_RESULT;
+  var s = SIGNS[r.tzIdx];
+  var lines = [];
+  lines.push('玛雅历法 ' + r.dateStr + '：长纪历' + r.lcStr + '，卓尔金' + r.tzNum + s.n + '，哈布' + haabStr(r));
+  lines.push('长纪历：' + r.baktun + '伯克盾 ' + r.katun + '卡盾 ' + r.tun + '盾 ' + r.uinal + '乌纳 ' + r.kin + '金；儒略日数 ' + r.jdn + '。');
+  lines.push('卓尔金：数字' + r.tzNum + '，日符 ' + s.n + '（' + s.cn + '）——' + SIGN_MEAN['zh-CN'][r.tzIdx] + '。');
+  lines.push('哈布：' + haabStr(r) + (r.wayeb ? '（无名日）' : '（' + HAAB[r.haabIdx].cn + '）') + '——' + (r.wayeb ? WAYEB_GLOSS['zh-CN'] : HAAB[r.haabIdx].cn) + '。');
+  lines.push('注：换算采用 GMT 相关常数 584283；日符含义属传统解读，仅供参考。');
+  return lines.join('\n');
+};
+
+// 默认填入今天
+document.getElementById('date').value = dateInputValue(new Date());
+// 初始化界面语言（localStorage 优先，否则按浏览器语言自动检测）
+applyI18n();
+</script>
+<script src="/js/ai-jiegua.js"></script>
+<script>
+// 共享脚本与本页主脚本都已加载后再挂接（getJieguaSummary 已定义）。
+if (window.AIInterpret) window.AIInterpret.attach();
+</script>
+</body>
+</html>

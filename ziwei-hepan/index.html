@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 紫微合盘</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .method-row { display: flex; gap: 2rem; }
+  .method-row > .field { flex: 1; min-width: 0; }
+  .check-row { display: flex; align-items: center; gap: .6rem; margin-bottom: 1.4rem; }
+  .check-row input[type="checkbox"] { width: 1.05rem; height: 1.05rem; accent-color: #c9a962; }
+  .check-row label { margin: 0; font-size: .92rem; color: #c8c2ae; letter-spacing: .05em; }
+  .hint { color: #9a9aab; font-size: .85rem; line-height: 1.8; margin-bottom: 1rem; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .verdict { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .level { color: #c9a962; font-weight: 700; }
+  .person-card { border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1.1rem 1.2rem; margin-bottom: 1.2rem; }
+  .person-card h3 { font-size: .85rem; color: #c9a962; letter-spacing: .25em; font-weight: 400; margin-bottom: .8rem; }
+  .table-wrap { overflow-x: auto; margin-top: 1.2rem; }
+  table.chart { width: 100%; border-collapse: collapse; font-size: .88rem; min-width: 520px; }
+  table.chart th { color: #b08d3e; font-weight: 400; letter-spacing: .18em; text-align: left; padding: .5rem .6rem; border-bottom: 1px solid rgba(201,169,98,.45); white-space: nowrap; }
+  table.chart td { padding: .55rem .6rem; border-bottom: 1px solid rgba(201,169,98,.12); color: #c8c2ae; white-space: nowrap; line-height: 1.6; }
+  table.chart td b { color: #f0ead8; font-weight: 600; }
+  table.chart td .gold { color: #e8c97a; font-weight: 700; }
+  table.chart td.wrap { white-space: normal; }
+  .duan-block { margin-top: 1.6rem; }
+  .duan-block h3 { font-size: .85rem; color: #c9a962; letter-spacing: .25em; font-weight: 400; margin-bottom: .7rem; }
+  .duan-item { padding: .7rem 0; border-bottom: 1px solid rgba(201,169,98,.12); font-size: .92rem; line-height: 1.9; color: #c8c2ae; }
+  .duan-item:last-child { border-bottom: none; }
+  .duan-item .cond { color: #c9a962; font-weight: 600; }
+  .duan-item .src { color: #6f6f80; font-size: .8rem; }
+  .duan-note { font-size: .82rem; color: #6f6f80; line-height: 1.8; margin-top: .6rem; }
+  .pair-card { border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: .9rem 1.1rem; margin-top: .8rem; }
+  .pair-card .p-name { font-size: 1rem; color: #f0ead8; font-weight: 600; }
+  .pair-card .p-level { font-size: .75rem; color: #c9a962; border: 1px solid rgba(201,169,98,.5); border-radius: 999px; padding: .05rem .5rem; margin-left: .5rem; }
+  .pair-card .p-level.bad { color: #d97b6c; border-color: rgba(217,123,108,.5); }
+  .pair-card .p-desc { font-size: .9rem; color: #c8c2ae; line-height: 1.8; margin-top: .4rem; }
+  .score-line { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.6rem; color: #c9a962; letter-spacing: .1em; text-align: center; margin: .6rem 0; }
+  .score-line small { font-size: .9rem; color: #9a9aab; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .method-row { flex-direction: column; gap: 0; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">紫微合盘 · 本地排盘</div>
+    </div>
+  </a>
+        <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></span>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">两人之间 · 合盘</div>
+  <h1 class="slogan" data-i18n-html="slogan">两盘相对，<br>星光自见分晓。</h1>
+  <p class="subtitle" data-i18n="subtitle">紫微斗数合盘免费在线排盘</p>
+
+  <section class="section">
+    <div class="person-card">
+      <h3 data-i18n="personA">本人</h3>
+      <div class="method-row">
+        <div class="field">
+          <label for="a-calendar" data-i18n="labelCalendar">历法</label>
+          <select id="a-calendar" onchange="switchCalendar('a', this.value)">
+            <option value="lunar" data-i18n="optLunar">农历（阴历）</option>
+            <option value="solar" selected data-i18n="optSolar">公历（阳历）</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="a-gender" data-i18n="labelGender">性别</label>
+          <select id="a-gender">
+            <option value="male" selected data-i18n="optMale">男</option>
+            <option value="female" data-i18n="optFemale">女</option>
+          </select>
+        </div>
+      </div>
+      <div class="method-row">
+        <div class="field">
+          <label for="a-date" data-i18n="labelBirthDate">出生日期</label>
+          <input type="date" id="a-date">
+        </div>
+        <div class="field">
+          <label for="a-time"><span data-i18n="labelBirthTime">出生时间</span></label>
+          <input type="time" id="a-time" value="12:00">
+        </div>
+      </div>
+      <div class="check-row hidden" id="a-leap-row">
+        <input type="checkbox" id="a-leap">
+        <label for="a-leap" data-i18n="labelLeap">闰月出生（所填月份为闰月）</label>
+      </div>
+      <div class="check-row">
+        <input type="checkbox" id="a-time-unknown" onchange="toggleTimeUnknown('a', this.checked)">
+        <label for="a-time-unknown" data-i18n="labelTimeUnknown">时辰不详（按午时排盘）</label>
+      </div>
+    </div>
+
+    <div class="person-card">
+      <h3 data-i18n="personB">对方</h3>
+      <div class="method-row">
+        <div class="field">
+          <label for="b-calendar" data-i18n="labelCalendar">历法</label>
+          <select id="b-calendar" onchange="switchCalendar('b', this.value)">
+            <option value="lunar" data-i18n="optLunar">农历（阴历）</option>
+            <option value="solar" selected data-i18n="optSolar">公历（阳历）</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="b-gender" data-i18n="labelGender">性别</label>
+          <select id="b-gender">
+            <option value="male" data-i18n="optMale">男</option>
+            <option value="female" selected data-i18n="optFemale">女</option>
+          </select>
+        </div>
+      </div>
+      <div class="method-row">
+        <div class="field">
+          <label for="b-date" data-i18n="labelBirthDate">出生日期</label>
+          <input type="date" id="b-date">
+        </div>
+        <div class="field">
+          <label for="b-time"><span data-i18n="labelBirthTime">出生时间</span></label>
+          <input type="time" id="b-time" value="12:00">
+        </div>
+      </div>
+      <div class="check-row hidden" id="b-leap-row">
+        <input type="checkbox" id="b-leap">
+        <label for="b-leap" data-i18n="labelLeap">闰月出生（所填月份为闰月）</label>
+      </div>
+      <div class="check-row">
+        <input type="checkbox" id="b-time-unknown" onchange="toggleTimeUnknown('b', this.checked)">
+        <label for="b-time-unknown" data-i18n="labelTimeUnknown">时辰不详（按午时排盘）</label>
+      </div>
+    </div>
+
+    <p class="hint" data-i18n="formHint">紫微斗数以农历起盘：填公历会自动换算为农历；时辰决定命宫与身宫，请尽量准确。23:00–24:00 出生按次日农历排盘（晚子时换日）。</p>
+    <div class="error" id="form-error"></div>
+    <button class="submit-btn" onclick="doHepan()" data-i18n="btnSubmit">安星 · 排合盘</button>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">合盘</div>
+    <div class="result-head" id="result-head"></div>
+    <div id="compare-block"></div>
+    <div id="pairs-block"></div>
+    <div id="sihua-block"></div>
+    <div id="spouse-block"></div>
+    <div id="verdict-block"></div>
+    <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="ziwei-hepan" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+  </section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">紫微合盘：免费排盘与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">紫微合盘看什么？</summary>
+      <p data-i18n="faqA1">本页先为两人各排一盘，再对照三处：一是双方命宫、身宫主星的组合；二是一方的生年四化落入另一方命盘的哪一宫；三是各自夫妻宫主星与对方命宫主星是否相合。只看这三处，不看流年与大限。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">契合度分数是怎么算的？</summary>
+      <p data-i18n="faqA2">分数是模板加权：以 50 分为底，主星组合和谐加分、化禄化科落入对方命宫夫妻宫福德宫加分、化忌落入对方命宫夫妻宫福德宫减分，上下限为 30–95 分。它不是测量值，只是把上述三处对照折成一个便于比较的数字，请勿当作感情好坏的定论。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">四化飞入对方命盘是什么意思？</summary>
+      <p data-i18n="faqA3">每个人的生年四化由出生年干决定（禄权科忌各化一星）。把这颗星放到对方的命盘里，看它落在对方哪一宫：落在夫妻宫多主感情上的给予或牵绊，落在财帛宫多主钱财上的往来，余类推。每条只给一句模板解说。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">为什么有的排盘软件身主与本页不同？</summary>
+      <p data-i18n="faqA4">身主按生年地支定。午年生人身主，全书为铃星，个别现代排盘作火星，本页从全书。命主按命宫地支定，身主按生年地支定，两者取法不同。闰月按下一个月起命宫与身宫，23:00–24:00 出生按次日农历排盘，均与本站紫微斗数页一致。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">合盘结果能决定要不要在一起吗？</summary>
+      <p data-i18n="faqA5">不能。本页是简化的合盘解读，只对照命宫主星与生年四化，未看全盘辅星、三方四正、流年大限，更未看现实相处。结果仅供参考，不构成决策依据；真正的关系以两人的实际相处为准。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">紫微斗数属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="attrLine">安星数据：《紫微斗数全书》，与本站紫微斗数页同法。</span><br>
+    <span data-i18n="offlineNote">本页排盘在本地完成，农历换算使用本地 lunar.js，不向任何服务器发送数据。</span>
+  </footer>
+</div>
+</main>
+<script src="lunar.js"></script>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。星曜组合解说保留中文，见 classicalNote。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '紫微合盘 · 本地排盘',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '两人之间 · 合盘',
+  slogan: '两盘相对，<br>星光自见分晓。',
+  subtitle: '紫微斗数合盘免费在线排盘',
+  personA: '本人',
+  personB: '对方',
+  labelCalendar: '历法',
+  optLunar: '农历（阴历）',
+  optSolar: '公历（阳历）',
+  labelGender: '性别',
+  optMale: '男',
+  optFemale: '女',
+  labelBirthDate: '出生日期',
+  labelBirthTime: '出生时间',
+  labelLeap: '闰月出生（所填月份为闰月）',
+  labelTimeUnknown: '时辰不详（按午时排盘）',
+  formHint: '紫微斗数以农历起盘：填公历会自动换算为农历；时辰决定命宫与身宫，请尽量准确。23:00–24:00 出生按次日农历排盘（晚子时换日）。',
+  btnSubmit: '安星 · 排合盘',
+  errNoDate: '请先填写双方的出生日期。',
+  errBadDate: '出生日期不正确。',
+  errNoLeap: '该年该月没有闰月，请取消闰月勾选。',
+  errBadTime: '出生时间不正确。',
+  resultTitle: '合盘',
+  ai_interpret: 'AI 解读',
+  lunarLbl: '农历',
+  solarLbl: '公历',
+  sizhu: '四柱',
+  shengxiao: '生肖',
+  juLbl: '五行局',
+  mingzhuLbl: '命主',
+  shenzhuLbl: '身主',
+  minggongLbl: '命宫',
+  shengongLbl: '身宫',
+  bodyMark: '身',
+  secCompare: '双方命盘对照',
+  colItem: '项目',
+  colA: '本人',
+  colB: '对方',
+  rowMingStars: '命宫主星',
+  rowShenStars: '身宫主星',
+  rowJu: '五行局',
+  rowMingzhu: '命主 / 身主',
+  rowSpouseStars: '夫妻宫主星',
+  emptyPalace: '空宫（无主星）',
+  secPairs: '命宫主星互动',
+  secBodyPairs: '身宫主星互动',
+  pairNote: '星曜组合解说为传统模板短句，仅就两颗主星的配对而言。',
+  secSihua: '四化飞入对方命盘',
+  sihuaAToB: '本人的四化 → 对方的命盘',
+  sihuaBToA: '对方的四化 → 本人的命盘',
+  colSihua: '四化',
+  colStar: '星曜',
+  colPalace: '落入对方宫位',
+  colMeaning: '解说',
+  secSpouse: '夫妻宫对照',
+  secVerdict: '综合解读',
+  scoreSuffix: '分',
+  bandHigh: '契合较好',
+  bandMid: '平稳互补',
+  bandLow: '磨合较多',
+  scoreNote: '分数为模板加权（50 分起，见 FAQ），不是测量值。',
+  classicalNote: '',
+  faqTitle: '紫微合盘：免费排盘与使用常见问题',
+  faqQ1: '紫微合盘看什么？',
+  faqA1: '本页先为两人各排一盘，再对照三处：一是双方命宫、身宫主星的组合；二是一方的生年四化落入另一方命盘的哪一宫；三是各自夫妻宫主星与对方命宫主星是否相合。只看这三处，不看流年与大限。',
+  faqQ2: '契合度分数是怎么算的？',
+  faqA2: '分数是模板加权：以 50 分为底，主星组合和谐加分、化禄化科落入对方命宫夫妻宫福德宫加分、化忌落入对方命宫夫妻宫福德宫减分，上下限为 30–95 分。它不是测量值，只是把上述三处对照折成一个便于比较的数字，请勿当作感情好坏的定论。',
+  faqQ3: '四化飞入对方命盘是什么意思？',
+  faqA3: '每个人的生年四化由出生年干决定（禄权科忌各化一星）。把这颗星放到对方的命盘里，看它落在对方哪一宫：落在夫妻宫多主感情上的给予或牵绊，落在财帛宫多主钱财上的往来，余类推。每条只给一句模板解说。',
+  faqQ4: '为什么有的排盘软件身主与本页不同？',
+  faqA4: '身主按生年地支定。午年生人身主，全书为铃星，个别现代排盘作火星，本页从全书。命主按命宫地支定，身主按生年地支定，两者取法不同。闰月按下一个月起命宫与身宫，23:00–24:00 出生按次日农历排盘，均与本站紫微斗数页一致。',
+  faqQ5: '合盘结果能决定要不要在一起吗？',
+  faqA5: '不能。本页是简化的合盘解读，只对照命宫主星与生年四化，未看全盘辅星、三方四正、流年大限，更未看现实相处。结果仅供参考，不构成决策依据；真正的关系以两人的实际相处为准。',
+  disclaimer: '紫微斗数属传统术数，仅供参考，不构成决策依据。',
+  attrLine: '安星数据：《紫微斗数全书》，与本站紫微斗数页同法。',
+  offlineNote: '本页排盘在本地完成，农历换算使用本地 lunar.js，不向任何服务器发送数据。',
+  langLabel: '语言',
+  mutLu: '化禄', mutQuan: '化权', mutKe: '化科', mutJi: '化忌',
+  leapMonthWord: '闰',
+  yearWord: '年', monthWord: '月', dayWord: '日',
+  levelGood: '和谐', levelCaution: '留意', levelNeutral: '平',
+  spouseMatch: '对方的命宫主星正是你夫妻宫的主星，所向往的伴侣特质与对方本性相合。',
+  spouseNoMatch: '对方的命宫主星与你夫妻宫主星不同，所向往的伴侣特质与对方本性有距离，需看实际相处。',
+  verdictHigh: '两人主星多互补，四化往来以给予与体面为主，相处顺畅度较高。',
+  verdictMid: '两人各有主导与让步之处，四化有给予也有牵绊，总体平稳，磨合在所难免。',
+  verdictLow: '两人主星冲撞较多，或化忌落入对方要害宫位，摩擦点明显，更需坦诚沟通与互相让步。',
+  mutVerbLu: '在对方的{palace}上带来好处与缘分，主动给予。',
+  mutVerbQuan: '在对方的{palace}上带来影响与主导，管得多、要求也多。',
+  mutVerbKe: '在对方的{palace}上带来名声与体面，互相长脸。',
+  mutVerbJi: '在对方的{palace}上带来压力与牵绊，最易起摩擦。'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '紫微合盤 · 本地排盤',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '兩人之間 · 合盤',
+  slogan: '兩盤相對，<br>星光自見分曉。',
+  subtitle: '紫微斗數合盤免費線上排盤',
+  personA: '本人',
+  personB: '對方',
+  labelCalendar: '曆法',
+  optLunar: '農曆（陰曆）',
+  optSolar: '公曆（陽曆）',
+  labelGender: '性別',
+  optMale: '男',
+  optFemale: '女',
+  labelBirthDate: '出生日期',
+  labelBirthTime: '出生時間',
+  labelLeap: '閏月出生（所填月份為閏月）',
+  labelTimeUnknown: '時辰不詳（按午時排盤）',
+  formHint: '紫微斗數以農曆起盤：填公曆會自動換算為農曆；時辰決定命宮與身宮，請盡量準確。23:00–24:00 出生按次日農曆排盤（晚子時換日）。',
+  btnSubmit: '安星 · 排合盤',
+  errNoDate: '請先填寫雙方的出生日期。',
+  errBadDate: '出生日期不正確。',
+  errNoLeap: '該年該月沒有閏月，請取消閏月勾選。',
+  errBadTime: '出生時間不正確。',
+  resultTitle: '合盤',
+  ai_interpret: 'AI 解讀',
+  lunarLbl: '農曆',
+  solarLbl: '公曆',
+  sizhu: '四柱',
+  shengxiao: '生肖',
+  juLbl: '五行局',
+  mingzhuLbl: '命主',
+  shenzhuLbl: '身主',
+  minggongLbl: '命宮',
+  shengongLbl: '身宮',
+  bodyMark: '身',
+  secCompare: '雙方命盤對照',
+  colItem: '項目',
+  colA: '本人',
+  colB: '對方',
+  rowMingStars: '命宮主星',
+  rowShenStars: '身宮主星',
+  rowJu: '五行局',
+  rowMingzhu: '命主 / 身主',
+  rowSpouseStars: '夫妻宮主星',
+  emptyPalace: '空宮（無主星）',
+  secPairs: '命宮主星互動',
+  secBodyPairs: '身宮主星互動',
+  pairNote: '星曜組合解說為傳統模板短句，僅就兩顆主星的配對而言。',
+  secSihua: '四化飛入對方命盤',
+  sihuaAToB: '本人的四化 → 對方的命盤',
+  sihuaBToA: '對方的四化 → 本人的命盤',
+  colSihua: '四化',
+  colStar: '星曜',
+  colPalace: '落入對方宮位',
+  colMeaning: '解說',
+  secSpouse: '夫妻宮對照',
+  secVerdict: '綜合解讀',
+  scoreSuffix: '分',
+  bandHigh: '契合較好',
+  bandMid: '平穩互補',
+  bandLow: '磨合較多',
+  scoreNote: '分數為模板加權（50 分起，見 FAQ），不是測量值。',
+  classicalNote: '',
+  faqTitle: '紫微合盤：免費排盤與使用常見問題',
+  faqQ1: '紫微合盤看什麼？',
+  faqA1: '本頁先為兩人各排一盤，再對照三處：一是雙方命宮、身宮主星的組合；二是一方的生年四化落入另一方命盤的哪一宮；三是各自夫妻宮主星與對方命宮主星是否相合。只看這三處，不看流年與大限。',
+  faqQ2: '契合度分數是怎麼算的？',
+  faqA2: '分數是模板加權：以 50 分為底，主星組合和諧加分、化祿化科落入對方命宮夫妻宮福德宮加分、化忌落入對方命宮夫妻宮福德宮減分，上下限為 30–95 分。它不是測量值，只是把上述三處對照折成一個便於比較的數字，請勿當作感情好壞的定論。',
+  faqQ3: '四化飛入對方命盤是什麼意思？',
+  faqA3: '每個人的生年四化由出生年干決定（祿權科忌各化一星）。把這顆星放到對方的命盤裡，看它落在對方哪一宮：落在夫妻宮多主感情上的給予或牽絆，落在財帛宮多主錢財上的往來，餘類推。每條只給一句模板解說。',
+  faqQ4: '為什麼有的排盤軟體身主與本頁不同？',
+  faqA4: '身主按生年地支定。午年生人身主，全書為鈴星，個別現代排盤作火星，本頁從全書。命主按命宮地支定，身主按生年地支定，兩者取法不同。閏月按下一月起命宮與身宮，23:00–24:00 出生按次日農曆排盤，均與本站紫微斗數頁一致。',
+  faqQ5: '合盤結果能決定要不要在一起嗎？',
+  faqA5: '不能。本頁是簡化的合盤解讀，只對照命宮主星與生年四化，未看全盤輔星、三方四正、流年大限，更未看現實相處。結果僅供參考，不構成決策依據；真正的關係以兩人的實際相處為準。',
+  disclaimer: '紫微斗數屬傳統術數，僅供參考，不構成決策依據。',
+  attrLine: '安星數據：《紫微斗數全書》，與本站紫微斗數頁同法。',
+  offlineNote: '本頁排盤在本地完成，農曆換算使用本地 lunar.js，不向任何伺服器發送數據。',
+  langLabel: '語言',
+  mutLu: '化祿', mutQuan: '化權', mutKe: '化科', mutJi: '化忌',
+  leapMonthWord: '閏',
+  yearWord: '年', monthWord: '月', dayWord: '日',
+  levelGood: '和諧', levelCaution: '留意', levelNeutral: '平',
+  spouseMatch: '對方的命宮主星正是你夫妻宮的主星，所嚮往的伴侶特質與對方本性相合。',
+  spouseNoMatch: '對方的命宮主星與你夫妻宮主星不同，所嚮往的伴侶特質與對方本性有距離，需看實際相處。',
+  verdictHigh: '兩人主星多互補，四化往來以給予與體面為主，相處順暢度較高。',
+  verdictMid: '兩人各有主導與讓步之處，四化有給予也有牽絆，總體平穩，磨合在所難免。',
+  verdictLow: '兩人主星衝撞較多，或化忌落入對方要害宮位，摩擦點明顯，更需坦誠溝通與互相讓步。',
+  mutVerbLu: '在對方的{palace}上帶來好處與緣分，主動給予。',
+  mutVerbQuan: '在對方的{palace}上帶來影響與主導，管得多、要求也多。',
+  mutVerbKe: '在對方的{palace}上帶來名聲與體面，互相長臉。',
+  mutVerbJi: '在對方的{palace}上帶來壓力與牽絆，最易起摩擦。'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Ziwei Compatibility · Local Chart',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'Between Two · Synastry',
+  slogan: 'Two charts face each other,<br>and the starlight speaks.',
+  subtitle: 'Free online Ziwei Doushu compatibility chart',
+  personA: 'You',
+  personB: 'Partner',
+  labelCalendar: 'Calendar',
+  optLunar: 'Lunar calendar',
+  optSolar: 'Solar calendar',
+  labelGender: 'Gender',
+  optMale: 'Male',
+  optFemale: 'Female',
+  labelBirthDate: 'Date of birth',
+  labelBirthTime: 'Time of birth',
+  labelLeap: 'Born in a leap month (the month entered is a leap month)',
+  labelTimeUnknown: 'Birth time unknown (chart by noon, Wu hour)',
+  formHint: 'Ziwei Doushu charts use the lunar calendar: a solar date is converted automatically. The birth hour sets the Life and Body palaces, so be as exact as you can. Births at 23:00–24:00 are charted on the next lunar day (late Zi hour rolls over).',
+  btnSubmit: 'Cast the synastry chart',
+  errNoDate: 'Please enter both dates of birth first.',
+  errBadDate: 'The date of birth is invalid.',
+  errNoLeap: 'There is no leap month in that year and month; please uncheck the leap-month box.',
+  errBadTime: 'The time of birth is invalid.',
+  resultTitle: 'The Synastry Chart',
+  ai_interpret: 'AI Reading',
+  lunarLbl: 'Lunar',
+  solarLbl: 'Solar',
+  sizhu: 'Four Pillars',
+  shengxiao: 'Zodiac',
+  juLbl: 'Elemental Phase',
+  mingzhuLbl: 'Life Lord',
+  shenzhuLbl: 'Body Lord',
+  minggongLbl: 'Life Palace',
+  shengongLbl: 'Body Palace',
+  bodyMark: 'Body',
+  secCompare: 'Side-by-Side Charts',
+  colItem: 'Item',
+  colA: 'You',
+  colB: 'Partner',
+  rowMingStars: 'Life Palace major stars',
+  rowShenStars: 'Body Palace major stars',
+  rowJu: 'Elemental Phase',
+  rowMingzhu: 'Life Lord / Body Lord',
+  rowSpouseStars: 'Spouse Palace major stars',
+  emptyPalace: 'Empty palace (no major star)',
+  secPairs: 'Life Palace Star Interaction',
+  secBodyPairs: 'Body Palace Star Interaction',
+  pairNote: 'Star-combination notes are traditional template lines, shown in Chinese, and speak only about the pairing of two major stars.',
+  secSihua: 'Transformations Flying into the Other Chart',
+  sihuaAToB: 'Your transformations → partner’s chart',
+  sihuaBToA: 'Partner’s transformations → your chart',
+  colSihua: 'Transformation',
+  colStar: 'Star',
+  colPalace: 'Palace it lands in',
+  colMeaning: 'Reading',
+  secSpouse: 'Spouse Palace Comparison',
+  secVerdict: 'Overall Reading',
+  scoreSuffix: ' / 100',
+  bandHigh: 'Good match',
+  bandMid: 'Steady and complementary',
+  bandLow: 'Needs more work',
+  scoreNote: 'The score is a template weighting (starting at 50; see FAQ), not a measurement.',
+  classicalNote: 'Star-combination notes are shown in Chinese.',
+  faqTitle: 'Ziwei Compatibility: Free Chart & FAQ',
+  faqQ1: 'What does a Ziwei synastry chart look at?',
+  faqA1: 'This page casts a chart for each person, then compares three things: the pairing of the two Life and Body Palace major stars; which palace of the other person’s chart each birth-year transformation (Sihua) lands in; and whether each person’s Spouse Palace stars match the other’s Life Palace stars. Only these three are compared — no annual or decade fortunes.',
+  faqQ2: 'How is the compatibility score calculated?',
+  faqA2: 'The score is a template weighting: it starts at 50, adds points for harmonious star pairings and for Hua Lu / Hua Ke landing in the other person’s Life, Spouse or Fortune palace, and subtracts points for Hua Ji landing in those palaces, clamped to 30–95. It is not a measurement — just the three comparisons above folded into one number for easy reference. Do not treat it as a verdict on the relationship.',
+  faqQ3: 'What does it mean for a transformation to fly into the other person’s chart?',
+  faqA3: 'Each person’s birth-year transformations are fixed by the birth-year stem (Hua Lu, Hua Quan, Hua Ke, Hua Ji, one star each). Placing that star in the other person’s chart shows which palace it lands in: in the Spouse Palace it mostly concerns giving or friction in love; in the Wealth Palace it mostly concerns money between you; and so on. Each line gives one template sentence.',
+  faqQ4: 'Why does another charting app give a different Body Lord?',
+  faqA4: 'The Body Lord is fixed by the birth-year branch. For a Wu year the Quanshu gives Lingxing; some modern apps give Huoxing instead. This page follows the Quanshu. The Life Lord uses the Life Palace branch while the Body Lord uses the birth-year branch — different rules. A leap month counts as the following month, and births at 23:00–24:00 are charted on the next lunar day, the same as this site’s Ziwei Doushu page.',
+  faqQ5: 'Can the synastry result decide whether we should be together?',
+  faqA5: 'No. This is a simplified compatibility reading: it compares only the Life Palace stars and the birth-year transformations, and does not look at the full chart, supporting stars, the three directions, annual or decade fortunes — let alone how two people actually live together. It is for reference only and is not a basis for decisions; the real relationship is how the two of you actually get along.',
+  disclaimer: 'Ziwei Doushu is a traditional divination art, for reference only; it is not a basis for decisions.',
+  attrLine: 'Star placement data: Ziwei Doushu Quanshu, same method as this site’s Ziwei Doushu page.',
+  offlineNote: 'Charting runs locally. Lunar conversion uses the local lunar.js and no data is sent to any server.',
+  langLabel: 'Language',
+  mutLu: 'Hua Lu', mutQuan: 'Hua Quan', mutKe: 'Hua Ke', mutJi: 'Hua Ji',
+  leapMonthWord: 'Leap ',
+  yearWord: ' ', monthWord: ' ', dayWord: '',
+  levelGood: 'Harmonious', levelCaution: 'Caution', levelNeutral: 'Neutral',
+  spouseMatch: 'The partner’s Life Palace stars are exactly the stars of your Spouse Palace: the partner you long for matches the partner’s nature.',
+  spouseNoMatch: 'The partner’s Life Palace stars differ from your Spouse Palace stars: the partner you long for is at some distance from the partner’s nature — judge by how you actually get along.',
+  verdictHigh: 'The two sets of major stars mostly complement each other, and the transformations exchanged are mainly giving and face — things flow well between you.',
+  verdictMid: 'Each of you has places to lead and places to yield; the transformations bring both giving and friction. Overall steady, with the usual adjustment unavoidable.',
+  verdictLow: 'The major stars clash in several places, or Hua Ji lands in the other person’s key palaces; friction points are clear, and honest communication and mutual concession matter more.',
+  mutVerbLu: 'Brings benefit and affinity to the other person’s {palace}, giving actively.',
+  mutVerbQuan: 'Brings influence and direction to the other person’s {palace}, managing more and asking more.',
+  mutVerbKe: 'Brings reputation and face to the other person’s {palace}; you lend each other standing.',
+  mutVerbJi: 'Brings pressure and entanglement to the other person’s {palace}; this is where friction starts most easily.'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '紫微合盤 · ローカル排盤',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '二人の間 · 合盤',
+  slogan: '二つの命盤が向き合い、<br>星の光が答える。',
+  subtitle: '紫微斗数合盤 無料オンライン排盤',
+  personA: '本人',
+  personB: '相手',
+  labelCalendar: '暦',
+  optLunar: '旧暦（陰暦）',
+  optSolar: '新暦（陽暦）',
+  labelGender: '性別',
+  optMale: '男',
+  optFemale: '女',
+  labelBirthDate: '生年月日',
+  labelBirthTime: '出生時刻',
+  labelLeap: '閏月生まれ（入力した月が閏月）',
+  labelTimeUnknown: '時刻不明（午の刻で排盤）',
+  formHint: '紫微斗数は旧暦で起盤します。新暦を入力すると自動で旧暦に換算します。時刻は命宮と身宮を決めるので、できるだけ正確に。23:00–24:00 生まれは翌日の旧暦で排盤します（夜子時の日替わり）。',
+  btnSubmit: '安星 · 排合盤',
+  errNoDate: 'まず二人の生年月日を入力してください。',
+  errBadDate: '生年月日が正しくありません。',
+  errNoLeap: 'その年その月に閏月はありません。閏月のチェックを外してください。',
+  errBadTime: '出生時刻が正しくありません。',
+  resultTitle: '合盤',
+  ai_interpret: 'AI 解釈',
+  lunarLbl: '旧暦',
+  solarLbl: '新暦',
+  sizhu: '四柱',
+  shengxiao: '干支',
+  juLbl: '五行局',
+  mingzhuLbl: '命主',
+  shenzhuLbl: '身主',
+  minggongLbl: '命宮',
+  shengongLbl: '身宮',
+  bodyMark: '身',
+  secCompare: '二人の命盤対照',
+  colItem: '項目',
+  colA: '本人',
+  colB: '相手',
+  rowMingStars: '命宮主星',
+  rowShenStars: '身宮主星',
+  rowJu: '五行局',
+  rowMingzhu: '命主 / 身主',
+  rowSpouseStars: '夫妻宮主星',
+  emptyPalace: '空宮（主星なし）',
+  secPairs: '命宮主星の相互作用',
+  secBodyPairs: '身宮主星の相互作用',
+  pairNote: '星曜組合せの解說は伝統的なテンプレート短句で、中国語原文のまま表示しています。二つの主星の組み合わせのみを論じます。',
+  secSihua: '四化が相手の命盤に飛ぶ',
+  sihuaAToB: '本人の四化 → 相手の命盤',
+  sihuaBToA: '相手の四化 → 本人の命盤',
+  colSihua: '四化',
+  colStar: '星曜',
+  colPalace: '入る相手の宮',
+  colMeaning: '解說',
+  secSpouse: '夫妻宮対照',
+  secVerdict: '総合解釈',
+  scoreSuffix: ' / 100',
+  bandHigh: '相性が良い',
+  bandMid: '穏やかで補い合う',
+  bandLow: 'すり合わせが多い',
+  scoreNote: 'スコアはテンプレート加重（50 点から、FAQ 参照）で、測定値ではありません。',
+  classicalNote: '星曜組合せの解說は中国語原文のまま表示しています。',
+  faqTitle: '紫微合盤：無料排盤とよくある質問',
+  faqQ1: '紫微合盤では何を見ますか？',
+  faqA1: '本ページはまず二人の命盤をそれぞれ排盤し、三か所を対照します。一つは二人の命宮・身宮の主星の組み合わせ、二つは一方の生年四化が相手の命盤のどの宮に入るか、三つは各自の夫妻宮主星と相手の命宮主星が合うかどうかです。この三か所のみで、流年と大限は見ません。',
+  faqQ2: '相性スコアはどう計算しますか？',
+  faqA2: 'スコアはテンプレート加重です。50 点から始まり、主星の組み合わせが調和すれば加点、化禄・化科が相手の命宮・夫妻宮・福德宮に入れば加点、化忌がそれらの宮に入れば減点し、30–95 点に収めます。測定値ではなく、上記の三か所の対照を一つの数字に折りたたんだだけのものです。感情の良し悪しの断定として扱わないでください。',
+  faqQ3: '四化が相手の命盤に飛ぶとは？',
+  faqA3: '各人の生年四化は出生年の干で決まります（禄権科忌それぞれ一星）。その星を相手の命盤に置き、相手のどの宮に入るかを見ます。夫妻宮に入れば恋愛における与えや絡み、財帛宮に入れば金銭の往来が主となります。以下同様で、各条はテンプレートの一文です。',
+  faqQ4: '他の排盤ソフトと身主が違うのはなぜ？',
+  faqA4: '身主は生年の地支で決まります。午年生まれの身主は、全書では鈴星ですが、現代の一部の排盤では火星としています。本ページは全書に従います。命主は命宮の地支、身主は生年の地支で決まる点も異なります。閏月は翌月として命宮と身宮を起て、23:00–24:00 生まれは翌日の旧暦で排盤します。いずれも本站の紫微斗数ページと同じです。',
+  faqQ5: '合盤の結果で付き合うかどうか決められますか？',
+  faqA5: 'できません。本ページは簡略化した合盤解釈で、命宮主星と生年四化だけを対照し、全盤の輔星・三方四正・流年大限は見ておらず、現実の付き合いも見ていません。結果は参考までで、判断の根拠にはなりません。本当の関係は二人の実際の付き合い次第です。',
+  disclaimer: '紫微斗数は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  attrLine: '安星データ：『紫微斗数全書』、本站の紫微斗数ページと同じ方法。',
+  offlineNote: '本ページの排盤はローカルで動作します。旧暦換算はローカルの lunar.js を使い、データは外部サーバーに送信されません。',
+  langLabel: '言語',
+  mutLu: '化禄', mutQuan: '化権', mutKe: '化科', mutJi: '化忌',
+  leapMonthWord: '閏',
+  yearWord: '年', monthWord: '月', dayWord: '日',
+  levelGood: '調和', levelCaution: '注意', levelNeutral: '平',
+  spouseMatch: '相手の命宮主星は、まさにあなたの夫妻宮の主星です。求める伴侶の特質と相手の本性が合っています。',
+  spouseNoMatch: '相手の命宮主星は、あなたの夫妻宮主星とは異なります。求める伴侶の特質と相手の本性には距離があり、実際の付き合いで判断してください。',
+  verdictHigh: '二人の主星は多くが補い合い、四化の往来も与えと体面が主で、付き合いは順調です。',
+  verdictMid: '二人それぞれに主導する場面と譲る場面があり、四化には与えも絡みもあります。全体としては穏やかで、すり合わせは避けられません。',
+  verdictLow: '二人の主星の衝突が多く、あるいは化忌が相手の要害の宮に入っており、摩擦点がはっきりしています。率直な対話と互いの譲歩がより必要です。',
+  mutVerbLu: '相手の{palace}に利益と縁をもたらし、積極的に与えます。',
+  mutVerbQuan: '相手の{palace}に影響と主導権をもたらし、管理も要求も多くなります。',
+  mutVerbKe: '相手の{palace}に名声と体面をもたらし、互いに顔を立てます。',
+  mutVerbJi: '相手の{palace}に圧力と絡みをもたらし、摩擦が最も起きやすいところです。'
+}
+};
+
+// 宫名 / 星曜的英文名（en 模式下括号内显示；zh-TW / ja 仍用中文名）
+var PALACE_EN = {'命宫':'Life','兄弟':'Siblings','夫妻':'Spouse','子女':'Children','财帛':'Wealth','疾厄':'Health','迁移':'Travel','仆役':'Servants','官禄':'Career','田宅':'Property','福德':'Fortune','父母':'Parents'};
+var PALACE_TW = {'命宫':'命宮','兄弟':'兄弟','夫妻':'夫妻','子女':'子女','财帛':'財帛','疾厄':'疾厄','迁移':'遷移','仆役':'僕役','官禄':'官祿','田宅':'田宅','福德':'福德','父母':'父母'};
+var STAR_EN = {'紫微':'Ziwei','天机':'Tianji','太阳':'Taiyang','武曲':'Wuqu','天同':'Tiantong','廉贞':'Lianzhen','天府':'Tianfu','太阴':'Taiyin','贪狼':'Tanlang','巨门':'Jumen','天相':'Tianxiang','天梁':'Tianliang','七杀':'Qisha','破军':'Pojun'};
+var JU_EN = {'水二局':'Water 2','木三局':'Wood 3','金四局':'Metal 4','土五局':'Earth 5','火六局':'Fire 6'};
+// 四化解说里的宫位角色（en / ja 用翻译，zh 用中文宫名）
+var PALACE_ROLE = {
+  'zh-CN': {'命宫':'命宫','兄弟':'兄弟宫','夫妻':'夫妻宫','子女':'子女宫','财帛':'财帛宫','疾厄':'疾厄宫','迁移':'迁移宫','仆役':'仆役宫','官禄':'官禄宫','田宅':'田宅宫','福德':'福德宫','父母':'父母宫'},
+  'zh-TW': {'命宫':'命宮','兄弟':'兄弟宮','夫妻':'夫妻宮','子女':'子女宮','财帛':'財帛宮','疾厄':'疾厄宮','迁移':'遷移宮','仆役':'僕役宮','官禄':'官祿宮','田宅':'田宅宮','福德':'福德宮','父母':'父母宮'},
+  'en': {'命宫':'Life Palace','兄弟':'Siblings Palace','夫妻':'Spouse Palace','子女':'Children Palace','财帛':'Wealth Palace','疾厄':'Health Palace','迁移':'Travel Palace','仆役':'Servants Palace','官禄':'Career Palace','田宅':'Property Palace','福德':'Fortune Palace','父母':'Parents Palace'},
+  'ja': {'命宫':'命宮','兄弟':'兄弟宮','夫妻':'夫妻宮','子女':'子女宮','财帛':'財帛宮','疾厄':'疾厄宮','迁移':'遷移宮','仆役':'僕役宮','官禄':'官禄宮','田宅':'田宅宮','福德':'福德宮','父母':'父母宮'}
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function palaceName(n) {
+  if (LANG === 'en') return PALACE_EN[n] || n;
+  if (LANG === 'zh-TW') return PALACE_TW[n] || n;
+  return n;
+}
+function starName(n) { return LANG === 'en' ? (STAR_EN[n] || n) : n; }
+function juName(j) { return LANG === 'en' ? (JU_EN[j] || j) : j; }
+function palaceRole(n) { var m = PALACE_ROLE[LANG] || PALACE_ROLE['zh-CN']; return m[n] || n; }
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var fe = document.getElementById('form-error'); if (fe) fe.textContent = '';
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) renderResult(LAST_RESULT);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// ---- 常量（与本站紫微斗数页同法） ----
+var BRANCHES_YIN = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
+var BRANCHES_ZI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var PALACE_NAMES = ['命宫','兄弟','夫妻','子女','财帛','疾厄','迁移','仆役','官禄','田宅','福德','父母'];
+var MAJOR_STARS = ['紫微','天机','太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'];
+var CS_STAGES = ['长生','沐浴','冠带','临官','帝旺','衰','病','死','墓','绝','胎','养'];
+
+// ---- 核心安星表（与紫微斗数页 FALLBACK 一致） ----
+var ZW = null; // 本页不加载 /data，恒用 FALLBACK
+var FALLBACK = {
+  nayin: {'甲子':'金','乙丑':'金','丙寅':'火','丁卯':'火','戊辰':'木','己巳':'木','庚午':'土','辛未':'土','壬申':'金','癸酉':'金','甲戌':'火','乙亥':'火','丙子':'水','丁丑':'水','戊寅':'土','己卯':'土','庚辰':'金','辛巳':'金','壬午':'木','癸未':'木','甲申':'水','乙酉':'水','丙戌':'土','丁亥':'土','戊子':'火','己丑':'火','庚寅':'木','辛卯':'木','壬辰':'水','癸巳':'水','甲午':'金','乙未':'金','丙申':'火','丁酉':'火','戊戌':'木','己亥':'木','庚子':'土','辛丑':'土','壬寅':'金','癸卯':'金','甲辰':'火','乙巳':'火','丙午':'水','丁未':'水','戊申':'土','己酉':'土','庚戌':'金','辛亥':'金','壬子':'木','癸丑':'木','甲寅':'水','乙卯':'水','丙辰':'土','丁巳':'土','戊午':'火','己未':'火','庚申':'木','辛酉':'木','壬戌':'水','癸亥':'水'},
+  sihua: {'甲':{'禄':'廉贞','权':'破军','科':'武曲','忌':'太阳'},'乙':{'禄':'天机','权':'天梁','科':'紫微','忌':'太阴'},'丙':{'禄':'天同','权':'天机','科':'文昌','忌':'廉贞'},'丁':{'禄':'太阴','权':'天同','科':'天机','忌':'巨门'},'戊':{'禄':'贪狼','权':'太阴','科':'右弼','忌':'天机'},'己':{'禄':'武曲','权':'贪狼','科':'天梁','忌':'文曲'},'庚':{'禄':'太阳','权':'武曲','科':'太阴','忌':'天同'},'辛':{'禄':'巨门','权':'太阳','科':'文曲','忌':'文昌'},'壬':{'禄':'天梁','权':'紫微','科':'左辅','忌':'武曲'},'癸':{'禄':'破军','权':'巨门','科':'太阴','忌':'贪狼'}},
+  // 命宫地支 → 命主；生年地支 → 身主（从《紫微斗数全书》；午年生人身主为铃星）
+  mingzhu: {'子':'贪狼','丑':'巨门','寅':'禄存','卯':'文曲','辰':'廉贞','巳':'武曲','午':'破军','未':'武曲','申':'廉贞','酉':'文曲','戌':'禄存','亥':'巨门'},
+  shenzhu: {'子':'火星','丑':'天相','寅':'天梁','卯':'天同','辰':'文昌','巳':'天机','午':'铃星','未':'天相','申':'天梁','酉':'天同','戌':'文昌','亥':'天机'},
+  fulu: {'甲':'寅','乙':'卯','丙':'巳','丁':'午','戊':'巳','己':'午','庚':'申','辛':'酉','壬':'亥','癸':'子'},
+  qkui: {'甲':['丑','未'],'乙':['子','申'],'丙':['亥','酉'],'丁':['亥','酉'],'戊':['丑','未'],'己':['子','申'],'庚':['丑','未'],'辛':['午','寅'],'壬':['卯','巳'],'癸':['卯','巳']},
+  tianma: {'寅':'申','午':'申','戌':'申','申':'寅','子':'寅','辰':'寅','巳':'亥','酉':'亥','丑':'亥','亥':'巳','卯':'巳','未':'巳'},
+  huoling: {'寅':['丑','卯'],'午':['丑','卯'],'戌':['丑','卯'],'申':['寅','戌'],'子':['寅','戌'],'辰':['寅','戌'],'巳':['卯','戌'],'酉':['卯','戌'],'丑':['卯','戌'],'亥':['酉','戌'],'卯':['酉','戌'],'未':['酉','戌']},
+  changsheng: {'火':'寅','木':'亥','水':'申','金':'巳','土':'申'}
+};
+var JU_NUM = {'水':2,'木':3,'金':4,'土':5,'火':6};
+var JU_NAME = {2:'水二局',3:'木三局',4:'金四局',5:'土五局',6:'火六局'};
+var TIGER = {'甲':'丙','己':'丙','乙':'戊','庚':'戊','丙':'庚','辛':'庚','丁':'壬','壬':'壬','戊':'甲','癸':'甲'};
+var YANG_STEMS = {'甲':1,'丙':1,'戊':1,'庚':1,'壬':1};
+
+function fix(n, m) { m = m || 12; n %= m; return n < 0 ? n + m : n; }
+function branchToPalace(b) { return fix(BRANCHES_ZI.indexOf(b) - 2); }
+function palaceToBranch(p) { return BRANCHES_YIN[fix(p)]; }
+
+function nayinOf(gz) {
+  if (ZW && ZW.nayin && ZW.nayin[gz]) return ZW.nayin[gz];
+  return FALLBACK.nayin[gz];
+}
+function nayinElement(gz) {
+  var v = nayinOf(gz);
+  if (!v) return null;
+  return v.charAt(v.length - 1);
+}
+function sihuaOf(stem) {
+  if (ZW && ZW.sihua && ZW.sihua[stem]) return ZW.sihua[stem];
+  return FALLBACK.sihua[stem];
+}
+function tableOf(key) {
+  if (ZW && ZW[key]) return ZW[key];
+  return FALLBACK[key];
+}
+
+// ---- 核心排盘（纯函数；与紫微斗数页 computeChart 同法） ----
+function computeChart(inp) {
+  var M = inp.month;
+  var T = BRANCHES_ZI.indexOf(inp.timeBranch);
+  var yStem = inp.yearStem, yBranch = inp.yearBranch;
+  var soulB = fix(2 + (M - 1) - T, 12);
+  var bodyB = fix(2 + (M - 1) + T, 12);
+  var soulP = branchToPalace(BRANCHES_ZI[soulB]);
+  var bodyP = branchToPalace(BRANCHES_ZI[bodyB]);
+  var yinStem = TIGER[yStem];
+  var yinStemIdx = STEMS.indexOf(yinStem);
+  function palaceStem(p) { return STEMS[fix(yinStemIdx + p, 10)]; }
+  function palaceGZ(p) { return palaceStem(p) + palaceToBranch(p); }
+  var soulGZ = palaceGZ(soulP);
+  var juEl = nayinElement(soulGZ);
+  var juNum = JU_NUM[juEl];
+  var juName = JU_NAME[juNum];
+  var D = inp.day, L = juNum, offset = 0, q = 0, r = -1;
+  do {
+    var divisor = D + offset;
+    q = Math.floor(divisor / L);
+    r = divisor % L;
+    offset++;
+  } while (r !== 0);
+  offset--;
+  q = q % 12;
+  var z = q - 1;
+  if (offset % 2 === 0) z += offset; else z -= offset;
+  z = fix(z);
+  var f = fix(12 - z);
+  var stars = {};
+  function put(p, name, major) {
+    p = fix(p);
+    if (!stars[p]) stars[p] = [];
+    stars[p].push({ name: name, major: !!major });
+  }
+  var ZW_OFF = [0,1,3,4,5,8];
+  var ZW_NAMES = ['紫微','天机','太阳','武曲','天同','廉贞'];
+  for (var i = 0; i < ZW_OFF.length; i++) put(z - ZW_OFF[i], ZW_NAMES[i], true);
+  var TF_OFF = [0,1,2,3,4,5,6,10];
+  var TF_NAMES = ['天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'];
+  for (var j = 0; j < TF_OFF.length; j++) put(f + TF_OFF[j], TF_NAMES[j], true);
+  var luBranch = tableOf('fulu')[yStem];
+  var luP = branchToPalace(luBranch);
+  put(luP, '禄存', false);
+  put(luP + 1, '擎羊', false);
+  put(luP - 1, '陀罗', false);
+  put(branchToPalace(tableOf('tianma')[yBranch]), '天马', false);
+  var kui = tableOf('qkui')[yStem];
+  put(branchToPalace(kui[0]), '天魁', false);
+  put(branchToPalace(kui[1]), '天钺', false);
+  put(fix(2 + (M - 1)), '左辅', false);
+  put(fix(8 - (M - 1)), '右弼', false);
+  put(fix(8 - T), '文昌', false);
+  put(fix(2 + T), '文曲', false);
+  var hl = tableOf('huoling')[yBranch];
+  put(fix(branchToPalace(hl[0]) + T), '火星', false);
+  put(fix(branchToPalace(hl[1]) + T), '铃星', false);
+  put(fix(9 + T), '地劫', false);
+  put(fix(9 - T), '地空', false);
+  var sihua = sihuaOf(yStem);
+  var mutByStar = {};
+  var mutList = [];
+  ['禄','权','科','忌'].forEach(function(k) {
+    var s = sihua[k];
+    mutByStar[s] = k;
+    var pal = findStarPalace(stars, s);
+    mutList.push({ kind: k, star: s, palace: pal });
+  });
+  var forward = !!YANG_STEMS[yStem] === (inp.gender === 'male');
+  var csStart = branchToPalace(tableOf('changsheng')[juEl]);
+  var csByPalace = {};
+  for (var k2 = 0; k2 < 12; k2++) {
+    var p2 = forward ? fix(csStart + k2) : fix(csStart - k2);
+    csByPalace[p2] = CS_STAGES[k2];
+  }
+  var decByPalace = {};
+  for (var k3 = 0; k3 < 12; k3++) {
+    var p3 = forward ? fix(soulP + k3) : fix(soulP - k3);
+    var start = juNum + k3 * 10;
+    decByPalace[p3] = [start, start + 9];
+  }
+  var palaceNameByIdx = {};
+  for (var k4 = 0; k4 < 12; k4++) palaceNameByIdx[fix(soulP - k4)] = PALACE_NAMES[k4];
+  return {
+    input: inp,
+    soulP: soulP, bodyP: bodyP,
+    soulBranch: BRANCHES_ZI[soulB], bodyBranch: BRANCHES_ZI[bodyB],
+    soulGZ: soulGZ, juEl: juEl, juNum: juNum, juName: juName,
+    ziweiP: z, tianfuP: f,
+    stars: stars, mutByStar: mutByStar, mutList: mutList, sihua: sihua,
+    csByPalace: csByPalace, decByPalace: decByPalace,
+    palaceNameByIdx: palaceNameByIdx, palaceStem: palaceStem, palaceGZ: palaceGZ,
+    mingzhu: tableOf('mingzhu')[BRANCHES_ZI[soulB]],
+    shenzhu: tableOf('shenzhu')[yBranch],
+    forward: forward
+  };
+}
+
+function findStarPalace(stars, name) {
+  for (var p in stars) {
+    for (var i = 0; i < stars[p].length; i++) if (stars[p][i].name === name) return parseInt(p, 10);
+  }
+  return -1;
+}
+function starsInPalace(chart, p) { return chart.stars[fix(p)] || []; }
+function hasStar(chart, p, name) {
+  var arr = starsInPalace(chart, p);
+  for (var i = 0; i < arr.length; i++) if (arr[i].name === name) return true;
+  return false;
+}
+function palaceByName(chart, name) {
+  for (var p in chart.palaceNameByIdx) if (chart.palaceNameByIdx[p] === name) return parseInt(p, 10);
+  return -1;
+}
+function majorStarsIn(chart, p) {
+  return starsInPalace(chart, p).filter(function(s) { return s.major; }).map(function(s) { return s.name; });
+}
+// ==LOGIC-1-END==
+</script>
+<script>
+// ==LOGIC-2-BEGIN==
+// ---- 合盘对照 ----
+// 星性（用于无传统定论组合时的兜底解说）
+var STAR_TRAIT = {
+  '紫微': '帝星：主导、尊贵、要面子', '天府': '库星：稳重、包容、守成',
+  '天机': '智星：多思、善变、谋略', '太阳': '光明：热情、外放、好名声',
+  '武曲': '财星：刚毅、务实、重钱财', '天同': '福星：温和、随缘、享福',
+  '廉贞': '次桃花：刚烈、多情、要强', '太阴': '财星：细腻、内敛、重感情',
+  '贪狼': '桃花：欲望、多变、好交际', '巨门': '暗星：口才、疑心、是非',
+  '天相': '印星：谨慎、忠诚、讲体面', '天梁': '荫星：稳重、长者、护持',
+  '七杀': '煞星：果决、冲劲、好胜', '破军': '煞星：破旧、变革、不安分'
+};
+// 传统主星配对短句（键为两星按 STAR_ORDER 排序后以 + 连接；level: good / caution / neutral）
+// 判断说明：所列为通行配对解说，非全书原文；未列出的配对用星性兜底，不虚构定论。
+var STAR_ORDER = ['紫微','天机','太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'];
+var PAIR_NOTES = {
+  '紫微+天府': ['good','帝库相逢，主从分明而互补：一方主导方向、一方持家守成，稳定度高。'],
+  '紫微+天相': ['good','帝星得印，彼此尊重、讲究体面，适合长久经营。'],
+  '紫微+破军': ['caution','帝星遇破军，主导遇上变革：都想说了算时易争权，需一方让步。'],
+  '紫微+贪狼': ['neutral','帝星遇桃花，吸引强、磨合多：主导遇上多变，热闹也多波折。'],
+  '紫微+天机': ['neutral','帝星遇智星，谋略互补，但都想定方向，需先分工。'],
+  '紫微+天同': ['good','帝星遇福星，主导得温和承托，家中气氛宽松。'],
+  '紫微+七杀': ['caution','帝星遇七杀，主导遇冲劲，权责要分清。'],
+  '紫微+廉贞': ['neutral','帝星遇廉贞，主导遇刚烈，彼此都要面子。'],
+  '紫微+太阳': ['good','帝星遇太阳，主导得光明襄助，目标一致时气势足。'],
+  '紫微+太阴': ['good','帝星遇太阴，主导得细腻辅佐，内外兼顾。'],
+  '紫微+巨门': ['caution','帝星遇巨门，主导遇口舌，决策易被质疑。'],
+  '紫微+天梁': ['good','帝星遇天梁，主导得荫庇，稳重有靠。'],
+  '天府+天相': ['good','库印相逢，务实稳重、讲究承诺，细水长流型。'],
+  '天府+武曲': ['good','双财星，理财务实、目标一致，物质基础稳固。'],
+  '天府+廉贞': ['neutral','库星遇廉贞，稳重遇热情，互补但节奏不同。'],
+  '天府+天同': ['good','库星遇福星，稳重得温和，安稳少争。'],
+  '天府+七杀': ['neutral','库星遇七杀，稳重遇冲劲，一守一攻。'],
+  '天府+贪狼': ['neutral','库星遇桃花，稳重遇多变，守成与享乐拉扯。'],
+  '天府+巨门': ['caution','库星遇巨门，稳重遇口舌，闷气易积。'],
+  '天府+太阳': ['good','库星遇太阳，稳重得光明，持家有方向。'],
+  '天府+太阴': ['good','库星遇太阴，双稳重，细水长流。'],
+  '天府+天梁': ['good','库星遇荫星，稳重加稳重，安稳少波折。'],
+  '天府+天机': ['neutral','库星遇智星，稳重遇多思，决策偏慢。'],
+  '天机+太阴': ['good','智星遇太阴，心思细腻、善解人意，沟通顺畅。'],
+  '天机+天梁': ['good','智星遇荫星，一动一静，谋略得长者护持。'],
+  '天机+巨门': ['caution','智星遇巨门，心思都重，易生猜疑，需坦诚。'],
+  '天机+天同': ['neutral','智星遇福星，一动一静，但福星随缘、智星多思，步调需调。'],
+  '天机+武曲': ['neutral','智星遇财星，谋略遇务实，合作讲实效。'],
+  '天机+贪狼': ['neutral','智星遇桃花，多思遇多变，变化多、需定心。'],
+  '天机+廉贞': ['neutral','廉贞遇天机，刚烈遇多思，谋定而后动可缓冲突。'],
+  '太阳+太阴': ['good','日月同辉，阴阳调和，一外一内，互补性强。'],
+  '太阳+巨门': ['caution','太阳遇巨门，热情遇口舌，好意易被误解，话要说清楚。'],
+  '太阳+天梁': ['good','太阳遇天梁，光明遇荫庇，互相提携。'],
+  '太阳+天同': ['good','太阳遇天同，热情遇温和，家中气氛明朗。'],
+  '太阳+廉贞': ['neutral','太阳遇廉贞，热情遇刚烈，坦率直接。'],
+  '太阳+贪狼': ['neutral','桃花遇太阳，多变得光明照拂，坦荡则稳。'],
+  '武曲+贪狼': ['caution','财星遇桃花，务实遇欲望，金钱观与消费观需对齐。'],
+  '武曲+天相': ['good','财星遇印星，务实谨慎，合作可靠。'],
+  '武曲+破军': ['caution','财星遇破军，守成遇破耗，花钱节奏冲突明显。'],
+  '武曲+七杀': ['neutral','财星遇七杀，务实遇果决，做事都硬，需留商量余地。'],
+  '武曲+天同': ['neutral','财星遇福星，务实遇随缘，金钱观一紧一松。'],
+  '武曲+太阴': ['good','财星遇太阴，务实遇细腻，理财有商有量。'],
+  '武曲+天梁': ['good','财星遇荫星，务实得护持，稳健。'],
+  '武曲+廉贞': ['neutral','财星遇廉贞，务实遇刚烈，花钱要讲道理。'],
+  '武曲+巨门': ['caution','财星遇巨门，务实遇口舌，钱的事最忌猜疑。'],
+  '武曲+太阳': ['good','财星遇太阳，务实得光明，目标明确。'],
+  '天同+天梁': ['good','福荫相逢，温和随缘，少冲突、也少激情。'],
+  '天同+太阴': ['neutral','双柔星，温柔体贴，但都缺决断，大事需有人拍板。'],
+  '天同+巨门': ['caution','福星遇巨门，温和遇多疑，需多给安全感。'],
+  '天同+廉贞': ['neutral','福星遇廉贞，温和遇刚烈，一柔一刚。'],
+  '天同+七杀': ['neutral','福星遇七杀，温和遇冲劲，一柔一刚。'],
+  '天同+破军': ['neutral','福星遇破军，随缘遇变革，变化面前一松一紧。'],
+  '天同+天相': ['good','福星遇印星，温和得谨慎，处事有分寸。'],
+  '廉贞+贪狼': ['caution','双桃花，吸引极强、激情多，也多波折。'],
+  '廉贞+天相': ['neutral','廉贞遇天相，刚烈遇谨慎，互补但需磨合。'],
+  '廉贞+七杀': ['caution','廉贞遇七杀，刚烈遇果决，火花强、冲突也强。'],
+  '廉贞+破军': ['caution','廉贞遇破军，多变遇破旧，关系起伏大。'],
+  '廉贞+天梁': ['neutral','廉贞遇天梁，刚烈得荫庇，长者气度可缓冲突。'],
+  '廉贞+太阴': ['neutral','廉贞遇太阴，刚烈遇细腻，刚柔互补。'],
+  '廉贞+巨门': ['caution','廉贞遇巨门，刚烈遇口舌，吵架最伤。'],
+  '贪狼+七杀': ['caution','桃花遇七杀，欲望遇冲劲，激情强、稳定性弱。'],
+  '贪狼+破军': ['caution','桃花遇破军，多变遇破旧，聚散较快。'],
+  '贪狼+天相': ['neutral','桃花遇印星，多变得谨慎收束，互补。'],
+  '贪狼+太阴': ['neutral','桃花遇太阴，多变遇细腻，吸引强、需专一。'],
+  '贪狼+巨门': ['caution','桃花遇巨门，多变遇疑心，最忌捕风捉影。'],
+  '贪狼+天梁': ['neutral','桃花遇荫星，多变得稳重收束。'],
+  '贪狼+天同': ['neutral','桃花遇福星，多变遇随缘，热闹随和。'],
+  '七杀+破军': ['caution','双煞星，冲劲遇变革，同进同退则强，内耗则伤。'],
+  '七杀+天相': ['good','七杀遇天相，冲劲得印星收束，刚柔相济。'],
+  '七杀+天梁': ['good','七杀遇天梁，冲劲得荫庇，果决有后盾。'],
+  '七杀+太阴': ['neutral','七杀遇太阴，冲劲遇细腻，刚柔互补。'],
+  '破军+天相': ['neutral','破军遇天相，变革遇谨慎，一破一立。'],
+  '破军+天梁': ['neutral','破军遇天梁，变革得荫庇，破旧有人兜底。'],
+  '破军+太阴': ['neutral','破军遇太阴，变革遇细腻，破中有补。'],
+  '破军+太阳': ['neutral','破军遇太阳，变革得光明，方向明确则稳。'],
+  '破军+天机': ['neutral','破军遇天机，变革遇谋略，破而有算。'],
+  '巨门+天梁': ['good','巨门遇天梁，口舌遇荫庇，长者气度可化疑心。'],
+  '巨门+太阴': ['caution','巨门遇太阴，疑心遇细腻，需坦诚沟通。'],
+  '巨门+七杀': ['caution','巨门遇七杀，口舌遇冲劲，话赶话最易伤人。'],
+  '巨门+破军': ['caution','巨门遇破军，口舌遇变革，变中多是非。'],
+  '巨门+天相': ['neutral','巨门遇印星，口舌得谨慎收束。'],
+  '太阴+天梁': ['good','太阴遇天梁，细腻遇稳重，安稳型。'],
+  '天相+天梁': ['good','印荫相逢，谨慎稳重，可靠长久。']
+};
+
+function pairKey(a, b) {
+  var ia = STAR_ORDER.indexOf(a), ib = STAR_ORDER.indexOf(b);
+  return ia <= ib ? a + '+' + b : b + '+' + a;
+}
+function pairNote(a, b) {
+  // 键按 STAR_ORDER 排序，但为防手写键顺序不一致，三向都查
+  var n = PAIR_NOTES[pairKey(a, b)] || PAIR_NOTES[a + '+' + b] || PAIR_NOTES[b + '+' + a];
+  if (n) return { level: n[0], text: n[1], known: true };
+  return { level: 'neutral', text: '无传统定论组合。按星性看：' + (STAR_TRAIT[a] || a) + '；' + (STAR_TRAIT[b] || b) + '。相处以坦诚与分工为宜。', known: false };
+}
+function starPairs(listA, listB) {
+  var out = [];
+  for (var i = 0; i < listA.length; i++) {
+    for (var j = 0; j < listB.length; j++) {
+      var pn = pairNote(listA[i], listB[j]);
+      out.push({ a: listA[i], b: listB[j], level: pn.level, text: pn.text, known: pn.known });
+    }
+  }
+  return out;
+}
+
+// ---- 四化飞入：from 的生年四化星落入 to 的哪一宫 ----
+function sihuaFly(fromChart, toChart) {
+  var rows = [];
+  ['禄','权','科','忌'].forEach(function(k) {
+    var star = fromChart.sihua[k];
+    var pal = findStarPalace(toChart.stars, star);
+    var pname = pal >= 0 ? toChart.palaceNameByIdx[pal] : null;
+    rows.push({ kind: k, star: star, palaceIdx: pal, palace: pname });
+  });
+  return rows;
+}
+function mutMeaning(kind, palace) {
+  var role = palaceRole(palace);
+  var key = { '禄': 'mutVerbLu', '权': 'mutVerbQuan', '科': 'mutVerbKe', '忌': 'mutVerbJi' }[kind];
+  return t(key).replace('{palace}', role);
+}
+function mutLabel(kind) {
+  return { '禄': t('mutLu'), '权': t('mutQuan'), '科': t('mutKe'), '忌': t('mutJi') }[kind] || kind;
+}
+
+// ---- 契合度：模板加权（50 起；见 FAQ Q2） ----
+function computeScore(mingPairs, bodyPairs, flyAB, flyBA) {
+  var score = 50;
+  function scorePairs(pairs) {
+    for (var i = 0; i < pairs.length; i++) {
+      if (pairs[i].level === 'good') score += 6;
+      else if (pairs[i].level === 'caution') score -= 3;
+    }
+  }
+  scorePairs(mingPairs);
+  scorePairs(bodyPairs);
+  var KEY = ['命宫','夫妻','福德'];
+  function scoreFly(rows) {
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      if (!r.palace) continue;
+      if ((r.kind === '禄' || r.kind === '科') && KEY.indexOf(r.palace) >= 0) score += 4;
+      else if ((r.kind === '禄' || r.kind === '科') && (r.palace === '财帛' || r.palace === '官禄')) score += 2;
+      else if (r.kind === '忌' && KEY.indexOf(r.palace) >= 0) score -= 6;
+      else if (r.kind === '忌' && (r.palace === '财帛' || r.palace === '疾厄')) score -= 3;
+      else if (r.kind === '权' && (r.palace === '命宫' || r.palace === '官禄' || r.palace === '夫妻')) score += 1;
+    }
+  }
+  scoreFly(flyAB);
+  scoreFly(flyBA);
+  if (score < 30) score = 30;
+  if (score > 95) score = 95;
+  return score;
+}
+
+function compareCharts(chartA, chartB) {
+  var mingA = majorStarsIn(chartA, chartA.soulP);
+  var mingB = majorStarsIn(chartB, chartB.soulP);
+  var shenA = majorStarsIn(chartA, chartA.bodyP);
+  var shenB = majorStarsIn(chartB, chartB.bodyP);
+  var mingPairs = starPairs(mingA, mingB);
+  var bodyPairs = starPairs(shenA, shenB);
+  var flyAB = sihuaFly(chartA, chartB);
+  var flyBA = sihuaFly(chartB, chartA);
+  var score = computeScore(mingPairs, bodyPairs, flyAB, flyBA);
+  // 夫妻宫对照：A 的夫妻宫主星与 B 的命宫主星是否有重合
+  function spouseMatch(selfChart, otherChart) {
+    var sp = palaceByName(selfChart, '夫妻');
+    var spStars = majorStarsIn(selfChart, sp);
+    var otherMing = majorStarsIn(otherChart, otherChart.soulP);
+    var hit = [];
+    for (var i = 0; i < spStars.length; i++) if (otherMing.indexOf(spStars[i]) >= 0) hit.push(spStars[i]);
+    return { spouseStars: spStars, otherMing: otherMing, hit: hit };
+  }
+  return {
+    mingA: mingA, mingB: mingB, shenA: shenA, shenB: shenB,
+    mingPairs: mingPairs, bodyPairs: bodyPairs,
+    flyAB: flyAB, flyBA: flyBA, score: score,
+    spouseA: spouseMatch(chartA, chartB),
+    spouseB: spouseMatch(chartB, chartA)
+  };
+}
+// ==LOGIC-2-END==
+</script>
+<script>
+// ==RENDER-BEGIN==
+function esc(s) {
+return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function pad2(n) { return (n < 10? '0': '') + n;}
+function starListHtml(list) {
+if (!list.length) return esc(t('emptyPalace'));
+return list.map(function(s) { return '<b>' + esc(starName(s)) + '</b>';}).join('、');
+}
+function levelLabel(level) {
+return level === 'good'? t('levelGood'): level === 'caution'? t('levelCaution'): t('levelNeutral');
+}
+
+function renderResult(res) {
+LAST_RESULT = res;
+var a = res.a, b = res.b, c = res.cmp;
+var head = document.getElementById('result-head');
+function personLine(chart, who) {
+var inp = chart.input;
+var lunarStr = t('lunarLbl') + ' ' + inp.year + t('yearWord') + (inp.isLeap? t('leapMonthWord'): '') + inp.month + t('monthWord') + inp.day + t('dayWord');
+var solarStr = t('solarLbl') + ' ' + inp.solarYear + '-' + pad2(inp.solarMonth) + '-' + pad2(inp.solarDay);
+return '<div><b>' + esc(who) + '</b> ' + esc(lunarStr) + ' · ' + esc(solarStr) + ' · ' + esc(t('sizhu')) + ' <b>' + esc(inp.yearGZ + ' ' + inp.monthGZ + ' ' + inp.dayGZ + ' ' + inp.timeGZ) + '</b> · ' + esc(t('shengxiao')) + ' <b>' + esc(inp.shengxiao) + '</b></div>';
+}
+head.innerHTML = personLine(a, t('personA')) + personLine(b, t('personB'));
+
+// 双方命盘对照表
+var rows = '';
+function row(label, av, bv) {
+rows += '<tr><td>' + esc(label) + '</td><td>' + av + '</td><td>' + bv + '</td></tr>';
+}
+row(t('rowMingStars'), starListHtml(c.mingA), starListHtml(c.mingB));
+row(t('rowShenStars'), starListHtml(c.shenA), starListHtml(c.shenB));
+row(t('rowJu'), '<b>' + esc(juName(a.juName)) + '</b>', '<b>' + esc(juName(b.juName)) + '</b>');
+row(t('rowMingzhu'), '<b>' + esc(starName(a.mingzhu)) + '</b> / <b>' + esc(starName(a.shenzhu)) + '</b>', '<b>' + esc(starName(b.mingzhu)) + '</b> / <b>' + esc(starName(b.shenzhu)) + '</b>');
+row(t('rowSpouseStars'), starListHtml(c.spouseA.spouseStars), starListHtml(c.spouseB.spouseStars));
+document.getElementById('compare-block').innerHTML =
+'<div class="duan-block"><h3>' + esc(t('secCompare')) + '</h3>' +
+'<div class="table-wrap"><table class="chart"><tr><th>' + esc(t('colItem')) + '</th><th>' + esc(t('colA')) + '</th><th>' + esc(t('colB')) + '</th></tr>' + rows + '</table></div></div>';
+
+// 命宫 / 身宫主星互动
+function pairsHtml(title, pairs) {
+var h = '<div class="duan-block"><h3>' + esc(title) + '</h3>';
+if (t('classicalNote')) h += '<p class="duan-note">' + esc(t('classicalNote')) + '</p>';
+h += '<p class="duan-note">' + esc(t('pairNote')) + '</p>';
+for (var i = 0; i < pairs.length; i++) {
+var p = pairs[i];
+h += '<div class="pair-card"><span class="p-name">' + esc(starName(p.a)) + ' × ' + esc(starName(p.b)) + '</span>' +
+'<span class="p-level' + (p.level === 'caution'? ' bad': '') + '">' + esc(levelLabel(p.level)) + '</span>' +
+'<div class="p-desc">' + esc(p.text) + '</div></div>';
+}
+h += '</div>';
+return h;
+}
+document.getElementById('pairs-block').innerHTML =
+pairsHtml(t('secPairs'), c.mingPairs) + pairsHtml(t('secBodyPairs'), c.bodyPairs);
+
+// 四化飞入
+function flyTable(title, rows2) {
+var h = '<div class="duan-block"><h3>' + esc(title) + '</h3><div class="table-wrap"><table class="chart">' +
+'<tr><th>' + esc(t('colSihua')) + '</th><th>' + esc(t('colStar')) + '</th><th>' + esc(t('colPalace')) + '</th><th>' + esc(t('colMeaning')) + '</th></tr>';
+for (var i = 0; i < rows2.length; i++) {
+var r = rows2[i];
+var ptxt = r.palace? esc(palaceName(r.palace)): '—';
+var meaning = r.palace? esc(mutMeaning(r.kind, r.palace)): '—';
+h += '<tr><td><span class="gold">' + esc(mutLabel(r.kind)) + '</span></td><td><b>' + esc(starName(r.star)) + '</b></td><td>' + ptxt + '</td><td class="wrap">' + meaning + '</td></tr>';
+}
+h += '</table></div></div>';
+return h;
+}
+document.getElementById('sihua-block').innerHTML =
+'<div class="section-title" style="margin-top:1.8rem">' + esc(t('secSihua')) + '</div>' +
+flyTable(t('sihuaAToB'), c.flyAB) + flyTable(t('sihuaBToA'), c.flyBA);
+
+// 夫妻宫对照
+function spouseLine(sp, who) {
+var hitTxt = sp.hit.length? esc(t('spouseMatch')): esc(t('spouseNoMatch'));
+return '<div class="duan-item"><span class="cond">' + esc(who) + '</span><br>' + hitTxt + '</div>';
+}
+document.getElementById('spouse-block').innerHTML =
+'<div class="duan-block"><h3>' + esc(t('secSpouse')) + '</h3>' +
+spouseLine(c.spouseA, t('personA')) + spouseLine(c.spouseB, t('personB')) + '</div>';
+
+// 综合解读
+var band = c.score >= 75? t('bandHigh'): c.score >= 55? t('bandMid'): t('bandLow');
+var verdictTxt = c.score >= 75? t('verdictHigh'): c.score >= 55? t('verdictMid'): t('verdictLow');
+document.getElementById('verdict-block').innerHTML =
+'<div class="duan-block"><h3>' + esc(t('secVerdict')) + '</h3>' +
+'<div class="score-line">' + c.score + esc(t('scoreSuffix')) + ' · <small>' + esc(band) + '</small></div>' +
+'<div class="verdict"><span class="level">' + esc(band) + '</span> — ' + esc(verdictTxt) + '</div>' +
+'<p class="duan-note">' + esc(t('scoreNote')) + '</p></div>';
+
+document.getElementById('result-card').classList.remove('hidden');
+}
+
+// ---- 表单 ----
+function switchCalendar(who, v) {
+document.getElementById(who + '-leap-row').classList.toggle('hidden', v!== 'lunar');
+}
+function toggleTimeUnknown(who, checked) {
+var ti = document.getElementById(who + '-time');
+ti.disabled = checked;
+if (checked) ti.value = '12:00';
+}
+
+function readPerson(who) {
+var cal = document.getElementById(who + '-calendar').value;
+var gender = document.getElementById(who + '-gender').value;
+var dateVal = document.getElementById(who + '-date').value;
+var timeVal = document.getElementById(who + '-time').value || '12:00';
+if (!dateVal) throw new Error('errNoDate');
+var parts = dateVal.split('-');
+var y = parseInt(parts[0], 10), mo = parseInt(parts[1], 10), d = parseInt(parts[2], 10);
+var tp = timeVal.split(':');
+var hh = parseInt(tp[0], 10), mi = parseInt(tp[1] || '0', 10);
+if (isNaN(y) || isNaN(mo) || isNaN(d) || isNaN(hh)) throw new Error('errBadDate');
+var isLeap = cal === 'lunar' && document.getElementById(who + '-leap').checked;
+var lunar;
+try {
+if (cal === 'lunar') {
+lunar = Lunar.fromYmdHms(y, isLeap? -mo: mo, d, hh, mi, 0);
+} else {
+var dt = new Date(y, mo - 1, d, hh, mi, 0);
+lunar = Lunar.fromDate(dt);
+}
+} catch (e) {
+throw new Error(isLeap? 'errNoLeap': 'errBadDate');
+}
+if (!lunar) throw new Error('errBadDate');
+// 晚子时（23:00–23:59）换日：按次日农历排盘
+if (hh === 23) {
+try {
+var sol = lunar.getSolar();
+var next = sol.next(1);
+lunar = next.getLunar();
+} catch (e) { /* 换日失败则按原日 */}
+}
+var lYear = lunar.getYear(), lMonth = lunar.getMonth(), lDay = lunar.getDay();
+var effMonth = lMonth;
+var leapFlag = false;
+if (lMonth < 0) { leapFlag = true; effMonth = -lMonth;}
+// 闰月按书例折为下月
+var useMonth = leapFlag? effMonth + 1: effMonth;
+if (useMonth > 12) useMonth = 1;
+var sol2 = lunar.getSolar();
+var inp = {
+year: lYear, month: useMonth, day: lDay, isLeap: leapFlag,
+solarYear: sol2.getYear(), solarMonth: sol2.getMonth(), solarDay: sol2.getDay(),
+yearStem: lunar.getYearInGanZhi().charAt(0),
+yearBranch: lunar.getYearInGanZhi().charAt(1),
+yearGZ: lunar.getYearInGanZhi(),
+monthGZ: lunar.getMonthInGanZhi(),
+dayGZ: lunar.getDayInGanZhi(),
+timeGZ: lunar.getTimeInGanZhi(),
+timeBranch: lunar.getTimeZhi(),
+shengxiao: lunar.getShengxiao(),
+gender: gender
+};
+return computeChart(inp);
+}
+
+function doHepan() {
+var errEl = document.getElementById('form-error');
+errEl.textContent = '';
+var chartA, chartB;
+try {
+chartA = readPerson('a');
+chartB = readPerson('b');
+} catch (e) {
+errEl.textContent = t(e.message || 'errBadDate');
+return;
+}
+var cmp = compareCharts(chartA, chartB);
+renderResult({ a: chartA, b: chartB, cmp: cmp});
+}
+
+// ---- 初始化 ----
+applyI18n();
+switchCalendar('a', document.getElementById('a-calendar').value);
+switchCalendar('b', document.getElementById('b-calendar').value);
+document.getElementById('a-time').value = '12:00';
+document.getElementById('b-time').value = '12:00';
+// ==RENDER-END==
+
+// ==AI-INTERPRET==
+// Shared AI 解读 button (/js/ai-jiegua.js). Summary comes from this page's
+// own result state; null/'' means "no result yet" and the button only shows
+// a hint instead of calling the backend.
+window.getJieguaSummary = function() {
+if (!LAST_RESULT) return null;
+var r = LAST_RESULT, a = r.a, b = r.b, c = r.cmp;
+function personLine(chart, who) {
+var inp = chart.input;
+return who + '：农历 ' + inp.year + '年' + (inp.isLeap? '闰': '') + inp.month + '月' + inp.day + '日 · ' + inp.yearGZ + ' ' + inp.monthGZ + ' ' + inp.dayGZ + ' ' + inp.timeGZ +
+'；局 ' + chart.juName + '；命主 ' + chart.mingzhu + '；身主 ' + chart.shenzhu;
+}
+var lines = [];
+lines.push('');
+lines.push(personLine(a, '本人'));
+lines.push(personLine(b, '对方'));
+lines.push('本人命宫主星：' + (c.mingA.join('、') || '空宫') + '；身宫主星：' + (c.shenA.join('、') || '空宫') + '；夫妻宫主星：' + (c.spouseA.spouseStars.join('、') || '空宫'));
+lines.push('对方命宫主星：' + (c.mingB.join('、') || '空宫') + '；身宫主星：' + (c.shenB.join('、') || '空宫') + '；夫妻宫主星：' + (c.spouseB.spouseStars.join('、') || '空宫'));
+c.mingPairs.forEach(function(p) { lines.push('命宫互动 ' + p.a + '×' + p.b + '：' + p.text);});
+c.bodyPairs.forEach(function(p) { lines.push('身宫互动 ' + p.a + '×' + p.b + '：' + p.text);});
+function flyLines(rows, from, to) {
+rows.forEach(function(r) {
+lines.push(from + '的' + mutLabel(r.kind) + '（' + r.star + '）落入' + to + '的' + (r.palace || '—') + '：' + (r.palace? mutMeaning(r.kind, r.palace): '—'));
+});
+}
+flyLines(c.flyAB, '本人', '对方');
+flyLines(c.flyBA, '对方', '本人');
+lines.push('契合度：' + c.score + ' 分（模板加权，50 分起，见 FAQ）。');
+lines.push('注：本页为简化合盘解读，只对照命宫主星与生年四化，未看全盘辅星、三方四正、流年大限。');
+return lines.join('\n');
+};
+
+if (window.AIInterpret) { window.AIInterpret.attach();}
+else { document.addEventListener('DOMContentLoaded', function () { if (window.AIInterpret) window.AIInterpret.attach();});}
+</script>
+<script src="/js/ai-jiegua.js"></script>
+</body>
+</html>

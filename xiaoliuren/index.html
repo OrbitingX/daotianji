@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 小六壬</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { display: block; font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45); color: #f0ead8; outline: none; border-radius: 0; font-family: inherit; cursor: pointer; }
+  .lang-switch select:focus { border-bottom-color: #c9a962; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .method-row { display: flex; gap: 2rem; }
+  .method-row > .field { flex: 1; min-width: 0; }
+  .num-row { display: flex; gap: 2rem; }
+  .num-row > .field { flex: 1; min-width: 0; }
+  .hint { font-size: .78rem; color: #6f6f80; line-height: 1.7; margin-top: .4rem; }
+  .link-btn { background: none; border: none; color: #c9a962; font-size: .75rem; cursor: pointer; letter-spacing: .1em; padding: 0; margin-left: .5rem; font-family: inherit; }
+  .link-btn:hover { text-decoration: underline; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .submit-btn:disabled { opacity: .45; cursor: default; }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .palm { display: flex; gap: .6rem; margin: 1.4rem 0 .4rem; }
+  .palm-chip {
+    flex: 1; min-width: 0; text-align: center; padding: .7rem .2rem .6rem;
+    border: 1px solid rgba(201,169,98,.3); border-radius: 6px;
+    font-size: .8rem; color: #9a9aab; line-height: 1.6;
+  }
+  .palm-chip .palm-num { display: block; font-size: .7rem; color: #6f6f80; letter-spacing: .1em; }
+  .palm-chip .palm-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1rem; color: #c8c2ae; }
+  .palm-chip.hit { border-color: #c9a962; background: rgba(201,169,98,.1); color: #c9a962; }
+  .palm-chip.hit .palm-num { color: #c9a962; }
+  .palm-chip.hit .palm-name { color: #c9a962; font-weight: 700; }
+  .palace-name {
+    font-family: "Noto Serif SC","Songti SC","SimSun",serif;
+    font-size: 2.4rem; line-height: 1.4; color: #f0ead8; text-align: center;
+    letter-spacing: .15em; margin: 1.2rem 0 .2rem;
+  }
+  .palace-name .palace-cn { display: block; font-size: .9rem; color: #9a9aab; letter-spacing: .1em; margin-top: .3rem; }
+  .palace-level { text-align: center; color: #c9a962; font-size: .95rem; letter-spacing: .25em; margin-bottom: .6rem; }
+  .attr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1.4rem; }
+  .attr { border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: .8rem 1rem; }
+  .attr h3 { font-size: .75rem; color: #b08d3e; font-weight: 400; letter-spacing: .25em; margin-bottom: .35rem; }
+  .attr p { font-size: .95rem; color: #f0ead8; line-height: 1.6; }
+  .verdict { margin-top: 1.4rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .level { color: #c9a962; font-weight: 700; }
+  .duanyue { margin-top: 1.4rem; font-size: .95rem; line-height: 1.9; color: #c8c2ae; }
+  .duanyue h3, .detail-block h3 { font-size: .8rem; color: #b08d3e; font-weight: 400; letter-spacing: .25em; margin-bottom: .6rem; }
+  .classical-note { font-size: .78rem; color: #6f6f80; margin-top: .5rem; line-height: 1.6; }
+  .detail-block { margin-top: 1.4rem; }
+  .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .8rem 1.4rem; }
+  .detail-item { font-size: .9rem; line-height: 1.7; color: #c8c2ae; border-bottom: 1px dashed rgba(201,169,98,.25); padding-bottom: .5rem; }
+  .detail-item b { color: #c9a962; font-weight: 600; margin-right: .5rem; }
+  .waigua { margin-top: 1.4rem; font-size: .9rem; line-height: 1.8; color: #9a9aab; }
+  .waigua b { color: #c9a962; font-weight: 600; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .method-row, .num-row { flex-direction: column; gap: 0; }
+    .palm { flex-wrap: wrap; }
+    .palm-chip { flex: 1 1 28%; }
+    .palace-name { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">小六壬 · 本地占卜</div>
+    </div>
+  </a>
+                <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></span>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">第一幕 · 报时起课</div>
+  <h1 class="slogan" data-i18n-html="slogan">掐指一算，<br>六宫见分晓。</h1>
+  <p class="subtitle" data-i18n="subtitle">小六壬免费在线占卜排盘</p>
+
+  <section class="section">
+    <div class="field">
+      <label for="question" data-i18n="labelQuestion">所问之事（可选）</label>
+      <input type="text" id="question" placeholder="例如：今天出门顺利吗？" data-i18n-ph="phQuestion">
+    </div>
+    <div class="method-row">
+      <div class="field">
+        <label for="method" data-i18n="labelMethod">起课方式</label>
+        <select id="method" onchange="switchTab(this.value)">
+          <option value="time" selected data-i18n="optTime">以当前时间起课</option>
+          <option value="number" data-i18n="optNumber">报数起课</option>
+        </select>
+      </div>
+      <div class="field" id="panel-time">
+        <label for="datetime"><span data-i18n="labelTime">时间</span> <button type="button" class="link-btn" onclick="useNow()" data-i18n="btnNow">用当前时间</button></label>
+        <input type="datetime-local" id="datetime">
+        <div class="error" id="time-error"></div>
+      </div>
+    </div>
+    <div id="panel-number" class="hidden">
+      <div class="num-row">
+        <div class="field">
+          <label for="num1" data-i18n="labelNum1">月（1–12）</label>
+          <input type="number" id="num1" min="1" max="12" step="1" placeholder="如 10" data-i18n-ph="phNum1">
+        </div>
+        <div class="field">
+          <label for="num2" data-i18n="labelNum2">日（1–30）</label>
+          <input type="number" id="num2" min="1" max="30" step="1" placeholder="如 17" data-i18n-ph="phNum2">
+        </div>
+        <div class="field">
+          <label for="num3" data-i18n="labelNum3">时（时辰数 1–12）</label>
+          <input type="number" id="num3" min="1" max="12" step="1" placeholder="如 7（午时）" data-i18n-ph="phNum3">
+        </div>
+      </div>
+      <div class="hint" data-i18n="numHint">时辰数：子=1、丑=2、寅=3、卯=4、辰=5、巳=6、午=7、未=8、申=9、酉=10、戌=11、亥=12。报数也可用农历月、日与当时时辰。</div>
+      <div class="error" id="number-error"></div>
+    </div>
+    <button class="submit-btn" id="submit-btn" onclick="doCast()" disabled data-i18n="btnSubmit">掐指 · 起课</button>
+    <div class="error" id="load-error"></div>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">课象</div>
+    <div class="result-head" id="result-head"></div>
+    <div class="palm" id="palm"></div>
+    <div class="palace-name" id="palace-name"></div>
+    <div class="palace-level" id="palace-level"></div>
+    <div class="attr-grid" id="attr-grid"></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="duanyue" id="duanyue"></div>
+    <div class="detail-block" id="detail-block"></div>
+    <div class="waigua" id="waigua"></div>
+      <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="xiaoliuren" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+</section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">小六壬：免费排盘与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">小六壬是什么？</summary>
+      <p data-i18n="faqA1">小六壬又称马前课、六神掌诀，是民间流传的掌诀占卜法：以大安为起点，在手指六宫上按月、日、时依次数过，落在哪一宫，就以那一宫断吉凶。不用铜钱、不用排盘，掐指即可起课。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">月日时怎么数？</summary>
+      <p data-i18n="faqA2">大安起正月，月上起日，日上起时：先从大安数到农历月份，再从停下的那一宫数到农历日期，最后从停下的那一宫数到时辰地支，落宫即结果。时辰数子=1、丑=2、寅=3、卯=4、辰=5、巳=6、午=7、未=8、申=9、酉=10、戌=11、亥=12。本页时间起课会自动换算农历月日与时辰。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">六宫各代表什么？</summary>
+      <p data-i18n="faqA3">大安主安稳大吉，事事昌；留连主拖延纠缠，事难成；速喜主喜讯速至，事速成；赤口主口舌是非，防官非；小吉主和合小吉，事可成；空亡主落空无果，事不祥。六宫按大安、留连、速喜、赤口、小吉、空亡的固定顺序循环。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">速喜和大安哪个更好？</summary>
+      <p data-i18n="faqA4">大安是最吉的一宫，主稳、主成，问大事、求长远以大安为上；速喜主快、主喜，问消息、等回音、求速决时速喜更合。两宫都是吉宫，分工不同：要稳选大安，要快选速喜。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">小六壬排盘免费吗？</summary>
+      <p data-i18n="faqA5">免费。本页排盘在本地完成，不联网、不收费，也不会保存你输入的问题。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">小六壬属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="offlineNote">本页完全离线运行，农历换算使用本地 lunar.js，不向任何服务器发送数据。</span>
+  </footer>
+</div>
+</main>
+
+<script src="lunar.js"></script>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。古典断语原文一律保留中文，见 classicalNote。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '小六壬 · 本地占卜',
+  navGroup: '占卜',
+  nav_1: '解梦', nav_2: '六爻占卜', nav_3: '梅花易数', nav_4: '小六壬', nav_5: '塔罗牌',
+  nav_6: '雷诺曼', nav_7: '北欧卢恩符文', nav_8: '奇门遁甲', nav_9: '印度占星卜卦', nav_10: '西方卜卦占星',
+  nav_11: '大六壬', nav_12: '金口诀', nav_13: '太乙神数', nav_14: '占星骰子',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '第一幕 · 报时起课',
+  slogan: '掐指一算，<br>六宫见分晓。',
+  subtitle: '小六壬免费在线占卜排盘',
+  labelQuestion: '所问之事（可选）',
+  phQuestion: '例如：今天出门顺利吗？',
+  labelMethod: '起课方式',
+  optTime: '以当前时间起课',
+  optNumber: '报数起课',
+  labelTime: '时间',
+  btnNow: '用当前时间',
+  labelNum1: '月（1–12）',
+  phNum1: '如 10',
+  labelNum2: '日（1–30）',
+  phNum2: '如 17',
+  labelNum3: '时（时辰数 1–12）',
+  phNum3: '如 7（午时）',
+  numHint: '时辰数：子=1、丑=2、寅=3、卯=4、辰=5、巳=6、午=7、未=8、申=9、酉=10、戌=11、亥=12。报数也可用农历月、日与当时时辰。',
+  btnSubmit: '掐指 · 起课',
+  errNoTime: '请先选择时间。',
+  errBadTime: '时间格式不正确。',
+  errNums: '月、日、时须为正整数：月 1–12，日 1–30，时 1–12。',
+  errLoad: '课例数据加载失败，请刷新页面重试。',
+  resultTitle: '课象',
+  ai_interpret: 'AI 解读',
+  asked: '所问', lunar: '农历', castNums: '起课数',
+  month: '月', day: '日', hour: '时',
+  num1: '月', num2: '日', num3: '时',
+  classicalNote: '',
+  attrWuxing: '五行', attrColor: '颜色', attrDir: '方位', attrShen: '神煞',
+  attrGuiren: '贵人方', attrChongfan: '冲犯', attrMoushi: '谋事数', attrTime: '所主之时',
+  xiangyiLabel: '象意', duanyueLabel: '断语',
+  duanyuLabel: '断曰',
+  detailTitle: '六事断',
+  detail_0: '寻人', detail_1: '失物', detail_2: '病人', detail_3: '行人', detail_4: '官非', detail_5: '赌博',
+  waiguaLabel: '外应',
+  level: { '大安': '大吉', '留连': '中凶', '速喜': '中吉', '赤口': '小凶', '小吉': '小吉', '空亡': '大凶' },
+  gongName: { '大安': '大安', '留连': '留连', '速喜': '速喜', '赤口': '赤口', '小吉': '小吉', '空亡': '空亡' },
+  gongTime: { '大安': '身不动时', '留连': '人未归时', '速喜': '人便至时', '赤口': '官事凶时', '小吉': '人来喜时', '空亡': '音信稀时' },
+  wuxing: { '木': '木', '水': '水', '火': '火', '金': '金', '土': '土' },
+  color: { '青': '青', '黑': '黑', '红': '红', '白': '白', '黄': '黄' },
+  dir: { '东方': '东方', '北方': '北方', '南方': '南方', '西方': '西方', '中央': '中央', '西南': '西南', '厝地': '厝地' },
+  shen: { '青龙': '青龙', '玄武': '玄武', '朱雀': '朱雀', '白虎': '白虎', '六合': '六合', '勾陈': '勾陈' },
+  shichenName: { '子': '子时', '丑': '丑时', '寅': '寅时', '卯': '卯时', '辰': '辰时', '巳': '巳时', '午': '午时', '未': '未时', '申': '申时', '酉': '酉时', '戌': '戌时', '亥': '亥时' },
+  faqTitle: '小六壬：免费排盘与使用常见问题',
+  faqQ1: '小六壬是什么？',
+  faqA1: '小六壬又称马前课、六神掌诀，是民间流传的掌诀占卜法：以大安为起点，在手指六宫上按月、日、时依次数过，落在哪一宫，就以那一宫断吉凶。不用铜钱、不用排盘，掐指即可起课。',
+  faqQ2: '月日时怎么数？',
+  faqA2: '大安起正月，月上起日，日上起时：先从大安数到农历月份，再从停下的那一宫数到农历日期，最后从停下的那一宫数到时辰地支，落宫即结果。时辰数子=1、丑=2、寅=3、卯=4、辰=5、巳=6、午=7、未=8、申=9、酉=10、戌=11、亥=12。本页时间起课会自动换算农历月日与时辰。',
+  faqQ3: '六宫各代表什么？',
+  faqA3: '大安主安稳大吉，事事昌；留连主拖延纠缠，事难成；速喜主喜讯速至，事速成；赤口主口舌是非，防官非；小吉主和合小吉，事可成；空亡主落空无果，事不祥。六宫按大安、留连、速喜、赤口、小吉、空亡的固定顺序循环。',
+  faqQ4: '速喜和大安哪个更好？',
+  faqA4: '大安是最吉的一宫，主稳、主成，问大事、求长远以大安为上；速喜主快、主喜，问消息、等回音、求速决时速喜更合。两宫都是吉宫，分工不同：要稳选大安，要快选速喜。',
+  faqQ5: '小六壬排盘免费吗？',
+  faqA5: '免费。本页排盘在本地完成，不联网、不收费，也不会保存你输入的问题。',
+  disclaimer: '小六壬属传统术数，仅供参考，不构成决策依据。',
+  offlineNote: '本页完全离线运行，农历换算使用本地 lunar.js，不向任何服务器发送数据。',
+  langLabel: '语言'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '小六壬 · 本地占卜',
+  navGroup: '占卜',
+  nav_1: '解夢', nav_2: '六爻占卜', nav_3: '梅花易數', nav_4: '小六壬', nav_5: '塔羅牌',
+  nav_6: '雷諾曼', nav_7: '北歐盧恩符文', nav_8: '奇門遁甲', nav_9: '印度占星卜卦', nav_10: '西方卜卦占星',
+  nav_11: '大六壬', nav_12: '金口訣', nav_13: '太乙神數', nav_14: '占星骰子',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '第一幕 · 報時起課',
+  slogan: '掐指一算，<br>六宮見分曉。',
+  subtitle: '小六壬免費線上占卜排盤',
+  labelQuestion: '所問之事（可選）',
+  phQuestion: '例如：今天出門順利嗎？',
+  labelMethod: '起課方式',
+  optTime: '以當前時間起課',
+  optNumber: '報數起課',
+  labelTime: '時間',
+  btnNow: '用當前時間',
+  labelNum1: '月（1–12）',
+  phNum1: '如 10',
+  labelNum2: '日（1–30）',
+  phNum2: '如 17',
+  labelNum3: '時（時辰數 1–12）',
+  phNum3: '如 7（午時）',
+  numHint: '時辰數：子=1、丑=2、寅=3、卯=4、辰=5、巳=6、午=7、未=8、申=9、酉=10、戌=11、亥=12。報數也可用農曆月、日與當時時辰。',
+  btnSubmit: '掐指 · 起課',
+  errNoTime: '請先選擇時間。',
+  errBadTime: '時間格式不正確。',
+  errNums: '月、日、時須為正整數：月 1–12，日 1–30，時 1–12。',
+  errLoad: '課例數據加載失敗，請刷新頁面重試。',
+  resultTitle: '課象',
+  ai_interpret: 'AI 解讀',
+  asked: '所問', lunar: '農曆', castNums: '起課數',
+  month: '月', day: '日', hour: '時',
+  num1: '月', num2: '日', num3: '時',
+  classicalNote: '',
+  attrWuxing: '五行', attrColor: '顏色', attrDir: '方位', attrShen: '神煞',
+  attrGuiren: '貴人方', attrChongfan: '沖犯', attrMoushi: '謀事數', attrTime: '所主之時',
+  xiangyiLabel: '象意', duanyueLabel: '斷語',
+  duanyuLabel: '斷曰',
+  detailTitle: '六事斷',
+  detail_0: '尋人', detail_1: '失物', detail_2: '病人', detail_3: '行人', detail_4: '官非', detail_5: '賭博',
+  waiguaLabel: '外應',
+  level: { '大安': '大吉', '留連': '中凶', '速喜': '中吉', '赤口': '小凶', '小吉': '小吉', '空亡': '大凶' },
+  gongName: { '大安': '大安', '留連': '留連', '速喜': '速喜', '赤口': '赤口', '小吉': '小吉', '空亡': '空亡' },
+  gongTime: { '大安': '身不動時', '留連': '人未歸時', '速喜': '人便至時', '赤口': '官事凶時', '小吉': '人來喜時', '空亡': '音信稀時' },
+  wuxing: { '木': '木', '水': '水', '火': '火', '金': '金', '土': '土' },
+  color: { '青': '青', '黑': '黑', '红': '紅', '白': '白', '黄': '黃' },
+  dir: { '东方': '東方', '北方': '北方', '南方': '南方', '西方': '西方', '中央': '中央', '西南': '西南', '厝地': '厝地' },
+  shen: { '青龙': '青龍', '玄武': '玄武', '朱雀': '朱雀', '白虎': '白虎', '六合': '六合', '勾陈': '勾陳' },
+  shichenName: { '子': '子時', '丑': '丑時', '寅': '寅時', '卯': '卯時', '辰': '辰時', '巳': '巳時', '午': '午時', '未': '未時', '申': '申時', '酉': '酉時', '戌': '戌時', '亥': '亥時' },
+  faqTitle: '小六壬：免費排盤與使用常見問題',
+  faqQ1: '小六壬是什麼？',
+  faqA1: '小六壬又稱馬前課、六神掌訣，是民間流傳的掌訣占卜法：以大安為起點，在手指六宮上按月、日、時依次數過，落在哪一宮，就以那一宮斷吉凶。不用銅錢、不用排盤，掐指即可起課。',
+  faqQ2: '月日時怎麼數？',
+  faqA2: '大安起正月，月上起日，日上起時：先從大安數到農曆月份，再從停下的那一宮數到農曆日期，最後從停下的那一宮數到時辰地支，落宮即結果。時辰數子=1、丑=2、寅=3、卯=4、辰=5、巳=6、午=7、未=8、申=9、酉=10、戌=11、亥=12。本頁時間起課會自動換算農曆月日與時辰。',
+  faqQ3: '六宮各代表什麼？',
+  faqA3: '大安主安穩大吉，事事昌；留連主拖延糾纏，事難成；速喜主喜訊速至，事速成；赤口主口舌是非，防官非；小吉主和合小吉，事可成；空亡主落空無果，事不祥。六宮按大安、留連、速喜、赤口、小吉、空亡的固定順序循環。',
+  faqQ4: '速喜和大安哪個更好？',
+  faqA4: '大安是最吉的一宮，主穩、主成，問大事、求長遠以大安為上；速喜主快、主喜，問消息、等回音、求速決時速喜更合。兩宮都是吉宮，分工不同：要穩選大安，要快選速喜。',
+  faqQ5: '小六壬排盤免費嗎？',
+  faqA5: '免費。本頁排盤在本地完成，不聯網、不收費，也不會保存你輸入的問題。',
+  disclaimer: '小六壬屬傳統術數，僅供參考，不構成決策依據。',
+  offlineNote: '本頁完全離線運行，農曆換算使用本地 lunar.js，不向任何伺服器發送數據。',
+  langLabel: '語言'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Xiao Liuren · Local Divination',
+  navGroup: 'Divination',
+  nav_1: 'Dream Interpretation', nav_2: 'Six Lines (Liu Yao)', nav_3: 'Meihua Yishu', nav_4: 'Xiao Liuren', nav_5: 'Tarot',
+  nav_6: 'Lenormand', nav_7: 'Norse Runes', nav_8: 'Qimen Dunjia', nav_9: 'Vedic Astrology', nav_10: 'Western Horary Astrology',
+  nav_11: 'Da Liuren', nav_12: 'Jinkou Jue', nav_13: 'Taiyi Shenshu', nav_14: 'Astrology Dice',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'Act I · Casting by Time',
+  slogan: 'Count on your fingers,<br>and the six palaces speak.',
+  subtitle: 'Free online Xiao Liuren divination chart',
+  labelQuestion: 'Your question (optional)',
+  phQuestion: 'e.g. Will going out today go well?',
+  labelMethod: 'Casting method',
+  optTime: 'Cast by current time',
+  optNumber: 'Cast by numbers',
+  labelTime: 'Time',
+  btnNow: 'Use now',
+  labelNum1: 'Month (1–12)',
+  phNum1: 'e.g. 10',
+  labelNum2: 'Day (1–30)',
+  phNum2: 'e.g. 17',
+  labelNum3: 'Hour (branch number 1–12)',
+  phNum3: 'e.g. 7 (Wu hour)',
+  numHint: 'Hour branch numbers: Zi=1, Chou=2, Yin=3, Mao=4, Chen=5, Si=6, Wu=7, Wei=8, Shen=9, You=10, Xu=11, Hai=12. For number casting you may also use the lunar month and day with the current hour branch.',
+  btnSubmit: 'Cast the palaces',
+  errNoTime: 'Please choose a time first.',
+  errBadTime: 'The time format is invalid.',
+  errNums: 'Month, day and hour must be positive integers: month 1–12, day 1–30, hour 1–12.',
+  errLoad: 'Failed to load the palace data. Please refresh and try again.',
+  resultTitle: 'The Reading',
+  ai_interpret: 'AI Reading',
+  asked: 'Question', lunar: 'Lunar date', castNums: 'Casting numbers',
+  month: 'Month', day: 'Day', hour: 'Hour',
+  num1: 'Month', num2: 'Day', num3: 'Hour',
+  classicalNote: 'Classical text shown in Chinese.',
+  attrWuxing: 'Element', attrColor: 'Color', attrDir: 'Direction', attrShen: 'Spirit',
+  attrGuiren: 'Benefactor direction', attrChongfan: 'Clash', attrMoushi: 'Auspicious numbers', attrTime: 'Governs',
+  xiangyiLabel: 'Meaning', duanyueLabel: 'Verse',
+  duanyuLabel: 'Verdict',
+  detailTitle: 'Six Matters',
+  detail_0: 'Seeking someone', detail_1: 'Lost items', detail_2: 'Illness', detail_3: 'Traveler', detail_4: 'Lawsuit', detail_5: 'Gambling',
+  waiguaLabel: 'Outer sign',
+  level: { '大安': 'Great Fortune', '留连': 'Moderate Misfortune', '速喜': 'Moderate Fortune', '赤口': 'Minor Misfortune', '小吉': 'Minor Fortune', '空亡': 'Great Misfortune' },
+  gongName: { '大安': 'Great Peace', '留连': 'Lingering', '速喜': 'Swift Joy', '赤口': 'Red Mouth', '小吉': 'Minor Fortune', '空亡': 'Empty Void' },
+  gongTime: { '大安': 'When the body is still', '留连': 'When the person has not returned', '速喜': 'When the person arrives soon', '赤口': 'When official matters turn ominous', '小吉': 'When joy arrives with the person', '空亡': 'When news is scarce' },
+  wuxing: { '木': 'Wood', '水': 'Water', '火': 'Fire', '金': 'Metal', '土': 'Earth' },
+  color: { '青': 'Blue-green', '黑': 'Black', '红': 'Red', '白': 'White', '黄': 'Yellow' },
+  dir: { '东方': 'East', '北方': 'North', '南方': 'South', '西方': 'West', '中央': 'Center', '西南': 'Southwest', '厝地': 'House ground' },
+  shen: { '青龙': 'Azure Dragon', '玄武': 'Black Tortoise', '朱雀': 'Vermilion Bird', '白虎': 'White Tiger', '六合': 'Liuhe', '勾陈': 'Gouchen' },
+  shichenName: { '子': 'Zi hour', '丑': 'Chou hour', '寅': 'Yin hour', '卯': 'Mao hour', '辰': 'Chen hour', '巳': 'Si hour', '午': 'Wu hour', '未': 'Wei hour', '申': 'Shen hour', '酉': 'You hour', '戌': 'Xu hour', '亥': 'Hai hour' },
+  faqTitle: 'Xiao Liuren: Free Chart & FAQ',
+  faqQ1: 'What is Xiao Liuren?',
+  faqA1: 'Xiao Liuren, also called the Maqian lesson or the Six Spirits palm method, is a folk palm divination: starting from Great Peace, you count the month, day and hour across the six palaces on your fingers, and the palace you land on gives the fortune. No coins, no chart — just your fingers.',
+  faqQ2: 'How do I count the month, day and hour?',
+  faqA2: 'Great Peace is the first lunar month; from the month you land on, count to the lunar day; from there, count to the hour branch — the palace you land on is the result. Hour branch numbers: Zi=1, Chou=2, Yin=3, Mao=4, Chen=5, Si=6, Wu=7, Wei=8, Shen=9, You=10, Xu=11, Hai=12. Time-based casting on this page converts the lunar month, day and hour branch automatically.',
+  faqQ3: 'What does each of the six palaces mean?',
+  faqA3: 'Great Peace means steady great fortune — everything prospers. Lingering means delay and entanglement — matters are hard to complete. Swift Joy means good news arrives fast — matters succeed quickly. Red Mouth means quarrels and gossip — beware of lawsuits. Minor Fortune means harmony and small fortune — matters can succeed. Empty Void means nothing comes of it — an unlucky sign. The six palaces always cycle in this fixed order.',
+  faqQ4: 'Which is better, Swift Joy or Great Peace?',
+  faqA4: 'Great Peace is the most fortunate palace — steady and lasting; for big matters and long-term plans, Great Peace is best. Swift Joy is about speed and happy news — for messages, replies and quick decisions, Swift Joy fits better. Both are fortunate palaces with different strengths: choose Great Peace for stability, Swift Joy for speed.',
+  faqQ5: 'Is the Xiao Liuren chart free?',
+  faqA5: 'Yes, free. The chart is computed locally in your browser — no internet, no charge, and your question is never saved.',
+  disclaimer: 'Xiao Liuren is a traditional divination art, for reference only; it is not a basis for decisions.',
+  offlineNote: 'This page runs fully offline. Lunar conversion uses the local lunar.js and no data is sent to any server.',
+  langLabel: 'Language'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '小六壬 · ローカル占い',
+  navGroup: '占い',
+  nav_1: '夢占い', nav_2: '六爻占い', nav_3: '梅花易数', nav_4: '小六壬', nav_5: 'タロット',
+  nav_6: 'ルノルマン', nav_7: '北欧ルーン', nav_8: '奇門遁甲', nav_9: 'インド占星術', nav_10: '西洋ホラリー占星術',
+  nav_11: '大六壬', nav_12: '金口訣', nav_13: '太乙神数', nav_14: '占星ダイス',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '第一幕 · 報時起課',
+  slogan: '指を折れば、<br>六宮の答えが見える。',
+  subtitle: '小六壬 無料オンライン占い排盤',
+  labelQuestion: '質問（任意）',
+  phQuestion: '例：今日の外出はうまくいく？',
+  labelMethod: '起課方法',
+  optTime: '現在時刻で起課',
+  optNumber: '報数起課',
+  labelTime: '時間',
+  btnNow: '現在時刻を使う',
+  labelNum1: '月（1–12）',
+  phNum1: '例 10',
+  labelNum2: '日（1–30）',
+  phNum2: '例 17',
+  labelNum3: '時（時辰数 1–12）',
+  phNum3: '例 7（午時）',
+  numHint: '時辰数：子=1、丑=2、寅=3、卯=4、辰=5、巳=6、午=7、未=8、申=9、酉=10、戌=11、亥=12。報数では旧暦の月・日と現在の時辰を使うこともできます。',
+  btnSubmit: '起課する',
+  errNoTime: 'まず時間を選択してください。',
+  errBadTime: '時間の形式が正しくありません。',
+  errNums: '月・日・時は正の整数で：月 1–12、日 1–30、時 1–12。',
+  errLoad: '課例データの読み込みに失敗しました。ページを更新してもう一度お試しください。',
+  resultTitle: '課象',
+  ai_interpret: 'AI 解釈',
+  asked: '質問', lunar: '旧暦', castNums: '起課数',
+  month: '月', day: '日', hour: '時',
+  num1: '月', num2: '日', num3: '時',
+  classicalNote: '原文は中国語のまま表示しています。',
+  attrWuxing: '五行', attrColor: '色', attrDir: '方位', attrShen: '神煞',
+  attrGuiren: '貴人方', attrChongfan: '沖犯', attrMoushi: '謀事数', attrTime: '主る時',
+  xiangyiLabel: '象意', duanyueLabel: '断語',
+  duanyuLabel: '断曰',
+  detailTitle: '六事断',
+  detail_0: '人探し', detail_1: '失せ物', detail_2: '病人', detail_3: '行人', detail_4: '官非', detail_5: '賭け事',
+  waiguaLabel: '外応',
+  level: { '大安': '大吉', '留連': '中凶', '速喜': '中吉', '赤口': '小凶', '小吉': '小吉', '空亡': '大凶' },
+  gongName: { '大安': '大安', '留連': '留連', '速喜': '速喜', '赤口': '赤口', '小吉': '小吉', '空亡': '空亡' },
+  gongTime: { '大安': '身動かざるとき', '留連': '人未だ帰らざるとき', '速喜': '人便ち至るとき', '赤口': '官事凶なるとき', '小吉': '人来たりて喜ぶとき', '空亡': '音信稀なるとき' },
+  wuxing: { '木': '木', '水': '水', '火': '火', '金': '金', '土': '土' },
+  color: { '青': '青', '黑': '黒', '红': '赤', '白': '白', '黄': '黄' },
+  dir: { '东方': '東方', '北方': '北方', '南方': '南方', '西方': '西方', '中央': '中央', '西南': '西南', '厝地': '屋敷' },
+  shen: { '青龙': '青龍', '玄武': '玄武', '朱雀': '朱雀', '白虎': '白虎', '六合': '六合', '勾陈': '勾陳' },
+  shichenName: { '子': '子時', '丑': '丑時', '寅': '寅時', '卯': '卯時', '辰': '辰時', '巳': '巳時', '午': '午時', '未': '未時', '申': '申時', '酉': '酉時', '戌': '戌時', '亥': '亥時' },
+  faqTitle: '小六壬：無料排盤とよくある質問',
+  faqQ1: '小六壬とは？',
+  faqA1: '小六壬は馬前課・六神掌訣とも呼ばれ、民間伝承の掌訣占いです。大安を起点に、指の六宮で月・日・時を順に数え、止まった宮で吉凶を断じます。銅銭も排盤も不要で、指を折るだけで起課できます。',
+  faqQ2: '月・日・時はどう数えますか？',
+  faqA2: '大安が正月、月上起日、日上起時：まず大安から旧暦の月まで数え、止まった宮から旧暦の日まで数え、さらに止まった宮から時辰の地支まで数え、最後に止まった宮が結果です。時辰数は子=1、丑=2、寅=3、卯=4、辰=5、巳=6、午=7、未=8、申=9、酉=10、戌=11、亥=12です。本ページの時間起課では旧暦の月日と時辰を自動で換算します。',
+  faqQ3: '六宮はそれぞれ何を表しますか？',
+  faqA3: '大安は安泰大吉で事事昌。留連は遅延と糾葛で事成り難し。速喜は喜びの知らせが速く届き、事速やかに成る。赤口は口舌是非で官非に注意。小吉は和合小吉で事成る可し。空亡は落空無果で不祥。六宮は大安・留連・速喜・赤口・小吉・空亡の固定順序で巡ります。',
+  faqQ4: '速喜と大安、どちらが良い？',
+  faqA4: '大安は最も吉な宮で、安定と成就を主ります。大事や長期の計画には大安が最上です。速喜は速さと喜びを主り、知らせを待つときや速決を求めるときに合います。両宮とも吉宮ですが役割が違います。安定を求めるなら大安、速さを求めるなら速喜です。',
+  faqQ5: '小六壬の排盤は無料ですか？',
+  faqA5: '無料です。このページの排盤はローカルで計算され、ネット接続も料金も不要で、入力した質問は保存されません。',
+  disclaimer: '小六壬は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  offlineNote: 'このページは完全オフラインで動作します。旧暦換算はローカルの lunar.js を使い、データは外部サーバーに送信されません。',
+  langLabel: '言語'
+}
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var XLR = null;       // fetched /data/xiaoliuren.json
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function tm(map, key) {
+  var m = (I18N[LANG] || {})[map] || {};
+  if (key in m) return m[key];
+  var f = I18N['zh-CN'][map] || {};
+  return (key in f) ? f[key] : key;
+}
+function gongName(name) { return tm('gongName', name); }
+function gongLevel(name) { return tm('level', name); }
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var te = document.getElementById('time-error'); if (te) te.textContent = '';
+  var ne = document.getElementById('number-error'); if (ne) ne.textContent = '';
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+var BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var DETAIL_KEYS = ['寻人','失物','病人','行人','官非','赌博'];
+
+// 时辰地支数：23-1 子 1，1-3 丑 2，3-5 寅 3，5-7 卯 4，7-9 辰 5，9-11 巳 6，
+// 11-13 午 7，13-15 未 8，15-17 申 9，17-19 酉 10，19-21 戌 11，21-23 亥 12
+function hourBranchNum(hour) {
+  if (hour >= 23 || hour < 1) return 1;
+  return Math.floor((hour + 1) / 2) + 1;
+}
+
+// 小六壬掌诀：宫序 = (月 + 日 + 时 - 2) mod 6，0-5 对应 大安 留连 速喜 赤口 小吉 空亡
+function palaceIndex(monthNum, dayNum, hourNum) {
+  return (monthNum + dayNum + hourNum - 2) % 6;
+}
+
+function gongByIndex(idx) {
+  if (!XLR || !XLR.gongs) return null;
+  var ordered = XLR.gongs.slice().sort(function(a, b) { return a.order - b.order; });
+  return ordered[idx] || null;
+}
+
+function timeCast(date) {
+  var solar = Solar.fromYmd(date.getFullYear(), date.getMonth() + 1, date.getDate());
+  var lunar = solar.getLunar();
+  var monthNum = lunar.getMonth();
+  var dayNum = lunar.getDay();
+  var hourNum = hourBranchNum(date.getHours());
+  return {
+    mode: 'time',
+    monthNum: monthNum, dayNum: dayNum, hourNum: hourNum,
+    index: palaceIndex(monthNum, dayNum, hourNum),
+    ganzhi: lunar.getYearInGanZhi(),
+    lunarYear: lunar.getYear(), lunarMonth: monthNum, lunarDay: dayNum,
+    monthCN: lunar.getMonthInChinese(), dayCN: lunar.getDayInChinese(),
+    date: date
+  };
+}
+
+function numberCast(n1, n2, n3) {
+  return { mode: 'number', monthNum: n1, dayNum: n2, hourNum: n3, index: palaceIndex(n1, n2, n3) };
+}
+// ==LOGIC-END==
+
+// ---- UI ----
+function switchTab(mode) {
+  document.getElementById('panel-time').classList.toggle('hidden', mode !== 'time');
+  document.getElementById('panel-number').classList.toggle('hidden', mode !== 'number');
+}
+
+function localInputValue(d) {
+  function p(n) { return (n < 10 ? '0' : '') + n; }
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + 'T' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+function useNow() {
+  document.getElementById('datetime').value = localInputValue(new Date());
+  document.getElementById('time-error').textContent = '';
+}
+
+function doCast() {
+  if (!XLR) { document.getElementById('load-error').textContent = t('errLoad'); return; }
+  if (document.getElementById('method').value === 'time') {
+    var v = document.getElementById('datetime').value;
+    var err = document.getElementById('time-error');
+    if (!v) { err.textContent = t('errNoTime'); return; }
+    err.textContent = '';
+    var d = new Date(v);
+    if (isNaN(d.getTime())) { err.textContent = t('errBadTime'); return; }
+    showResult(timeCast(d));
+  } else {
+    var nerr = document.getElementById('number-error');
+    var n1 = parseInt(document.getElementById('num1').value, 10);
+    var n2 = parseInt(document.getElementById('num2').value, 10);
+    var n3 = parseInt(document.getElementById('num3').value, 10);
+    if (isNaN(n1) || n1 < 1 || n1 > 12 || isNaN(n2) || n2 < 1 || n2 > 30 || isNaN(n3) || n3 < 1 || n3 > 12) {
+      nerr.textContent = t('errNums');
+      return;
+    }
+    nerr.textContent = '';
+    showResult(numberCast(n1, n2, n3));
+  }
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function shichenLabel(hourNum) {
+  var branch = BRANCHES[hourNum - 1];
+  var range = '';
+  if (XLR && XLR.shichen && XLR.shichen[hourNum - 1]) range = '（' + XLR.shichen[hourNum - 1][1] + '）';
+  return tm('shichenName', branch) + range;
+}
+
+function showResult(r, noScroll) {
+  LAST_RESULT = r;
+  var g = gongByIndex(r.index);
+  if (!g) return;
+  var q = document.getElementById('question').value.trim();
+
+  var head = '';
+  if (q) head += t('asked') + '：<b>' + esc(q) + '</b><br>';
+  if (r.mode === 'time') {
+    head += t('lunar') + '：<b>' + r.ganzhi + '年 ' + r.monthCN + '月' + r.dayCN + '</b>（' + r.lunarYear + '年' + r.lunarMonth + '月' + r.lunarDay + '日）<br>';
+  }
+  head += t('castNums') + '：' + t('month') + ' <b>' + r.monthNum + '</b> · ' + t('day') + ' <b>' + r.dayNum + '</b> · ' + t('hour') + ' <b>' + r.hourNum + '</b> (' + shichenLabel(r.hourNum) + ')';
+  document.getElementById('result-head').innerHTML = head;
+
+  var palmHtml = '';
+  var ordered = XLR.gongs.slice().sort(function(a, b) { return a.order - b.order; });
+  for (var i = 0; i < ordered.length; i++) {
+    palmHtml += '<div class="palm-chip' + (i === r.index ? ' hit' : '') + '"><span class="palm-num">' + ordered[i].order + '</span><span class="palm-name">' + esc(gongName(ordered[i].name)) + '</span></div>';
+  }
+  document.getElementById('palm').innerHTML = palmHtml;
+
+  var cnSub = (LANG === 'zh-CN' || LANG === 'zh-TW') ? '' : '<span class="palace-cn">' + esc(g.name) + '</span>';
+  document.getElementById('palace-name').innerHTML = esc(gongName(g.name)) + cnSub;
+  document.getElementById('palace-level').textContent = '· ' + gongLevel(g.name) + ' ·';
+
+  function attr(label, value) {
+    return '<div class="attr"><h3>' + label + '</h3><p>' + value + '</p></div>';
+  }
+  var attrs = '';
+  attrs += attr(t('attrWuxing'), esc(tm('wuxing', g.wuxing)));
+  attrs += attr(t('attrColor'), g.color ? esc(tm('color', g.color)) : '—');
+  attrs += attr(t('attrDir'), g.dir ? esc(tm('dir', g.dir)) : '—');
+  attrs += attr(t('attrShen'), esc(tm('shen', g.shen)));
+  attrs += attr(t('attrGuiren'), esc(tm('dir', g.guiren)));
+  attrs += attr(t('attrChongfan'), esc(tm('dir', g.chongfan)));
+  attrs += attr(t('attrMoushi'), (g.moushi || []).join(' · '));
+  attrs += attr(t('attrTime'), esc(tm('gongTime', g.name)));
+  document.getElementById('attr-grid').innerHTML = attrs;
+
+  var note = t('classicalNote');
+  var verdictHtml = t('duanyuLabel') + '：<span class="level">' + esc(gongName(g.name)) + ' · ' + esc(gongLevel(g.name)) + '</span>——' + esc(g.zhushu || '');
+  if (note) verdictHtml += '<div class="classical-note">' + note + '</div>';
+  document.getElementById('verdict').innerHTML = verdictHtml;
+
+  var dyHtml = '<h3>' + t('xiangyiLabel') + '</h3><p>' + esc(g.xiangyi || '') + '</p>' +
+    '<h3 style="margin-top:1.2rem">' + t('duanyueLabel') + '</h3><p>' + esc(g.duanyue || '') + '</p>';
+  if (note) dyHtml += '<div class="classical-note">' + note + '</div>';
+  document.getElementById('duanyue').innerHTML = dyHtml;
+
+  var detailHtml = '<h3>' + t('detailTitle') + '</h3><div class="detail-grid">';
+  for (var k = 0; k < DETAIL_KEYS.length; k++) {
+    var dk = DETAIL_KEYS[k];
+    var dv = (g.detail && g.detail[dk]) ? g.detail[dk] : '';
+    detailHtml += '<div class="detail-item"><b>' + t('detail_' + k) + '</b>' + esc(dv) + '</div>';
+  }
+  detailHtml += '</div>';
+  document.getElementById('detail-block').innerHTML = detailHtml;
+
+  var w = (XLR.waigua && XLR.waigua[g.name]) ? XLR.waigua[g.name] : null;
+  document.getElementById('waigua').innerHTML = w
+    ? '<b>' + t('waiguaLabel') + '：</b>' + esc(w.text)
+    : '';
+
+  document.getElementById('result-card').classList.remove('hidden');
+  if (!noScroll) document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// 课例数据：站根相对路径 /data/xiaoliuren.json
+fetch('/data/xiaoliuren.json')
+  .then(function(res) { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+  .then(function(data) {
+    XLR = data;
+    document.getElementById('submit-btn').disabled = false;
+  })
+  .catch(function() {
+    document.getElementById('load-error').textContent = t('errLoad');
+  });
+
+// 默认填入当前时间
+document.getElementById('datetime').value = localInputValue(new Date());
+// 初始化界面语言（localStorage 优先，否则按浏览器语言自动检测）
+applyI18n();
+
+// ==AI-INTERPRET==
+// Shared AI 解读 button (/js/ai-jiegua.js). Summary comes from this page's
+// own result state; null/'' means "no result yet" and the button only shows
+// a hint instead of calling the backend.
+function aiTrunc(s, n) { s = String(s == null ? '' : s); return s.length > n ? s.slice(0, n) + '…' : s; }
+window.getJieguaSummary = function() {
+if (!LAST_RESULT || !XLR) return null;
+var g = gongByIndex(LAST_RESULT.index);
+if (!g) return null;
+var parts = [];
+parts.push('小六壬·' + gongName(g.name) + '（' + gongLevel(g.name) + '）');
+if (LAST_RESULT.mode === 'time') parts.push('农历：' + LAST_RESULT.ganzhi + '年 ' + LAST_RESULT.monthCN + '月' + LAST_RESULT.dayCN + '日');
+parts.push('月' + LAST_RESULT.monthNum + ' · 日' + LAST_RESULT.dayNum + ' · 时' + LAST_RESULT.hourNum);
+if (g.zhushu) parts.push('断语：' + g.zhushu);
+if (g.xiangyi) parts.push('象意：' + aiTrunc(g.xiangyi, 200));
+if (g.duanyue) parts.push('断曰：' + aiTrunc(g.duanyue, 200));
+if (g.detail) { DETAIL_KEYS.forEach(function (k) { if (g.detail[k]) parts.push(k + '：' + aiTrunc(g.detail[k], 120)); }); }
+var w = (XLR.waigua && XLR.waigua[g.name]) ? XLR.waigua[g.name] : null;
+if (w && w.text) parts.push('外卦：' + aiTrunc(w.text, 150));
+return parts.join('\n');
+};
+window.getJieguaQuestion = function() { var el = document.getElementById('question'); return el ? el.value.trim() : ''; };
+if (window.AIInterpret) { window.AIInterpret.attach(); }
+else { document.addEventListener('DOMContentLoaded', function () { if (window.AIInterpret) window.AIInterpret.attach(); }); }
+</script>
+<script src="/js/ai-jiegua.js"></script>
+</body>
+</html>

@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 奇门遁甲</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-group:not(:first-child) { margin-top: 1.4rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .link-btn { background: none; border: none; color: #c9a962; font-size: .75rem; cursor: pointer; letter-spacing: .1em; padding: 0; margin-left: .5rem; font-family: inherit; }
+  .link-btn:hover { text-decoration: underline; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+  .ju-preview { margin-top: .6rem; font-size: .92rem; color: #c9a962; letter-spacing: .08em; line-height: 1.8; }
+  .ju-preview .dim { color: #9a9aab; }
+  .hint { font-size: .8rem; color: #6f6f80; line-height: 1.7; margin-top: .6rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .chips { margin-top: .9rem; display: flex; flex-wrap: wrap; gap: .5rem; }
+  .chip { font-size: .78rem; color: #c9a962; border: 1px solid rgba(201,169,98,.6); border-radius: 999px; padding: .15rem .7rem; letter-spacing: .08em; }
+  .chip.dim { color: #9a9aab; border-color: rgba(154,154,171,.4); }
+  .verdict { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .level { color: #c9a962; font-weight: 700; }
+
+  /* ---- 九宫格 ---- */
+  .qm-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-top: 1.4rem; border: 1px solid rgba(201,169,98,.4); }
+  .qm-cell { border: 1px solid rgba(201,169,98,.25); padding: .7rem .6rem .8rem; min-height: 148px; background: transparent; }
+  .qm-cell.center { background: rgba(201,169,98,.04); }
+  .qm-cell .palace { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid rgba(201,169,98,.25); padding-bottom: .35rem; margin-bottom: .5rem; }
+  .qm-cell .palace .pname { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.05rem; color: #f0ead8; }
+  .qm-cell .palace .pname small { font-size: .72rem; color: #9a9aab; margin-left: .3rem; font-family: system-ui, sans-serif; }
+  .qm-cell .palace .pnum { font-size: .72rem; color: #6f6f80; }
+  .qm-row { display: flex; justify-content: space-between; gap: .4rem; font-size: .88rem; line-height: 1.75; color: #c8c2ae; }
+  .qm-row .k { color: #6f6f80; font-size: .75rem; flex-shrink: 0; letter-spacing: .1em; }
+  .qm-row .v { text-align: right; }
+  .qm-row .v b { color: #f0ead8; font-weight: 600; }
+  .qm-row .v .gold { color: #c9a962; }
+  .qm-mark { display: inline-block; font-size: .68rem; color: #0b0b14; background: #c9a962; border-radius: 999px; padding: .02rem .45rem; margin-left: .3rem; vertical-align: .1em; }
+  .qm-mark.hollow { color: #c9a962; background: transparent; border: 1px solid rgba(201,169,98,.6); }
+  .qm-note { font-size: .78rem; color: #9a9aab; line-height: 1.7; margin-top: .4rem; }
+
+  /* ---- 宫位断语卡片 ---- */
+  .palace-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-top: 1.4rem; }
+  .palace-card { background: transparent; border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1.1rem 1.2rem; }
+  .palace-card h3 { font-size: .8rem; color: #b08d3e; font-weight: 400; letter-spacing: .25em; margin-bottom: .6rem; }
+  .palace-card .p-title { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.15rem; font-weight: 700; color: #f0ead8; }
+  .palace-card .p-lines { font-size: .85rem; color: #9a9aab; margin: .4rem 0 .8rem; line-height: 1.7; }
+  .palace-card .p-lines b { color: #f0ead8; font-weight: 600; }
+  .palace-card .duan { font-size: .88rem; color: #c8c2ae; line-height: 1.7; border-top: 1px dashed rgba(201,169,98,.35); padding-top: .7rem; margin-top: .7rem; }
+  .palace-card .duan .d-label { color: #b08d3e; font-size: .78rem; letter-spacing: .2em; display: block; margin-bottom: .2rem; }
+  .palace-card .duan .classical { font-size: .78rem; color: #6f6f80; margin-top: .5rem; line-height: 1.6; }
+
+  .ge-list { margin-top: 1rem; }
+  .ge-item { padding: .8rem 0; border-bottom: 1px dashed rgba(201,169,98,.25); font-size: .92rem; line-height: 1.8; color: #c8c2ae; }
+  .ge-item:last-child { border-bottom: none; }
+  .ge-item b { color: #c9a962; }
+  .ge-item .ge-palace { color: #9a9aab; font-size: .82rem; }
+  .empty-note { color: #9a9aab; font-size: .9rem; line-height: 1.8; margin-top: 1rem; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+  footer a { color: #c9a962; text-decoration: none; border-bottom: 1px solid rgba(201,169,98,.4); }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .qm-cell { min-height: 132px; padding: .55rem .45rem .7rem; }
+    .qm-row { font-size: .8rem; }
+    .qm-cell .palace .pname { font-size: .95rem; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">奇门遁甲 · 本地占卜</div>
+    </div>
+  </a>
+              <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></span>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">第一幕 · 问事信息</div>
+  <h1 class="slogan" data-i18n-html="slogan">遁甲既布，<br>九宫自明。</h1>
+  <p class="subtitle" data-i18n="subtitle">奇门遁甲免费在线占卜排盘 · 时家转盘</p>
+
+  <section class="section">
+    <div class="field">
+      <label for="question" data-i18n="labelQuestion">所问之事（可选）</label>
+      <input type="text" id="question" placeholder="例如：这次合作能不能成？" data-i18n-ph="phQuestion">
+    </div>
+    <div class="field">
+      <label for="datetime"><span data-i18n="labelTime">时间</span> <button type="button" class="link-btn" onclick="useNow()" data-i18n="btnNow">用当前时间</button></label>
+      <input type="datetime-local" id="datetime" onchange="updateJuPreview()">
+      <div class="error" id="time-error"></div>
+      <div class="ju-preview" id="ju-preview"></div>
+      <div class="hint" data-i18n="timeHint">按北京时间起局：请输入北京时间；一日以 23:00 子初换日。排盘使用时家转盘奇门、拆补法定局。</div>
+    </div>
+    <button class="submit-btn" onclick="doQimen()" data-i18n="btnSubmit">起局 · 布奇门</button>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">奇门局</div>
+    <div class="result-head" id="result-head"></div>
+    <div class="chips" id="result-chips"></div>
+    <div class="qm-grid" id="qm-grid"></div>
+    <div class="qm-note" id="qm-note"></div>
+    <div class="section-title" style="margin-top:2rem" data-i18n="palaceTitle">九宫断语</div>
+    <div class="palace-grid" id="palace-grid"></div>
+    <div class="section-title" style="margin-top:2rem" data-i18n="geTitle">格局</div>
+    <div class="ge-list" id="ge-list"></div>
+    <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="qimen" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+  </section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">奇门遁甲：免费排盘与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">奇门遁甲是什么？</summary>
+      <p data-i18n="faqA1">奇门遁甲是中国传统术数之一，以问事的时间起局，把天干、九星、八门、八神布于九宫，以值符值使为纲断吉凶。本页用时家转盘奇门排盘，排盘在本地完成。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">阴遁阳遁怎么分？</summary>
+      <p data-i18n="faqA2">以冬至、夏至为界：冬至到夏至之间为阳遁，顺布六仪；夏至到冬至之间为阴遁，逆布六仪。本页按问事时间所在的节气自动判定。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">局数是什么意思？</summary>
+      <p data-i18n="faqA3">局数由节气与上中下三元决定：每个节气各有上元、中元、下元三局，如冬至一七四、小雪五八二；三元由当日干支的符头定。局数决定六仪三奇在九宫的起布位置。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">值符和值使是什么？</summary>
+      <p data-i18n="faqA4">值符是领盘之星，值使是领盘之门：由问事时辰的旬首定符首，符首所落之宫的本宫星为值符、本宫门为值使；值符星落于时干之宫，值使门随旬首时辰数转宫。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">奇门遁甲排盘免费吗？</summary>
+      <p data-i18n="faqA5">免费。本页排盘在本地完成，不联网、不收费，也不会保存你输入的问题。断语引自古籍整理数据，仅供参考。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">奇门遁甲属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink">数据与出处</a><br>
+    <span data-i18n="attrNote">断语数据：comprehensive-shushu-engine（GPL-3.0），农历换算使用本地 lunar.js（MIT）。</span><br>
+    <span data-i18n="offlineNote">本页排盘完全离线运行，不向任何服务器发送数据；断语库按需加载。</span>
+  </footer>
+</div>
+</main>
+<script src="lunar.js"></script>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。古籍断语原文一律保留中文，见 classicalNote。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'ai_interpret': 'AI 解读',
+  'navGroup1': '一事一问', 'navGroup2': '一生之图', 'navGroup3': '两人之间', 'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦', 'nav_liuyao': '六爻占卜', 'nav_meihua': '梅花易数', 'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌', 'nav_leinuoman': '雷诺曼', 'nav_lunen': '北欧卢恩符文', 'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬', 'nav_jinkoujue': '金口诀', 'nav_taiyi': '太乙神数', 'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数', 'nav_lingqi': '灵棋经', 'nav_cezi': '测字', 'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字', 'nav_ziwei': '紫微斗数', 'nav_tieban': '铁板神数', 'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易', 'nav_taixuan': '太玄经', 'nav_huangji': '皇极经世', 'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命', 'nav_xiyang': '西洋占星', 'nav_yindu': '印度占星', 'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘', 'nav_bazi-hepan': '八字合盘', 'nav_ziwei-hepan': '紫微合盘', 'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月', 'nav_maya': '玛雅历法',
+  brandSub: '奇门遁甲 · 本地占卜',
+  navSoon: '即将上线', footNote: '本地运行 · 无需联网', langLabel: '语言',
+  eyebrow: '第一幕 · 问事信息',
+  slogan: '遁甲既布，<br>九宫自明。',
+  subtitle: '奇门遁甲免费在线占卜排盘 · 时家转盘',
+  labelQuestion: '所问之事（可选）', phQuestion: '例如：这次合作能不能成？',
+  labelTime: '时间', btnNow: '用当前时间',
+  timeHint: '按北京时间起局：请输入北京时间；一日以 23:00 子初换日。排盘使用时家转盘奇门、拆补法定局。',
+  btnSubmit: '起局 · 布奇门',
+  errNoTime: '请先选择时间。', errBadTime: '时间格式不正确。',
+  resultTitle: '奇门局', palaceTitle: '九宫断语', geTitle: '格局',
+  asked: '所问', lunar: '农历', ganzhi: '四柱', jieqi: '节气', ju: '局数', yuan: '三元',
+  yuanShang: '上元', yuanZhong: '中元', yuanXia: '下元',
+  yangDun: '阳遁', yinDun: '阴遁',
+  xunshou: '旬首', kongwang: '旬空', yima: '驿马',
+  zhifu: '值符', zhishi: '值使', zhifuStar: '值符星', zhishiDoor: '值使门',
+  earthStem: '地盘', heavenStem: '天盘', star: '九星', door: '八门', god: '八神',
+  palace: '宫', center: '中宫', jiKun: '寄坤', kongMark: '空亡', maMark: '驿马',
+  fuYinStar: '星伏吟', fanYinStar: '星反吟', fuYinDoor: '门伏吟', fanYinDoor: '门反吟',
+  geNone: '本局未命中上述可机判的格局；格局须结合所问之事取用神细断。',
+  duanKezhi: '十干克应', duanStar: '星', duanDoor: '门', duanSanqi: '三奇到宫',
+  classicalNote: '',
+  dataLoading: '断语库加载中……', dataFailed: '断语库未能加载（需经站点 /data/ 路径访问），排盘本身不受影响；刷新页面后可再试。',
+  fenleiNote: '分类占（如占婚姻、占求财）的断语须按所问之事取用神，本页仅列通用格局与九宫断语。',
+  faqTitle: '奇门遁甲：免费排盘与使用常见问题',
+  faqQ1: '奇门遁甲是什么？',
+  faqA1: '奇门遁甲是中国传统术数之一，以问事的时间起局，把天干、九星、八门、八神布于九宫，以值符值使为纲断吉凶。本页用时家转盘奇门排盘，排盘在本地完成。',
+  faqQ2: '阴遁阳遁怎么分？',
+  faqA2: '以冬至、夏至为界：冬至到夏至之间为阳遁，顺布六仪；夏至到冬至之间为阴遁，逆布六仪。本页按问事时间所在的节气自动判定。',
+  faqQ3: '局数是什么意思？',
+  faqA3: '局数由节气与上中下三元决定：每个节气各有上元、中元、下元三局，如冬至一七四、小雪五八二；三元由当日干支的符头定。局数决定六仪三奇在九宫的起布位置。',
+  faqQ4: '值符和值使是什么？',
+  faqA4: '值符是领盘之星，值使是领盘之门：由问事时辰的旬首定符首，符首所落之宫的本宫星为值符、本宫门为值使；值符星落于时干之宫，值使门随旬首时辰数转宫。',
+  faqQ5: '奇门遁甲排盘免费吗？',
+  faqA5: '免费。本页排盘在本地完成，不联网、不收费，也不会保存你输入的问题。断语引自古籍整理数据，仅供参考。',
+  disclaimer: '奇门遁甲属传统术数，仅供参考，不构成决策依据。',
+  attrNote: '断语数据：comprehensive-shushu-engine（GPL-3.0），农历换算使用本地 lunar.js（MIT）。',
+  offlineNote: '本页排盘完全离线运行，不向任何服务器发送数据；断语库按需加载。'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'ai_interpret': 'AI 解讀',
+  'navGroup1': '一事一問', 'navGroup2': '一生之圖', 'navGroup3': '兩人之間', 'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢', 'nav_liuyao': '六爻占卜', 'nav_meihua': '梅花易數', 'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌', 'nav_leinuoman': '雷諾曼', 'nav_lunen': '北歐盧恩符文', 'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬', 'nav_jinkoujue': '金口訣', 'nav_taiyi': '太乙神數', 'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數', 'nav_lingqi': '靈棋經', 'nav_cezi': '測字', 'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字', 'nav_ziwei': '紫微斗數', 'nav_tieban': '鐵板神數', 'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易', 'nav_taixuan': '太玄經', 'nav_huangji': '皇極經世', 'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命', 'nav_xiyang': '西洋占星', 'nav_yindu': '印度占星', 'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤', 'nav_bazi-hepan': '八字合盤', 'nav_ziwei-hepan': '紫微合盤', 'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月', 'nav_maya': '瑪雅曆法',
+  brandSub: '奇門遁甲 · 本地占卜',
+  navSoon: '即將上線', footNote: '本地運行 · 無需聯網', langLabel: '語言',
+  eyebrow: '第一幕 · 問事資訊',
+  slogan: '遁甲既布，<br>九宮自明。',
+  subtitle: '奇門遁甲免費線上占卜排盤 · 時家轉盤',
+  labelQuestion: '所問之事（可選）', phQuestion: '例如：這次合作能不能成？',
+  labelTime: '時間', btnNow: '用當前時間',
+  timeHint: '按北京時間起局：請輸入北京時間；一日以 23:00 子初換日。排盤使用時家轉盤奇門、拆補法定局。',
+  btnSubmit: '起局 · 布奇門',
+  errNoTime: '請先選擇時間。', errBadTime: '時間格式不正確。',
+  resultTitle: '奇門局', palaceTitle: '九宮斷語', geTitle: '格局',
+  asked: '所問', lunar: '農曆', ganzhi: '四柱', jieqi: '節氣', ju: '局數', yuan: '三元',
+  yuanShang: '上元', yuanZhong: '中元', yuanXia: '下元',
+  yangDun: '陽遁', yinDun: '陰遁',
+  xunshou: '旬首', kongwang: '旬空', yima: '驛馬',
+  zhifu: '值符', zhishi: '值使', zhifuStar: '值符星', zhishiDoor: '值使門',
+  earthStem: '地盤', heavenStem: '天盤', star: '九星', door: '八門', god: '八神',
+  palace: '宮', center: '中宮', jiKun: '寄坤', kongMark: '空亡', maMark: '驛馬',
+  fuYinStar: '星伏吟', fanYinStar: '星反吟', fuYinDoor: '門伏吟', fanYinDoor: '門反吟',
+  geNone: '本局未命中上述可機判的格局；格局須結合所問之事取用神細斷。',
+  duanKezhi: '十干克應', duanStar: '星', duanDoor: '門', duanSanqi: '三奇到宮',
+  classicalNote: '',
+  dataLoading: '斷語庫載入中……', dataFailed: '斷語庫未能載入（需經站點 /data/ 路徑訪問），排盤本身不受影響；刷新頁面後可再試。',
+  fenleiNote: '分類占（如占婚姻、占求財）的斷語須按所問之事取用神，本頁僅列通用格局與九宮斷語。',
+  faqTitle: '奇門遁甲：免費排盤與使用常見問題',
+  faqQ1: '奇門遁甲是什麼？',
+  faqA1: '奇門遁甲是中國傳統術數之一，以問事的時間起局，把天干、九星、八門、八神布於九宮，以值符值使為綱斷吉凶。本頁用時家轉盤奇門排盤，排盤在本地完成。',
+  faqQ2: '陰遁陽遁怎麼分？',
+  faqA2: '以冬至、夏至為界：冬至到夏至之間為陽遁，順布六儀；夏至到冬至之間為陰遁，逆布六儀。本頁按問事時間所在的節氣自動判定。',
+  faqQ3: '局數是什麼意思？',
+  faqA3: '局數由節氣與上中下三元決定：每個節氣各有上元、中元、下元三局，如冬至一七四、小雪五八二；三元由當日干支的符頭定。局數決定六儀三奇在九宮的起布位置。',
+  faqQ4: '值符和值使是什麼？',
+  faqA4: '值符是領盤之星，值使是領盤之門：由問事時辰的旬首定符首，符首所落之宮的本宮星為值符、本宮門為值使；值符星落於時干之宮，值使門隨旬首時辰數轉宮。',
+  faqQ5: '奇門遁甲排盤免費嗎？',
+  faqA5: '免費。本頁排盤在本地完成，不聯網、不收費，也不會保存你輸入的問題。斷語引自古籍整理數據，僅供參考。',
+  disclaimer: '奇門遁甲屬傳統術數，僅供參考，不構成決策依據。',
+  attrNote: '斷語數據：comprehensive-shushu-engine（GPL-3.0），農曆換算使用本地 lunar.js（MIT）。',
+  offlineNote: '本頁排盤完全離線運行，不向任何伺服器發送數據；斷語庫按需載入。'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'ai_interpret': 'AI Reading',
+  'navGroup1': 'One Question', 'navGroup2': 'Life Chart', 'navGroup3': 'Between Two', 'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation', 'nav_liuyao': 'Six Lines Divination', 'nav_meihua': 'Meihua Yishu', 'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot', 'nav_leinuoman': 'Lenormand', 'nav_lunen': 'Norse Runes', 'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren', 'nav_jinkoujue': 'Jinkou Jue', 'nav_taiyi': 'Taiyi Shenshu', 'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles', 'nav_lingqi': 'Lingqi Jing', 'nav_cezi': 'Character Divination', 'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)', 'nav_ziwei': 'Ziwei Doushu', 'nav_tieban': 'Tieban Shenshu', 'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi', 'nav_taixuan': 'Taixuan Jing', 'nav_huangji': 'Huangji Jingshi', 'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing', 'nav_xiyang': 'Western Astrology', 'nav_yindu': 'Vedic Astrology', 'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry', 'nav_bazi-hepan': 'Bazi Compatibility', 'nav_ziwei-hepan': 'Ziwei Compatibility', 'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune', 'nav_maya': 'Maya Calendar',
+  brandSub: 'Qimen Dunjia · Local Divination',
+  navSoon: 'Soon', footNote: 'Runs locally · No internet needed', langLabel: 'Language',
+  eyebrow: 'Act I · Your Question',
+  slogan: 'Once the Dun Jia is laid out,<br>the nine palaces speak for themselves.',
+  subtitle: 'Free online Qimen Dunjia chart · Hour-based rotating plate',
+  labelQuestion: 'Your question (optional)', phQuestion: 'e.g. Will this partnership work out?',
+  labelTime: 'Time', btnNow: 'Use now',
+  timeHint: 'Charts are cast in Beijing time: enter Beijing time; the day changes at 23:00 (first Zi hour). This page uses the hour-based rotating-plate method with the Chai Bu Ju determination.',
+  btnSubmit: 'Cast the chart',
+  errNoTime: 'Please choose a time first.', errBadTime: 'The time format is invalid.',
+  resultTitle: 'Qimen Chart', palaceTitle: 'Palace Readings', geTitle: 'Formations',
+  asked: 'Question', lunar: 'Lunar date', ganzhi: 'Four Pillars', jieqi: 'Solar term', ju: 'Ju', yuan: 'Yuan',
+  yuanShang: 'Upper Yuan', yuanZhong: 'Middle Yuan', yuanXia: 'Lower Yuan',
+  yangDun: 'Yang Dun', yinDun: 'Yin Dun',
+  xunshou: 'Xun head', kongwang: 'Void (Xun Kong)', yima: 'Travelling Horse',
+  zhifu: 'Zhi Fu', zhishi: 'Zhi Shi', zhifuStar: 'Zhi Fu star', zhishiDoor: 'Zhi Shi door',
+  earthStem: 'Earth stem', heavenStem: 'Heaven stem', star: 'Star', door: 'Door', god: 'Deity',
+  palace: 'Palace', center: 'Center palace', jiKun: 'lodged in Kun', kongMark: 'Void', maMark: 'Horse',
+  fuYinStar: 'Star Fu Yin', fanYinStar: 'Star Fan Yin', fuYinDoor: 'Door Fu Yin', fanYinDoor: 'Door Fan Yin',
+  geNone: 'No machine-readable formation matched in this chart; formations must be judged together with the matter asked about.',
+  duanKezhi: 'Stem interaction', duanStar: 'Star', duanDoor: 'Door', duanSanqi: 'Three Wonders in palace',
+  classicalNote: 'Classical texts are shown in Chinese.',
+  dataLoading: 'Loading the text database…', dataFailed: 'The text database could not be loaded (it is served from the site /data/ path). The chart itself is unaffected; refresh to retry.',
+  fenleiNote: 'Category readings (e.g. marriage, wealth) need a use-god chosen for the matter asked; this page lists only general formations and palace readings.',
+  faqTitle: 'Qimen Dunjia: Free Chart & FAQ',
+  faqQ1: 'What is Qimen Dunjia?',
+  faqA1: 'Qimen Dunjia is one of the traditional Chinese divination arts. A chart is cast from the time of the question, placing the heavenly stems, nine stars, eight doors and eight deities on the nine palaces, and read with the Zhi Fu star and Zhi Shi door as the lead. This page uses the hour-based rotating-plate method; the chart is computed locally.',
+  faqQ2: 'How are Yin Dun and Yang Dun divided?',
+  faqA2: 'By the winter and summer solstices: Yang Dun runs from the winter solstice to the summer solstice, with the Six Yi laid out forward; Yin Dun runs from the summer solstice to the winter solstice, with the Six Yi laid out in reverse. This page decides it from the solar term of the time asked.',
+  faqQ3: 'What does the Ju number mean?',
+  faqA3: 'The Ju is fixed by the solar term and the Upper/Middle/Lower Yuan: each term has three Ju, e.g. Winter Solstice 1-7-4 and Minor Snow 5-8-2. The Yuan is fixed by the Fu Tou of the day pillar. The Ju sets where the Six Yi and Three Wonders start on the nine palaces.',
+  faqQ4: 'What are Zhi Fu and Zhi Shi?',
+  faqA4: 'Zhi Fu is the leading star and Zhi Shi the leading door. The Xun head of the hour fixes the Fu Shou stem; the home star and home door of the palace where the Fu Shou sits on the Earth Plate are the Zhi Fu star and Zhi Shi door. The Zhi Fu star lands on the hour stem palace, and the Zhi Shi door advances with the hour count from the Xun head.',
+  faqQ5: 'Is the Qimen Dunjia chart free?',
+  faqA5: 'Yes, free. The chart is computed locally in your browser — no internet, no charge, and your question is never saved. The readings quote classical compiled data, for reference only.',
+  disclaimer: 'Qimen Dunjia is a traditional divination art, for reference only; it is not a basis for decisions.',
+  attrNote: 'Reading texts: comprehensive-shushu-engine (GPL-3.0); lunar conversion uses the local lunar.js (MIT).',
+  offlineNote: 'This page casts charts fully offline. No data is sent to any server; the text database loads on demand.'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'ai_interpret': 'AI 解釈',
+  'navGroup1': '一事一問', 'navGroup2': '一生之図', 'navGroup3': '二人の間', 'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い', 'nav_liuyao': '六爻占い', 'nav_meihua': '梅花易数', 'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット', 'nav_leinuoman': 'ルノルマン', 'nav_lunen': '北欧ルーン', 'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬', 'nav_jinkoujue': '金口訣', 'nav_taiyi': '太乙神数', 'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数', 'nav_lingqi': '霊棋経', 'nav_cezi': '測字', 'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字', 'nav_ziwei': '紫微斗数', 'nav_tieban': '鉄板神数', 'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易', 'nav_taixuan': '太玄経', 'nav_huangji': '皇極経世', 'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い', 'nav_xiyang': '西洋占星術', 'nav_yindu': 'インド占星術', 'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤', 'nav_bazi-hepan': '八字合盤', 'nav_ziwei-hepan': '紫微合盤', 'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月', 'nav_maya': 'マヤ暦',
+  brandSub: '奇門遁甲 · ローカル占い',
+  navSoon: '近日公開', footNote: 'ローカル動作 · ネット不要', langLabel: '言語',
+  eyebrow: '第一幕 · 問うこと',
+  slogan: '遁甲布けば、<br>九宮自ずと明らかになる。',
+  subtitle: '奇門遁甲 無料オンライン占い排盤 · 時家転盤',
+  labelQuestion: '質問（任意）', phQuestion: '例：今回の提携はうまくいく？',
+  labelTime: '時間', btnNow: '現在時刻を使う',
+  timeHint: '北京時間で起局します。北京時間を入力してください。一日は 23:00 子初で替わります。時家転盤奇門・拆補法定局です。',
+  btnSubmit: '起局する',
+  errNoTime: 'まず時間を選択してください。', errBadTime: '時間の形式が正しくありません。',
+  resultTitle: '奇門局', palaceTitle: '九宮の断語', geTitle: '格局',
+  asked: '質問', lunar: '旧暦', ganzhi: '四柱', jieqi: '節気', ju: '局数', yuan: '三元',
+  yuanShang: '上元', yuanZhong: '中元', yuanXia: '下元',
+  yangDun: '陽遁', yinDun: '陰遁',
+  xunshou: '旬首', kongwang: '旬空', yima: '駅馬',
+  zhifu: '値符', zhishi: '値使', zhifuStar: '値符星', zhishiDoor: '値使門',
+  earthStem: '地盤', heavenStem: '天盤', star: '九星', door: '八門', god: '八神',
+  palace: '宮', center: '中宮', jiKun: '坤に寄る', kongMark: '空亡', maMark: '駅馬',
+  fuYinStar: '星伏吟', fanYinStar: '星反吟', fuYinDoor: '門伏吟', fanYinDoor: '門反吟',
+  geNone: '本局は上記の機判できる格局に該当しません。格局は問う事柄の用神とあわせて判断します。',
+  duanKezhi: '十干剋応', duanStar: '星', duanDoor: '門', duanSanqi: '三奇到宮',
+  classicalNote: '古典の断語は中国語原文のまま表示しています。',
+  dataLoading: '断語データを読み込み中……', dataFailed: '断語データを読み込めませんでした（サイトの /data/ パス経由でのみ利用可）。排盤自体に影響はありません。更新して再試行してください。',
+  fenleiNote: '分類占（婚姻・求財など）の断語は問う事柄の用神で取るため、本頁では通用格局と九宮断語のみを示します。',
+  faqTitle: '奇門遁甲：無料排盤とよくある質問',
+  faqQ1: '奇門遁甲とは？',
+  faqA1: '奇門遁甲は中国の伝統的な占術の一つです。問う時刻で起局し、天干・九星・八門・八神を九宮に布き、値符・値使を軸に吉凶を断じます。本頁は時家転盤奇門で排盤し、計算はローカルで行います。',
+  faqQ2: '陰遁と陽遁はどう分ける？',
+  faqA2: '冬至・夏至を境に分けます。冬至から夏至までが陽遁で六儀を順布し、夏至から冬至までが陰遁で六儀を逆布します。本頁は問う時刻の節気から自動判定します。',
+  faqQ3: '局数とは何？',
+  faqA3: '局数は節気と上中下三元で決まります。各節気に上元・中元・下元の三局があり、例えば冬至一七四、小雪五八二です。三元は当日干支の符頭で定まり、局数が六儀三奇の九宮での起布位置を決めます。',
+  faqQ4: '値符と値使とは？',
+  faqA4: '値符は領盤の星、値使は領盤の門です。問う時辰の旬首から符首を定め、符首が地盤で落ちる宮の本宮星が値符、本宮門が値使です。値符星は時干の宮に落ち、値使門は旬首時からの時辰数で転宮します。',
+  faqQ5: '奇門遁甲の排盤は無料ですか？',
+  faqA5: '無料です。本頁の排盤はローカルで計算され、ネット接続も料金も不要で、入力した質問は保存されません。断語は古籍整理データを引用した参考です。',
+  disclaimer: '奇門遁甲は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  attrNote: '断語データ：comprehensive-shushu-engine（GPL-3.0）、旧暦換算はローカルの lunar.js（MIT）。',
+  offlineNote: 'このページは完全オフラインで排盤します。データは外部サーバーに送信されません。断語データは必要時に読み込みます。'
+}
+};
+
+// 九星 / 八门 / 八神 / 九宫 英日名
+var STAR_I18N = {
+  '天蓬': { en: 'Tian Peng', ja: '天蓬' }, '天芮': { en: 'Tian Rui', ja: '天芮' },
+  '天冲': { en: 'Tian Chong', ja: '天衝' }, '天辅': { en: 'Tian Fu', ja: '天輔' },
+  '天禽': { en: 'Tian Qin', ja: '天禽' }, '天心': { en: 'Tian Xin', ja: '天心' },
+  '天柱': { en: 'Tian Zhu', ja: '天柱' }, '天任': { en: 'Tian Ren', ja: '天任' },
+  '天英': { en: 'Tian Ying', ja: '天英' }
+};
+var DOOR_I18N = {
+  '休门': { en: 'Rest', ja: '休門' }, '死门': { en: 'Death', ja: '死門' },
+  '伤门': { en: 'Injury', ja: '傷門' }, '杜门': { en: 'Obstruction', ja: '杜門' },
+  '景门': { en: 'Scenery', ja: '景門' }, '开门': { en: 'Opening', ja: '開門' },
+  '惊门': { en: 'Surprise', ja: '驚門' }, '生门': { en: 'Life', ja: '生門' }
+};
+var GOD_I18N = {
+  '值符': { en: 'Zhi Fu', ja: '値符' }, '螣蛇': { en: 'Teng Snake', ja: '螣蛇' },
+  '太阴': { en: 'Great Yin', ja: '太陰' }, '六合': { en: 'Six Harmony', ja: '六合' },
+  '白虎': { en: 'White Tiger', ja: '白虎' }, '玄武': { en: 'Dark Warrior', ja: '玄武' },
+  '九地': { en: 'Nine Earth', ja: '九地' }, '九天': { en: 'Nine Heaven', ja: '九天' }
+};
+var PALACE_I18N = {
+  '坎': { en: 'Kan · North', ja: '坎・北' }, '坤': { en: 'Kun · Southwest', ja: '坤・西南' },
+  '震': { en: 'Zhen · East', ja: '震・東' }, '巽': { en: 'Xun · Southeast', ja: '巽・東南' },
+  '中': { en: 'Center', ja: '中' }, '乾': { en: 'Qian · Northwest', ja: '乾・西北' },
+  '兑': { en: 'Dui · West', ja: '兌・西' }, '艮': { en: 'Gen · Northeast', ja: '艮・東北' },
+  '离': { en: 'Li · South', ja: '離・南' }
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function locName(map, cn) {
+  if (LANG === 'en' || LANG === 'ja') { var m = map[cn]; if (m) return m[LANG]; }
+  return cn;
+}
+function starName(s) { return locName(STAR_I18N, s); }
+function doorName(d) { return locName(DOOR_I18N, d); }
+function godName(g) { return locName(GOD_I18N, g); }
+function palaceName(p) { return locName(PALACE_I18N, p); }
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var te = document.getElementById('time-error'); if (te) te.textContent = '';
+  updateJuPreview();
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// 时家转盘奇门 · 拆补法定局。算法依据：
+//  局数：节气 + 日柱符头定三元（子午卯酉上元，寅申巳亥中元，辰戌丑未下元；《奇门法窍》起例歌与三元歌），
+//        冬至→夏至阳遁，夏至→冬至阴遁；局数表与 qimen.json jueqi 及《奇门法窍》阴阳遁局数歌一致。
+//  地盘：阳遁顺布六仪（宫号递增）、逆布三奇；阴遁逆布六仪、顺布三奇。
+//  值符/值使：时干支旬首 → 符首（甲子戊、甲戌己、甲申庚、甲午辛、甲辰壬、甲寅癸），
+//        符首所落地盘宫的本宫星为值符、本宫门为值使；值符星落时干宫，值使门自旬首时辰数转宫。
+//  天盘星：按宫号方向转（阳遁递增、阴遁递减），落中五者寄坤二宫；天盘干随星同转。
+//  八门：自值使门起，沿后天八卦环（休生伤杜景死惊开）顺布。
+//  八神：值符神落时干宫，阳遁顺时针、阴遁逆时针，依次为值符、螣蛇、太阴、六合、白虎、玄武、九地、九天。
+//  旬空：时干支旬首地支后两位；驿马：按时支（申子辰寅、寅午戌申、巳酉丑亥、亥卯未巳）。
+var STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var JUEQI = {
+  '冬至': [1,7,4], '小寒': [2,8,5], '大寒': [3,9,6], '立春': [8,5,2], '雨水': [9,6,3], '惊蛰': [1,7,4],
+  '春分': [3,9,6], '清明': [4,1,7], '谷雨': [5,2,8], '立夏': [4,1,7], '小满': [5,2,8], '芒种': [6,3,9],
+  '夏至': [9,3,6], '小暑': [8,2,5], '大暑': [7,1,4], '立秋': [2,5,8], '处暑': [1,4,7], '白露': [9,3,6],
+  '秋分': [7,1,4], '寒露': [6,9,3], '霜降': [5,8,2], '立冬': [6,9,3], '小雪': [5,8,2], '大雪': [4,7,1]
+};
+var YANG_TERMS = ['冬至','小寒','大寒','立春','雨水','惊蛰','春分','清明','谷雨','立夏','小满','芒种'];
+var PALACE_INFO = {
+  1: { name: '坎', element: '水', dir: '北', branches: ['子'] },
+  2: { name: '坤', element: '土', dir: '西南', branches: ['未','申'] },
+  3: { name: '震', element: '木', dir: '东', branches: ['卯'] },
+  4: { name: '巽', element: '木', dir: '东南', branches: ['辰','巳'] },
+  5: { name: '中', element: '土', dir: '中', branches: [] },
+  6: { name: '乾', element: '金', dir: '西北', branches: ['戌','亥'] },
+  7: { name: '兑', element: '金', dir: '西', branches: ['酉'] },
+  8: { name: '艮', element: '土', dir: '东北', branches: ['丑','寅'] },
+  9: { name: '离', element: '火', dir: '南', branches: ['午'] }
+};
+var HOME_STAR = { 1: '天蓬', 2: '天芮', 3: '天冲', 4: '天辅', 5: '天禽', 6: '天心', 7: '天柱', 8: '天任', 9: '天英' };
+var HOME_DOOR = { 1: '休门', 2: '死门', 3: '伤门', 4: '杜门', 6: '开门', 7: '惊门', 8: '生门', 9: '景门' };
+var DOOR_RING = [1, 8, 3, 4, 9, 2, 7, 6];
+var DOOR_ORDER = ['休门', '生门', '伤门', '杜门', '景门', '死门', '惊门', '开门'];
+var GOD_ORDER = ['值符', '螣蛇', '太阴', '六合', '白虎', '玄武', '九地', '九天'];
+var GOD_RING_YANG = [1, 8, 3, 4, 9, 2, 7, 6];
+var GOD_RING_YIN = [1, 6, 7, 2, 9, 4, 3, 8];
+var XUN_YI = ['戊', '己', '庚', '辛', '壬', '癸'];
+var XUN_HEAD_BRANCH = [0, 10, 8, 6, 4, 2]; // 甲子 甲戌 甲申 甲午 甲辰 甲寅
+var OPPOSITE = { 1: 9, 9: 1, 2: 8, 8: 2, 3: 7, 7: 3, 4: 6, 6: 4, 5: 5 };
+var MA_BY_BRANCH = { '申': '寅', '子': '寅', '辰': '寅', '寅': '申', '午': '申', '戌': '申', '巳': '亥', '酉': '亥', '丑': '亥', '亥': '巳', '卯': '巳', '未': '巳' };
+
+function mod9(n) { return ((n - 1) % 9 + 9) % 9 + 1; }
+function sexagenaryIndex(stemIdx, branchIdx) {
+  var n = stemIdx;
+  while (n % 12 !== branchIdx) n += 10;
+  return n % 60;
+}
+// 日柱符头定三元：符头（甲/己日）地支 子午卯酉→上元，寅申巳亥→中元，辰戌丑未→下元
+function sanYuan(dayStemIdx, dayBranchIdx) {
+  var headOffset = dayStemIdx % 5;
+  var headBranch = (dayBranchIdx - headOffset + 12) % 12;
+  if (headBranch === 0 || headBranch === 6 || headBranch === 3 || headBranch === 9) return 0;
+  if (headBranch === 2 || headBranch === 8 || headBranch === 5 || headBranch === 11) return 1;
+  return 2;
+}
+
+function buildChart(date) {
+  var solar = Solar.fromYmdHms(date.getFullYear(), date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), 0);
+  var lunar = solar.getLunar();
+  var ec = lunar.getEightChar();
+  var yearGZ = ec.getYear(), monthGZ = ec.getMonth(), dayGZ = ec.getDay(), hourGZ = ec.getTime();
+  var dayStemIdx = STEMS.indexOf(dayGZ.charAt(0)), dayBranchIdx = BRANCHES.indexOf(dayGZ.charAt(1));
+  var hourStemIdx = STEMS.indexOf(hourGZ.charAt(0)), hourBranchIdx = BRANCHES.indexOf(hourGZ.charAt(1));
+  var hourIdx = sexagenaryIndex(hourStemIdx, hourBranchIdx);
+  var xunIdx = Math.floor(hourIdx / 10);
+  var xunYi = XUN_YI[xunIdx];
+  var xunHeadBranch = XUN_HEAD_BRANCH[xunIdx];
+  var xunHeadGZ = '甲' + BRANCHES[xunHeadBranch];
+  var kongWang = [BRANCHES[(xunHeadBranch + 10) % 12], BRANCHES[(xunHeadBranch + 11) % 12]];
+  var maBranch = MA_BY_BRANCH[BRANCHES[hourBranchIdx]];
+  var term = lunar.getPrevJieQi().getName();
+  var yang = YANG_TERMS.indexOf(term) !== -1;
+  var yuan = sanYuan(dayStemIdx, dayBranchIdx);
+  var ju = JUEQI[term][yuan];
+  var lunarStr = lunar.getYear() + '年' + lunar.getMonth() + '月' + lunar.getDay() + '日';
+
+  // 地盘：六仪 + 三奇
+  var earth = {};
+  var yi6 = ['戊', '己', '庚', '辛', '壬', '癸'], qi3 = ['乙', '丙', '丁'];
+  var k;
+  if (yang) {
+    for (k = 0; k < 6; k++) earth[mod9(ju + k)] = yi6[k];
+    for (k = 0; k < 3; k++) earth[mod9(ju - 1 - k)] = qi3[k];
+  } else {
+    for (k = 0; k < 6; k++) earth[mod9(ju - k)] = yi6[k];
+    for (k = 0; k < 3; k++) earth[mod9(ju + 1 + k)] = qi3[k];
+  }
+  function palaceOfStem(s) {
+    for (var p = 1; p <= 9; p++) if (earth[p] === s) return p;
+    return 0;
+  }
+  // 时干甲藏于戊之下
+  var hourStemSearch = hourGZ.charAt(0) === '甲' ? '戊' : hourGZ.charAt(0);
+  var hourStemPalace = palaceOfStem(hourStemSearch);
+  var fushouPalace = palaceOfStem(xunYi);
+  var zhifuStar = HOME_STAR[fushouPalace];
+  var zhishiDoor = fushouPalace === 5 ? '死门' : HOME_DOOR[fushouPalace];
+
+  // 天盘星：值符星落时干宫，其余按宫号方向转；落中五者寄坤二宫
+  var shift = yang ? (hourStemPalace - fushouPalace + 9) % 9 : (fushouPalace - hourStemPalace + 9) % 9;
+  var starsByPalace = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [] };
+  var starPalace = {};
+  for (var h = 1; h <= 9; h++) {
+    var np = yang ? mod9(h + shift) : mod9(h - shift);
+    starPalace[HOME_STAR[h]] = np;
+    if (np === 5) starsByPalace[2].push({ star: HOME_STAR[h], ji: true });
+    else starsByPalace[np].push({ star: HOME_STAR[h], ji: false });
+  }
+  // 天盘干随星同转：某宫天盘干 = 该宫之星本宫的地盘干
+  var heavenStemByPalace = {};
+  for (var p = 1; p <= 9; p++) {
+    var list = starsByPalace[p];
+    var main = null;
+    for (var li = 0; li < list.length; li++) if (!list[li].ji) { main = list[li]; break; }
+    if (!main && list.length) main = list[0];
+    heavenStemByPalace[p] = main ? earth[homeOfStar(main.star)] : '';
+  }
+  function homeOfStar(s) {
+    for (var hh = 1; hh <= 9; hh++) if (HOME_STAR[hh] === s) return hh;
+    return 0;
+  }
+
+  // 八门：值使门自值符宫（时干宫）起，随旬首时辰数转宫（阳遁递增、阴遁递减，九宫取余；落中五寄坤）
+  var steps = hourIdx - xunIdx * 10;
+  var zhishiPalaceRaw = yang ? mod9(hourStemPalace + steps) : mod9(hourStemPalace - steps);
+  var zhishiPalace = zhishiPalaceRaw === 5 ? 2 : zhishiPalaceRaw;
+  var zhishiJi = zhishiPalaceRaw === 5;
+  var doorsByPalace = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [] };
+  var doorPalace = {};
+  var ringIdx = DOOR_RING.indexOf(zhishiPalace);
+  var orderIdx = DOOR_ORDER.indexOf(zhishiDoor);
+  for (var d = 0; d < 8; d++) {
+    var dp = DOOR_RING[(ringIdx + d) % 8];
+    var dm = DOOR_ORDER[(orderIdx + d) % 8];
+    doorPalace[dm] = dp;
+    doorsByPalace[dp].push({ door: dm, ji: dp === zhishiPalace && zhishiJi && dm === zhishiDoor });
+  }
+
+  // 八神：值符神落时干宫，阳遁顺环、阴遁逆环
+  var godRing = yang ? GOD_RING_YANG : GOD_RING_YIN;
+  var godsByPalace = { 1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '', 9: '' };
+  var godPalace = {};
+  var gIdx = godRing.indexOf(hourStemPalace);
+  for (var g = 0; g < 8; g++) {
+    var gp = godRing[(gIdx + g) % 8];
+    godsByPalace[gp] = GOD_ORDER[g];
+    godPalace[GOD_ORDER[g]] = gp;
+  }
+
+  // 伏吟 / 反吟
+  var starFuYin = true, starFanYin = true, doorFuYin = true, doorFanYin = true;
+  for (var hh2 = 1; hh2 <= 9; hh2++) {
+    if (starPalace[HOME_STAR[hh2]] !== hh2) starFuYin = false;
+    if (starPalace[HOME_STAR[hh2]] !== OPPOSITE[hh2]) starFanYin = false;
+  }
+  for (var dh in HOME_DOOR) {
+    if (doorPalace[HOME_DOOR[dh]] !== (+dh)) doorFuYin = false;
+    if (doorPalace[HOME_DOOR[dh]] !== OPPOSITE[+dh]) doorFanYin = false;
+  }
+
+  var palaces = [];
+  for (var pp = 1; pp <= 9; pp++) {
+    var isKong = false, isMa = false;
+    var brs = PALACE_INFO[pp].branches;
+    for (var bi = 0; bi < brs.length; bi++) {
+      if (kongWang.indexOf(brs[bi]) !== -1) isKong = true;
+      if (brs[bi] === maBranch) isMa = true;
+    }
+    palaces.push({
+      num: pp, name: PALACE_INFO[pp].name, element: PALACE_INFO[pp].element, dir: PALACE_INFO[pp].dir,
+      branches: brs, earth: earth[pp], heaven: heavenStemByPalace[pp],
+      stars: starsByPalace[pp], doors: doorsByPalace[pp], god: godsByPalace[pp],
+      isKong: isKong, isMa: isMa
+    });
+  }
+
+  return {
+    date: date, lunarStr: lunarStr, yearGZ: yearGZ, monthGZ: monthGZ, dayGZ: dayGZ, hourGZ: hourGZ,
+    term: term, yang: yang, yuan: yuan, ju: ju,
+    xunHeadGZ: xunHeadGZ, xunYi: xunYi, kongWang: kongWang, maBranch: maBranch,
+    hourStemPalace: hourStemPalace, fushouPalace: fushouPalace,
+    zhifuStar: zhifuStar, zhishiDoor: zhishiDoor, zhishiPalace: zhishiPalace, zhishiJi: zhishiJi,
+    starPalace: starPalace, doorPalace: doorPalace, godPalace: godPalace,
+    starFuYin: starFuYin, starFanYin: starFanYin, doorFuYin: doorFuYin, doorFanYin: doorFanYin,
+    palaces: palaces
+  };
+}
+
+// ==DATA==
+// 断语库按需加载（首屏不阻塞）：qimen.json（十干克应/九星/八门/三奇/四十格）与
+// qimen_guji_cat.json（古籍断语层：四十格断语）。qimen_angan.json 为刻家奇门暗干表，
+// 仅用于刻家（局数恒为阳一/四/七、阴三/六/九），不用于此时家排盘，故不加载。
+var QIMEN_DATA = null, GUJI_DATA = null, DATA_PROMISE = null, DATA_FAILED = false;
+function loadData() {
+  if (DATA_PROMISE) return DATA_PROMISE;
+  DATA_PROMISE = Promise.all([
+    fetch('/data/qimen.json').then(function (r) { if (!r.ok) throw new Error('qimen'); return r.json(); }),
+    fetch('/data/qimen_guji_cat.json').then(function (r) { if (!r.ok) throw new Error('guji'); return r.json(); }).catch(function () { return null; })
+  ]).then(function (arr) {
+    QIMEN_DATA = arr[0]; GUJI_DATA = arr[1];
+    return true;
+  }).catch(function () { DATA_FAILED = true; return false; });
+  return DATA_PROMISE;
+}
+function geDuan(name) {
+  if (GUJI_DATA && GUJI_DATA.layers) {
+    for (var i = 0; i < GUJI_DATA.layers.length; i++) {
+      var rules = GUJI_DATA.layers[i].rules || [];
+      for (var j = 0; j < rules.length; j++) if (rules[j].name === name && rules[j].duan) return rules[j].duan;
+    }
+  }
+  return '';
+}
+// 可机判的格局（条件均可由本局九宫数据直接求值；条件见 qimen.json sishi_ge）
+function detectGe(chart) {
+  var out = [];
+  var byNum = {};
+  chart.palaces.forEach(function (pc) { byNum[pc.num] = pc; });
+  function palaceOfDoor(d) { return chart.doorPalace[d]; }
+  function palaceOfStar(s) { return chart.starPalace[s]; }
+  function add(name, palaceNums, duan) {
+    out.push({ name: name, palaces: palaceNums, duan: duan || geDuan(name) || '' });
+  }
+  chart.palaces.forEach(function (pc) {
+    if (pc.num === 5) return;
+    var hs = pc.heaven, es = pc.earth;
+    if (hs === '戊' && es === '丙') add('龙回首', [pc.num]);
+    if (hs === '丙' && es === '戊') add('鸟跌穴', [pc.num]);
+    if (hs === '乙' && es === '辛') add('龙逃走', [pc.num]);
+    if (hs === '辛' && es === '乙') add('虎猖狂', [pc.num]);
+    if (hs === '癸' && es === '丁') add('蛇妖矫', [pc.num]);
+    if (hs === '丁' && es === '癸') add('雀投江', [pc.num]);
+    if (hs === '庚' && es === '癸') add('大格', [pc.num]);
+    if (hs === '庚' && es === '己') add('刑格', [pc.num]);
+    if (hs === '庚' && es === '壬') add('小格', [pc.num]);
+    if (hs === '庚' && pc.num === chart.hourStemPalace) add('伏宫格', [pc.num]);
+    if (hs === '庚' && pc.earth === (chart.dayGZ.charAt(0) === '甲' ? '戊' : chart.dayGZ.charAt(0))) add('伏干格', [pc.num]);
+  });
+  // 三奇入墓：乙落坤，丙落乾，丁落艮（天盘干落宫）
+  chart.palaces.forEach(function (pc) {
+    if (pc.heaven === '乙' && pc.num === 2) add('三奇入墓', [pc.num], '乙奇落坤宫');
+    if (pc.heaven === '丙' && pc.num === 6) add('三奇入墓', [pc.num], '丙奇落乾宫');
+    if (pc.heaven === '丁' && pc.num === 8) add('三奇入墓', [pc.num], '丁奇落艮宫');
+  });
+  // 三遁（条件见 sishi_ge）
+  var shengP = palaceOfDoor('生门'), kaiP = palaceOfDoor('开门'), xiuP = palaceOfDoor('休门');
+  if (shengP && byNum[shengP].heaven === '丙' && byNum[kaiP].earth === '丙')
+    add('天遁', [shengP, kaiP]);
+  if (kaiP && byNum[kaiP].heaven === '乙' && byNum[kaiP].earth === '己')
+    add('地遁', [kaiP]);
+  if (xiuP && byNum[xiuP].heaven === '丁' && byNum[xiuP].god === '太阴')
+    add('人遁', [xiuP]);
+  // 门迫（menpo：门克宫）
+  if (QIMEN_DATA && QIMEN_DATA.menpo && QIMEN_DATA.menpo.items) {
+    var cnNum = { '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9 };
+    QIMEN_DATA.menpo.items.forEach(function (it) {
+      var m = /临([一二三四五六七八九]+)宫/.exec(it.cond || '');
+      if (!m) return;
+      var nums = [];
+      for (var i = 0; i < m[1].length; i++) nums.push(cnNum[m[1].charAt(i)]);
+      var dp = palaceOfDoor(it['门']);
+      if (nums.indexOf(dp) !== -1) add('门迫', [dp], it['门'] + '临' + byNum[dp].name + '宫，门克宫');
+    });
+  }
+  return out;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function palaceLabel(pc) {
+  if (LANG === 'en' || LANG === 'ja') return palaceName(pc.name) + ' · ' + pc.num;
+  return pc.name + pc.num + t('palace');
+}
+function showResult(chart, rerenderOnly) {
+  var head = document.getElementById('result-head');
+  var yuanName = [t('yuanShang'), t('yuanZhong'), t('yuanXia')][chart.yuan];
+  var dunName = chart.yang ? t('yangDun') : t('yinDun');
+  var q = document.getElementById('question').value.trim();
+  var html = '';
+  if (q) html += esc(t('asked')) + '：<b>' + esc(q) + '</b><br>';
+  html += esc(t('lunar')) + '：' + esc(chart.lunarStr) + '　' + esc(t('ganzhi')) + '：<b>' +
+    esc(chart.yearGZ) + ' ' + esc(chart.monthGZ) + ' ' + esc(chart.dayGZ) + ' ' + esc(chart.hourGZ) + '</b><br>';
+  html += esc(t('jieqi')) + '：<b>' + esc(chart.term) + '</b>　' + esc(t('ju')) + '：<b>' +
+    esc(dunName) + (LANG === 'en' ? ' ' : '') + esc(String(chart.ju)) + '局</b>（' + esc(yuanName) + '）<br>';
+  html += esc(t('xunshou')) + '：<b>' + esc(chart.xunHeadGZ) + '</b>（' + esc(chart.xunYi) + '）　' +
+    esc(t('kongwang')) + '：<b>' + esc(chart.kongWang.join('、')) + '</b>　' +
+    esc(t('yima')) + '：<b>' + esc(chart.maBranch) + '</b><br>';
+  html += esc(t('zhifuStar')) + '：<b>' + esc(starName(chart.zhifuStar)) + '</b>　' +
+    esc(t('zhishiDoor')) + '：<b>' + esc(doorName(chart.zhishiDoor)) + '</b>';
+  head.innerHTML = html;
+
+  var chips = [];
+  if (chart.starFuYin) chips.push(t('fuYinStar'));
+  if (chart.starFanYin) chips.push(t('fanYinStar'));
+  if (chart.doorFuYin) chips.push(t('fuYinDoor'));
+  if (chart.doorFanYin) chips.push(t('fanYinDoor'));
+  document.getElementById('result-chips').innerHTML = chips.map(function (c) {
+    return '<span class="chip">' + esc(c) + '</span>';
+  }).join('');
+
+  // 九宫格（南上：巽 离 坤 / 震 中 兑 / 艮 坎 乾）
+  var order = [4, 9, 2, 3, 5, 7, 8, 1, 6];
+  var byNum = {};
+  chart.palaces.forEach(function (pc) { byNum[pc.num] = pc; });
+  var grid = '';
+  order.forEach(function (num) {
+    var pc = byNum[num];
+    var cellCls = num === 5 ? 'qm-cell center' : 'qm-cell';
+    var pname = pc.name + '<small>' + esc(palaceName(pc.name)) + '</small>';
+    var g = '<div class="' + cellCls + '"><div class="palace"><span class="pname">' + pname +
+      '</span><span class="pnum">' + pc.num + ' · ' + esc(pc.element) + '</span></div>';
+    if (num === 5) {
+      g += '<div class="qm-row"><span class="k">' + esc(t('earthStem')) + '</span><span class="v"><b>' + esc(pc.earth) + '</b></span></div>';
+      var qinAt = chart.starPalace['天禽'];
+      if (qinAt === 5) g += '<div class="qm-row"><span class="k">' + esc(t('star')) + '</span><span class="v"><b>' + esc(starName('天禽')) + '</b></span></div>';
+      else g += '<div class="qm-note">' + esc(starName('天禽')) + esc(t('jiKun')) + '（' + esc(byNum[2].name) + '宫）</div>';
+      g += '<div class="qm-note">' + esc(t('center')) + ' · ' + esc(pc.branches.join('')) + '</div>';
+    } else {
+      g += '<div class="qm-row"><span class="k">' + esc(t('earthStem')) + '</span><span class="v"><b>' + esc(pc.earth) + '</b></span></div>';
+      g += '<div class="qm-row"><span class="k">' + esc(t('heavenStem')) + '</span><span class="v"><b>' + esc(pc.heaven) + '</b></span></div>';
+      var starHtml = pc.stars.map(function (s) {
+        var nm = starName(s.star);
+        if (s.ji) nm += '（' + esc(t('jiKun')) + '）';
+        if (s.star === chart.zhifuStar) nm += '<span class="qm-mark">' + esc(t('zhifu')) + '</span>';
+        return nm;
+      }).join(' ');
+      g += '<div class="qm-row"><span class="k">' + esc(t('star')) + '</span><span class="v"><b>' + starHtml + '</b></span></div>';
+      var doorHtml = pc.doors.map(function (dd) {
+        var nm = doorName(dd.door);
+        if (dd.door === chart.zhishiDoor) nm += '<span class="qm-mark">' + esc(t('zhishi')) + '</span>';
+        return nm;
+      }).join(' ');
+      g += '<div class="qm-row"><span class="k">' + esc(t('door')) + '</span><span class="v"><b>' + doorHtml + '</b></span></div>';
+      g += '<div class="qm-row"><span class="k">' + esc(t('god')) + '</span><span class="v"><b>' + esc(godName(pc.god)) + '</b></span></div>';
+      var marks = [];
+      if (pc.isKong) marks.push('<span class="qm-mark hollow">' + esc(t('kongMark')) + '</span>');
+      if (pc.isMa) marks.push('<span class="qm-mark hollow">' + esc(t('maMark')) + '</span>');
+      if (marks.length) g += '<div class="qm-row"><span class="k"></span><span class="v">' + marks.join(' ') + '</span></div>';
+    }
+    g += '</div>';
+    grid += g;
+  });
+  document.getElementById('qm-grid').innerHTML = grid;
+  document.getElementById('qm-note').textContent = t('fenleiNote') + (t('classicalNote') ? ' ' + t('classicalNote') : '');
+
+  renderPalaceDuans(chart);
+  renderGe(chart);
+}
+
+function renderPalaceDuans(chart) {
+  var wrap = document.getElementById('palace-grid');
+  if (!QIMEN_DATA) {
+    wrap.innerHTML = '<div class="empty-note">' + esc(DATA_FAILED ? t('dataFailed') : t('dataLoading')) + '</div>';
+    return;
+  }
+  var order = [4, 9, 2, 3, 5, 7, 8, 1, 6];
+  var byNum = {};
+  chart.palaces.forEach(function (pc) { byNum[pc.num] = pc; });
+  var html = '';
+  order.forEach(function (num) {
+    var pc = byNum[num];
+    if (num === 5) {
+      html += '<div class="palace-card"><h3>' + esc(palaceLabel(pc)) + '</h3><div class="p-title">' + esc(pc.name) + '</div>' +
+        '<div class="p-lines">' + esc(t('earthStem')) + ' <b>' + esc(pc.earth) + '</b></div>' +
+        '<div class="duan">' + esc(starName('天禽')) + esc(t('jiKun')) + '（' + esc(byNum[2].name) + '宫）</div></div>';
+      return;
+    }
+    var lines = esc(t('earthStem')) + ' <b>' + esc(pc.earth) + '</b> · ' + esc(t('heavenStem')) + ' <b>' + esc(pc.heaven) + '</b><br>' +
+      esc(t('star')) + ' <b>' + esc(pc.stars.map(function (s) { return starName(s.star) + (s.ji ? '（' + t('jiKun') + '）' : ''); }).join(' ')) + '</b> · ' +
+      esc(t('door')) + ' <b>' + esc(pc.doors.map(function (dd) { return doorName(dd.door); }).join(' ')) + '</b> · ' +
+      esc(t('god')) + ' <b>' + esc(godName(pc.god)) + '</b>';
+    var duans = '';
+    // 十干克应：天盘干 × 地盘干
+    var kz = QIMEN_DATA.shigan && QIMEN_DATA.shigan[pc.heaven] && QIMEN_DATA.shigan[pc.heaven][pc.earth];
+    if (kz) duans += '<div class="duan"><span class="d-label">' + esc(t('duanKezhi')) + ' · ' + esc(kz.name) + '</span>' + esc(kz.text) + '</div>';
+    // 九星主诗 + 时应（按时支）
+    var starRec = QIMEN_DATA.jiuxing && QIMEN_DATA.jiuxing[pc.stars[0] ? pc.stars[0].star : ''];
+    if (starRec) {
+      var shi = starRec.shi && starRec.shi[chart.hourGZ.charAt(1)];
+      duans += '<div class="duan"><span class="d-label">' + esc(t('duanStar')) + ' · ' + esc(starName(pc.stars[0].star)) + '</span>' + esc(starRec.zhu) +
+        (shi ? '<div class="classical">' + esc(shi) + '</div>' : '') + '</div>';
+    }
+    // 八门主诗 + 门加干应
+    var doorRec = QIMEN_DATA.bamen && QIMEN_DATA.bamen[pc.doors[0] ? pc.doors[0].door : ''];
+    if (doorRec) {
+      var jy = doorRec.jingying && doorRec.jingying['加' + (pc.heaven === '戊' ? '甲戊' : pc.heaven)];
+      duans += '<div class="duan"><span class="d-label">' + esc(t('duanDoor')) + ' · ' + esc(doorName(pc.doors[0].door)) + '</span>' + esc(doorRec.zhu) +
+        (jy ? '<div class="classical">' + esc(jy) + '</div>' : '') + '</div>';
+    }
+    // 三奇到宫：天盘乙/丙/丁落本宫
+    if ((pc.heaven === '乙' || pc.heaven === '丙' || pc.heaven === '丁') && QIMEN_DATA.sanqi && QIMEN_DATA.sanqi[pc.heaven] && QIMEN_DATA.sanqi[pc.heaven][pc.name]) {
+      duans += '<div class="duan"><span class="d-label">' + esc(t('duanSanqi')) + '</span>' + esc(QIMEN_DATA.sanqi[pc.heaven][pc.name]) + '</div>';
+    }
+    html += '<div class="palace-card"><h3>' + esc(palaceLabel(pc)) + '</h3><div class="p-title">' + esc(pc.name) + '</div>' +
+      '<div class="p-lines">' + lines + '</div>' + duans + '</div>';
+  });
+  wrap.innerHTML = html;
+}
+
+function renderGe(chart) {
+  var wrap = document.getElementById('ge-list');
+  var ges = detectGe(chart);
+  if (!ges.length) { wrap.innerHTML = '<div class="empty-note">' + esc(t('geNone')) + '</div>'; return; }
+  var byNum = {};
+  chart.palaces.forEach(function (pc) { byNum[pc.num] = pc; });
+  wrap.innerHTML = ges.map(function (ge) {
+    var ps = ge.palaces.map(function (n) { return esc(byNum[n].name) + esc(String(n)) + esc(t('palace')); }).join('、');
+    return '<div class="ge-item"><b>' + esc(ge.name) + '</b> <span class="ge-palace">' + ps + '</span><br>' + esc(ge.duan || '') + '</div>';
+  }).join('');
+}
+
+function parseDateTime() {
+  var v = document.getElementById('datetime').value;
+  var err = document.getElementById('time-error');
+  err.textContent = '';
+  if (!v) { err.textContent = t('errNoTime'); return null; }
+  var d = new Date(v.replace('T', ' ') + ':00');
+  if (isNaN(d.getTime())) { err.textContent = t('errBadTime'); return null; }
+  return d;
+}
+function updateJuPreview() {
+  var el = document.getElementById('ju-preview');
+  if (!el) return;
+  var d = parseDateTimeSilent();
+  if (!d) { el.textContent = ''; return; }
+  try {
+    var c = buildChart(d);
+    var dunName = c.yang ? t('yangDun') : t('yinDun');
+    var yuanName = [t('yuanShang'), t('yuanZhong'), t('yuanXia')][c.yuan];
+    el.innerHTML = esc(c.term) + ' · <b>' + esc(dunName) + esc(String(c.ju)) + '局</b> <span class="dim">（' + esc(yuanName) + '）</span>';
+  } catch (e) { el.textContent = ''; }
+}
+function parseDateTimeSilent() {
+  var v = document.getElementById('datetime').value;
+  if (!v) return null;
+  var d = new Date(v.replace('T', ' ') + ':00');
+  return isNaN(d.getTime()) ? null : d;
+}
+function useNow() {
+  var now = new Date();
+  var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+  document.getElementById('datetime').value = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) + 'T' + pad(now.getHours()) + ':' + pad(now.getMinutes());
+  updateJuPreview();
+}
+function doQimen() {
+  var d = parseDateTime();
+  if (!d) return;
+  var chart;
+  try { chart = buildChart(d); } catch (e) { document.getElementById('time-error').textContent = t('errBadTime'); return; }
+  LAST_RESULT = chart;
+  document.getElementById('result-card').classList.remove('hidden');
+  showResult(chart, false);
+  loadData().then(function () { renderPalaceDuans(chart); renderGe(chart); });
+  document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ---- AI 解读 ----
+window.getJieguaSummary = function() {
+  if (!LAST_RESULT) return null;
+  var c = LAST_RESULT;
+  var parts = [];
+  parts.push('奇门遁甲');
+  parts.push('四柱：' + c.yearGZ + ' ' + c.monthGZ + ' ' + c.dayGZ + ' ' + c.hourGZ + ' 节气：' + c.term);
+  parts.push((c.yang ? '阳遁' : '阴遁') + c.ju + '局（' + ['上元', '中元', '下元'][c.yuan] + '）');
+  parts.push('旬首：' + c.xunHeadGZ + '（' + c.xunYi + '） 空亡：' + c.kongWang.join('、') + ' 驿马：' + c.maBranch);
+  parts.push('值符：' + starName(c.zhifuStar) + ' 值使：' + doorName(c.zhishiDoor));
+  var chips = [];
+  if (c.starFuYin) chips.push('九星伏吟');
+  if (c.starFanYin) chips.push('九星反吟');
+  if (c.doorFuYin) chips.push('八门伏吟');
+  if (c.doorFanYin) chips.push('八门反吟');
+  if (chips.length) parts.push(chips.join('、'));
+  c.palaces.forEach(function(pc) {
+    var s = pc.name + pc.num + '宫：地盘' + pc.earth + ' 天盘' + pc.heaven +
+      ' 星' + pc.stars.map(function(x) { return starName(x.star); }).join('') +
+      ' 门' + pc.doors.map(function(x) { return doorName(x.door); }).join('') +
+      ' 神' + godName(pc.god);
+    if (pc.isKong) s += ' 空';
+    if (pc.isMa) s += ' 马';
+    parts.push(s);
+  });
+  try {
+    var ges = detectGe(c);
+    if (ges && ges.length) parts.push('格局：' + ges.map(function(g) { return g.name; }).join('、'));
+  } catch (e) {}
+  return parts.join('\n');
+};
+window.getJieguaQuestion = function() {
+  var el = document.getElementById('question');
+  return el ? el.value.trim() : '';
+};
+
+useNow();
+applyI18n();
+loadData();
+// ==LOGIC-END==
+</script>
+<script src="/js/ai-jiegua.js"></script>
+<script>
+if (window.AIInterpret) window.AIInterpret.attach();
+</script>
+</body>
+</html>

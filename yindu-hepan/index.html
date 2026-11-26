@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 印度合盘</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .num-row { display: flex; gap: 2rem; }
+  .num-row > .field { flex: 1; min-width: 0; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+  .hint { font-size: .78rem; color: #6f6f80; margin-top: .4rem; line-height: 1.6; }
+  .person-block { border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1.3rem 1.3rem .2rem; margin-bottom: 1.5rem; }
+  .person-block h3 { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.1rem; font-weight: 400; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .verdict { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .level { color: #c9a962; font-weight: 700; }
+  .verdict .total { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.6rem; color: #c9a962; }
+  .sub-title { font-size: .85rem; color: #c9a962; letter-spacing: .25em; margin: 1.6rem 0 .4rem; }
+  .chart-table { width: 100%; border-collapse: collapse; margin-top: .6rem; font-size: .92rem; }
+  .chart-table th { text-align: left; color: #b08d3e; font-weight: 400; letter-spacing: .12em; font-size: .78rem; padding: .5rem .4rem; border-bottom: 1px solid rgba(201,169,98,.45); }
+  .chart-table td { padding: .55rem .4rem; border-bottom: 1px solid rgba(201,169,98,.15); color: #f0ead8; line-height: 1.7; vertical-align: top; }
+  .chart-table td.num { color: #c9a962; font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 600; }
+  .chart-table td .sub { color: #9a9aab; font-size: .82rem; }
+  .result-note { font-size: .85rem; color: #9a9aab; line-height: 1.8; margin-top: 1rem; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .num-row { flex-direction: column; gap: 0; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">印度合盘 · 本地排盘</div>
+    </div>
+  </a>
+        <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></span>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">两人之间 · 双人月亮</div>
+  <h1 class="slogan" data-i18n-html="slogan">两月相望，<br>三十六分见分晓。</h1>
+  <p class="subtitle" data-i18n="subtitle">印度合盘（吠陀 Ashtakoota）免费在线配对</p>
+
+  <section class="section">
+    <div class="person-block">
+      <h3 data-i18n="personA">本人</h3>
+      <div class="num-row">
+        <div class="field">
+          <label for="a-date" data-i18n="labelDate">出生日期</label>
+          <input type="date" id="a-date" value="1990-01-01">
+        </div>
+        <div class="field">
+          <label for="a-time" data-i18n="labelTime">出生时间</label>
+          <input type="time" id="a-time" value="12:00">
+        </div>
+        <div class="field">
+          <label for="a-offset" data-i18n="labelOffset">出生地 UTC 时区偏移（小时）</label>
+          <input type="number" id="a-offset" value="8" step="0.5" min="-12" max="14">
+        </div>
+      </div>
+      <div class="hint" data-i18n="noteTimeUnknown">合盘只用月亮星座与出生宿，不用升点与经纬度；但月亮每天约走 13°，出生时间不准会算错宿。</div>
+    </div>
+    <div class="person-block">
+      <h3 data-i18n="personB">对方</h3>
+      <div class="num-row">
+        <div class="field">
+          <label for="b-date" data-i18n="labelDate">出生日期</label>
+          <input type="date" id="b-date" value="1990-07-01">
+        </div>
+        <div class="field">
+          <label for="b-time" data-i18n="labelTime">出生时间</label>
+          <input type="time" id="b-time" value="12:00">
+        </div>
+        <div class="field">
+          <label for="b-offset" data-i18n="labelOffset">出生地 UTC 时区偏移（小时）</label>
+          <input type="number" id="b-offset" value="8" step="0.5" min="-12" max="14">
+        </div>
+      </div>
+    </div>
+    <button class="submit-btn" onclick="doMatch()" data-i18n="btnSubmit">合盘 · 算八项</button>
+    <div class="error" id="form-error"></div>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">合盘</div>
+    <div class="result-head" id="result-head"></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="sub-title" data-i18n="kootaTitle">八项匹配（Ashtakoota · 共 36 分）</div>
+    <div id="koota-table"></div>
+    <div class="result-note" id="result-note"></div>
+    <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="yindu-hepan" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+  </section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">印度合盘：免费配对与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">总分 36 分怎么看？多少分算好？</summary>
+      <p data-i18n="faqA1">按通行分段：0–17 分不宜，18–24 分一般，25–32 分良好，33–36 分极佳。这是传统婚配常用的参考分段，不是科学测量；分数只看月亮星座与出生宿，不看太阳、金星、升点与大运，低分也不等于关系注定不好。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">「本人」「对方」和传统婚配里的男方、女方怎么对应？</summary>
+      <p data-i18n="faqA2">传统 Ashtakoota 是有方向的：Varna 看男方层级是否不低于女方，Vashya 与 Bhakoot 的查表也分男女方向。本页把「本人」当作男方（新郎）一侧、「对方」当作女方（新娘）一侧来计分；如果实际性别反过来，Varna 与 Vashya 的分数可能不同，Tara、Yoni、Graha Maitri、Gana、Bhakoot、Nadi 六项不受方向影响。交换两人位置重算一次即可对照。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">月亮星座与出生宿是怎么算的？准吗？</summary>
+      <p data-i18n="faqA3">与本站印度占星单盘完全相同的算法：回归黄经由 astronomy.browser.js 星历算出，减去 Lahiri 岁差近似值（23.85 +（年份 − 2000）× 0.01396 度）得到恒星黄经，再落入十二星座与二十七宿。岁差用的是线性近似，2000–2030 年间与真实 Lahiri 岁差的误差小于约 0.5°，宿的边界附近可能差一宿；要精确到角分请用专业星历软件核对。月亮每天约走 13°，出生时间误差几小时就可能算错宿。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">Vashya 为什么人马座、摩羯座要看月亮度数？</summary>
+      <p data-i18n="faqA4">人马座前 15°属人（Manava）、后 15°属四足（Chatushpada）；摩羯座前 15°属四足、后 15°属水生（Jalachara）。这是《Muhurta Chintamani》的分法，本页按月亮在星座内的实际度数划分，其余十个星座整座归属一组。查表以对方组为行、本人组为列，满分 2 分。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">Bhakoot 得 0 分时，同主星为什么又给 7 分？</summary>
+      <p data-i18n="faqA5">Bhakoot 只看两月亮星座的相对位置：2–12、6–8 宫位关系得 0 分，其余得 7 分。传统上若两星座主星相同（如白羊与天蝎同属火星、金牛与天秤同属金星、摩羯与水瓶同属土星），Bhakoot dosha 视为抵消，本页按常见计算器的处理给 7 分并在表中注明。是否抵消各家说法不一，这是本页的一处判断，见方法说明。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ6">Yoni 的友好、敌对分级为什么各家表不一样？</summary>
+      <p data-i18n="faqA6">十四种动物的友好与敌对分级在不同传承里略有出入，七对宿敌（马–水牛、象–狮、羊–猴、蛇–獴、犬–鹿、猫–鼠、牛–虎）是各家一致的 0 分。本页采用北印度 Parashari 常用表：同种 4 分，友好 3 分，中性 2 分，敌对 1 分，宿敌 0 分。换一张表可能差 1 分，总分以此为准。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ7">合盘免费吗？出生信息会被上传吗？</summary>
+      <p data-i18n="faqA7">免费。两张月亮盘都在浏览器本地计算，出生信息不会发送给任何服务器；只有点击「AI 解读」时，结果摘要才会被发给后端生成解读。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">印度合盘属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="offlineNote">本页合盘完全在本地浏览器运行（星历计算使用同源 astronomy.browser.js），不向任何服务器发送出生信息；点击“AI 解读”才会联网调用解读服务。</span>
+  </footer>
+</div>
+</main>
+<script src="/js/astronomy.browser.js"></script>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。八项名称为梵文原名，括号内为中文意译。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '印度合盘 · 本地排盘',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '两人之间 · 双人月亮',
+  slogan: '两月相望，<br>三十六分见分晓。',
+  subtitle: '印度合盘（吠陀 Ashtakoota）免费在线配对',
+  personA: '本人',
+  personB: '对方',
+  labelDate: '出生日期',
+  labelTime: '出生时间',
+  labelOffset: '出生地 UTC 时区偏移（小时）',
+  noteTimeUnknown: '合盘只用月亮星座与出生宿，不用升点与经纬度；但月亮每天约走 13°，出生时间不准会算错宿。',
+  btnSubmit: '合盘 · 算八项',
+  errNoDate: '请先选择双方的出生日期。',
+  errBadDate: '出生日期格式不正确。',
+  errBadOffset: '时区偏移须在 -12 到 +14 之间。',
+  errNoLib: '星历库未加载，请刷新页面重试。',
+  resultTitle: '合盘',
+  kootaTitle: '八项匹配（Ashtakoota · 共 36 分）',
+  birthLine: '出生',
+  moonLine: '月亮（恒星）',
+  nakLine: '出生宿',
+  ayanamsaLine: '岁差（Lahiri 近似）',
+  totalLine: '总分',
+  bandLabel: '总评',
+  band0: '不宜',
+  band1: '一般',
+  band2: '良好',
+  band3: '极佳',
+  colKoota: '匹配项',
+  colA: '本人',
+  colB: '对方',
+  colScore: '得分',
+  colMeaning: '含义',
+  kVarna: 'Varna · 种姓',
+  kVashya: 'Vashya · 驯服',
+  kTara: 'Tara · 星宿',
+  kYoni: 'Yoni · 兽性',
+  kGraha: 'Graha Maitri · 行星友谊',
+  kGana: 'Gana · 性情',
+  kBhakoot: 'Bhakoot · 月亮宫位',
+  kNadi: 'Nadi · 脉',
+  mVarna: '精神层级与气质是否相配。',
+  mVashya: '彼此吸引与影响力流向。',
+  mTara: '出生星宿是否互相生旺。',
+  mYoni: '本能与亲密相性。',
+  mGraha: '心智与沟通是否投契。',
+  mGana: '性情类别是否相容。',
+  mBhakoot: '月亮星座的相对位置，关乎健康与家运。',
+  mNadi: '体质与血脉是否相冲，同脉为 0 分。',
+  vVarnaOk: '本人层级不低于对方。',
+  vVarnaNo: '本人层级低于对方。',
+  vYoniSame: '同种动物。',
+  vYoniFriend: '友好。',
+  vYoniNeutral: '中性。',
+  vYoniEnemy: '敌对。',
+  vYoniSworn: '宿敌。',
+  vGanaSame: '同类。',
+  vGanaDevaManu: '天人相配。',
+  vGanaRakshasa: '与罗刹相冲。',
+  vNadiSame: '同脉（Nadi dosha）。',
+  vNadiDiff: '不同脉。',
+  vGrahaFF: '互为友星。',
+  vGrahaFN: '一方为友，一方中性。',
+  vGrahaNN: '双方中性。',
+  vGrahaFE: '一方为友，一方为敌。',
+  vGrahaNE: '一方中性，一方为敌。',
+  vGrahaEE: '互为敌星。',
+  dTara: '本人→对方：{A}；对方→本人：{B}。',
+  dBhakoot: '两月亮星座相距 {N} 宫。',
+  noteBhakootCancel: '两星座同主星，Bhakoot dosha 抵消。',
+  termsNote: '八项名称为梵文原名，括号内为中文意译；分级表见常见问题。',
+  noteDirection: '计分方向：本人按男方（新郎）一侧、对方按女方（新娘）一侧；交换两人位置重算可对照。',
+  faqTitle: '印度合盘：免费配对与使用常见问题',
+  faqQ1: '总分 36 分怎么看？多少分算好？',
+  faqA1: '按通行分段：0–17 分不宜，18–24 分一般，25–32 分良好，33–36 分极佳。这是传统婚配常用的参考分段，不是科学测量；分数只看月亮星座与出生宿，不看太阳、金星、升点与大运，低分也不等于关系注定不好。',
+  faqQ2: '「本人」「对方」和传统婚配里的男方、女方怎么对应？',
+  faqA2: '传统 Ashtakoota 是有方向的：Varna 看男方层级是否不低于女方，Vashya 与 Bhakoot 的查表也分男女方向。本页把「本人」当作男方（新郎）一侧、「对方」当作女方（新娘）一侧来计分；如果实际性别反过来，Varna 与 Vashya 的分数可能不同，Tara、Yoni、Graha Maitri、Gana、Bhakoot、Nadi 六项不受方向影响。交换两人位置重算一次即可对照。',
+  faqQ3: '月亮星座与出生宿是怎么算的？准吗？',
+  faqA3: '与本站印度占星单盘完全相同的算法：回归黄经由 astronomy.browser.js 星历算出，减去 Lahiri 岁差近似值（23.85 +（年份 − 2000）× 0.01396 度）得到恒星黄经，再落入十二星座与二十七宿。岁差用的是线性近似，2000–2030 年间与真实 Lahiri 岁差的误差小于约 0.5°，宿的边界附近可能差一宿；要精确到角分请用专业星历软件核对。月亮每天约走 13°，出生时间误差几小时就可能算错宿。',
+  faqQ4: 'Vashya 为什么人马座、摩羯座要看月亮度数？',
+  faqA4: '人马座前 15°属人（Manava）、后 15°属四足（Chatushpada）；摩羯座前 15°属四足、后 15°属水生（Jalachara）。这是《Muhurta Chintamani》的分法，本页按月亮在星座内的实际度数划分，其余十个星座整座归属一组。查表以对方组为行、本人组为列，满分 2 分。',
+  faqQ5: 'Bhakoot 得 0 分时，同主星为什么又给 7 分？',
+  faqA5: 'Bhakoot 只看两月亮星座的相对位置：2–12、6–8 宫位关系得 0 分，其余得 7 分。传统上若两星座主星相同（如白羊与天蝎同属火星、金牛与天秤同属金星、摩羯与水瓶同属土星），Bhakoot dosha 视为抵消，本页按常见计算器的处理给 7 分并在表中注明。是否抵消各家说法不一，这是本页的一处判断，见方法说明。',
+  faqQ6: 'Yoni 的友好、敌对分级为什么各家表不一样？',
+  faqA6: '十四种动物的友好与敌对分级在不同传承里略有出入，七对宿敌（马–水牛、象–狮、羊–猴、蛇–獴、犬–鹿、猫–鼠、牛–虎）是各家一致的 0 分。本页采用北印度 Parashari 常用表：同种 4 分，友好 3 分，中性 2 分，敌对 1 分，宿敌 0 分。换一张表可能差 1 分，总分以此为准。',
+  faqQ7: '合盘免费吗？出生信息会被上传吗？',
+  faqA7: '免费。两张月亮盘都在浏览器本地计算，出生信息不会发送给任何服务器；只有点击「AI 解读」时，结果摘要才会被发给后端生成解读。',
+  disclaimer: '印度合盘属传统术数，仅供参考，不构成决策依据。',
+  offlineNote: '本页合盘完全在本地浏览器运行（星历计算使用同源 astronomy.browser.js），不向任何服务器发送出生信息；点击“AI 解读”才会联网调用解读服务。',
+  langLabel: '语言',
+  ai_interpret: 'AI 解读'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '印度合盤 · 本地排盤',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '兩人之間 · 雙人月亮',
+  slogan: '兩月相望，<br>三十六分見分曉。',
+  subtitle: '印度合盤（吠陀 Ashtakoota）免費線上配對',
+  personA: '本人',
+  personB: '對方',
+  labelDate: '出生日期',
+  labelTime: '出生時間',
+  labelOffset: '出生地 UTC 時區偏移（小時）',
+  noteTimeUnknown: '合盤只用月亮星座與出生宿，不用升點與經緯度；但月亮每天約走 13°，出生時間不準會算錯宿。',
+  btnSubmit: '合盤 · 算八項',
+  errNoDate: '請先選擇雙方的出生日期。',
+  errBadDate: '出生日期格式不正確。',
+  errBadOffset: '時區偏移須在 -12 到 +14 之間。',
+  errNoLib: '星曆庫未載入，請重新整理頁面再試。',
+  resultTitle: '合盤',
+  kootaTitle: '八項匹配（Ashtakoota · 共 36 分）',
+  birthLine: '出生',
+  moonLine: '月亮（恆星）',
+  nakLine: '出生宿',
+  ayanamsaLine: '歲差（Lahiri 近似）',
+  totalLine: '總分',
+  bandLabel: '總評',
+  band0: '不宜',
+  band1: '一般',
+  band2: '良好',
+  band3: '極佳',
+  colKoota: '匹配項',
+  colA: '本人',
+  colB: '對方',
+  colScore: '得分',
+  colMeaning: '含義',
+  kVarna: 'Varna · 種姓',
+  kVashya: 'Vashya · 馴服',
+  kTara: 'Tara · 星宿',
+  kYoni: 'Yoni · 獸性',
+  kGraha: 'Graha Maitri · 行星友誼',
+  kGana: 'Gana · 性情',
+  kBhakoot: 'Bhakoot · 月亮宮位',
+  kNadi: 'Nadi · 脈',
+  mVarna: '精神層級與氣質是否相配。',
+  mVashya: '彼此吸引與影響力流向。',
+  mTara: '出生星宿是否互相生旺。',
+  mYoni: '本能與親密相性。',
+  mGraha: '心智與溝通是否投契。',
+  mGana: '性情類別是否相容。',
+  mBhakoot: '月亮星座的相對位置，關乎健康與家運。',
+  mNadi: '體質與血脈是否相衝，同脈為 0 分。',
+  vVarnaOk: '本人層級不低於對方。',
+  vVarnaNo: '本人層級低於對方。',
+  vYoniSame: '同種動物。',
+  vYoniFriend: '友好。',
+  vYoniNeutral: '中性。',
+  vYoniEnemy: '敵對。',
+  vYoniSworn: '宿敵。',
+  vGanaSame: '同類。',
+  vGanaDevaManu: '天人相配。',
+  vGanaRakshasa: '與羅剎相衝。',
+  vNadiSame: '同脈（Nadi dosha）。',
+  vNadiDiff: '不同脈。',
+  vGrahaFF: '互為友星。',
+  vGrahaFN: '一方為友，一方中性。',
+  vGrahaNN: '雙方中性。',
+  vGrahaFE: '一方為友，一方為敵。',
+  vGrahaNE: '一方中性，一方為敵。',
+  vGrahaEE: '互為敵星。',
+  dTara: '本人→對方：{A}；對方→本人：{B}。',
+  dBhakoot: '兩月亮星座相距 {N} 宮。',
+  noteBhakootCancel: '兩星座同主星，Bhakoot dosha 抵消。',
+  termsNote: '八項名稱為梵文原名，括號內為中文意譯；分級表見常見問題。',
+  noteDirection: '計分方向：本人按男方（新郎）一側、對方按女方（新娘）一側；交換兩人位置重算可對照。',
+  faqTitle: '印度合盤：免費配對與使用常見問題',
+  faqQ1: '總分 36 分怎麼看？多少分算好？',
+  faqA1: '按通行分段：0–17 分不宜，18–24 分一般，25–32 分良好，33–36 分極佳。這是傳統婚配常用的參考分段，不是科學測量；分數只看月亮星座與出生宿，不看太陽、金星、升點與大運，低分也不等於關係注定不好。',
+  faqQ2: '「本人」「對方」和傳統婚配裡的男方、女方怎麼對應？',
+  faqA2: '傳統 Ashtakoota 是有方向的：Varna 看男方層級是否不低於女方，Vashya 與 Bhakoot 的查表也分男女方向。本頁把「本人」當作男方（新郎）一側、「對方」當作女方（新娘）一側來計分；如果實際性別反過來，Varna 與 Vashya 的分數可能不同，Tara、Yoni、Graha Maitri、Gana、Bhakoot、Nadi 六項不受方向影響。交換兩人位置重算一次即可對照。',
+  faqQ3: '月亮星座與出生宿是怎麼算的？準嗎？',
+  faqA3: '與本站印度占星單盤完全相同的算法：回歸黃經由 astronomy.browser.js 星曆算出，減去 Lahiri 歲差近似值（23.85 +（年份 − 2000）× 0.01396 度）得到恆星黃經，再落入十二星座與二十七宿。歲差用的是線性近似，2000–2030 年間與真實 Lahiri 歲差的誤差小於約 0.5°，宿的邊界附近可能差一宿；要精確到角分請用專業星曆軟體核對。月亮每天約走 13°，出生時間誤差幾小時就可能算錯宿。',
+  faqQ4: 'Vashya 為什麼人馬座、摩羯座要看月亮度數？',
+  faqA4: '人馬座前 15°屬人（Manava）、後 15°屬四足（Chatushpada）；摩羯座前 15°屬四足、後 15°屬水生（Jalachara）。這是《Muhurta Chintamani》的分法，本頁按月亮在星座內的實際度數劃分，其餘十個星座整座歸屬一組。查表以對方組為行、本人組為列，滿分 2 分。',
+  faqQ5: 'Bhakoot 得 0 分時，同主星為什麼又給 7 分？',
+  faqA5: 'Bhakoot 只看兩月亮星座的相對位置：2–12、6–8 宮位關係得 0 分，其餘得 7 分。傳統上若兩星座主星相同（如白羊與天蠍同屬火星、金牛與天秤同屬金星、摩羯與水瓶同屬土星），Bhakoot dosha 視為抵消，本頁按常見計算器的處理給 7 分並在表中註明。是否抵消各家說法不一，這是本頁的一處判斷，見方法說明。',
+  faqQ6: 'Yoni 的友好、敵對分級為什麼各家表不一樣？',
+  faqA6: '十四種動物的友好與敵對分級在不同傳承裡略有出入，七對宿敵（馬–水牛、象–獅、羊–猴、蛇–獴、犬–鹿、貓–鼠、牛–虎）是各家一致的 0 分。本頁採用北印度 Parashari 常用表：同種 4 分，友好 3 分，中性 2 分，敵對 1 分，宿敵 0 分。換一張表可能差 1 分，總分以此為準。',
+  faqQ7: '合盤免費嗎？出生資訊會被上傳嗎？',
+  faqA7: '免費。兩張月亮盤都在瀏覽器本地計算，出生資訊不會發送給任何伺服器；只有點擊「AI 解讀」時，結果摘要才會被發給後端生成解讀。',
+  disclaimer: '印度合盤屬傳統術數，僅供參考，不構成決策依據。',
+  offlineNote: '本頁合盤完全在本地瀏覽器運行（星曆計算使用同源 astronomy.browser.js），不向任何伺服器發送出生資訊；點擊「AI 解讀」才會聯網調用解讀服務。',
+  langLabel: '語言',
+  ai_interpret: 'AI 解讀'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Vedic Compatibility · Local Chart',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'Between Two · Two Moons',
+  slogan: 'Two Moons face each other,<br>and thirty-six points decide.',
+  subtitle: 'Free online Vedic (Ashtakoota) compatibility matching',
+  personA: 'Person A (you)',
+  personB: 'Person B (partner)',
+  labelDate: 'Birth date',
+  labelTime: 'Birth time',
+  labelOffset: 'Birthplace UTC offset (hours)',
+  noteTimeUnknown: 'Matching uses only the Moon sign and birth nakshatra — no Ascendant or coordinates. But the Moon moves about 13° a day, so an inaccurate birth time can give the wrong nakshatra.',
+  btnSubmit: 'Match · Score the Eight',
+  errNoDate: 'Please choose both birth dates first.',
+  errBadDate: 'The birth date format is invalid.',
+  errBadOffset: 'The UTC offset must be between -12 and +14.',
+  errNoLib: 'The ephemeris library failed to load. Please refresh the page.',
+  resultTitle: 'The Match',
+  kootaTitle: 'The Eight Kootas (Ashtakoota · 36 points total)',
+  birthLine: 'Birth',
+  moonLine: 'Moon (sidereal)',
+  nakLine: 'Birth nakshatra',
+  ayanamsaLine: 'Ayanamsa (Lahiri approx.)',
+  totalLine: 'Total',
+  bandLabel: 'Overall',
+  band0: 'Not recommended',
+  band1: 'Average',
+  band2: 'Good',
+  band3: 'Excellent',
+  colKoota: 'Koota',
+  colA: 'Person A',
+  colB: 'Person B',
+  colScore: 'Score',
+  colMeaning: 'Meaning',
+  kVarna: 'Varna · 种姓',
+  kVashya: 'Vashya · 驯服',
+  kTara: 'Tara · 星宿',
+  kYoni: 'Yoni · 兽性',
+  kGraha: 'Graha Maitri · 行星友谊',
+  kGana: 'Gana · 性情',
+  kBhakoot: 'Bhakoot · 月亮宫位',
+  kNadi: 'Nadi · 脉',
+  mVarna: 'Whether your spiritual ranks and temperaments match.',
+  mVashya: 'Mutual attraction and who influences whom.',
+  mTara: 'Whether your birth stars support each other’s fortune.',
+  mYoni: 'Instinctive and intimate compatibility.',
+  mGraha: 'Mental rapport and communication.',
+  mGana: 'Whether your temperament classes agree.',
+  mBhakoot: 'The relative placement of your Moon signs — health and family fortune.',
+  mNadi: 'Constitution and lineage — the same Nadi scores 0.',
+  vVarnaOk: 'Person A’s rank is not below Person B’s.',
+  vVarnaNo: 'Person A’s rank is below Person B’s.',
+  vYoniSame: 'Same animal.',
+  vYoniFriend: 'Friendly.',
+  vYoniNeutral: 'Neutral.',
+  vYoniEnemy: 'Hostile.',
+  vYoniSworn: 'Sworn enemies.',
+  vGanaSame: 'Same class.',
+  vGanaDevaManu: 'Deva and Manushya agree.',
+  vGanaRakshasa: 'Clashes with Rakshasa.',
+  vNadiSame: 'Same Nadi (Nadi dosha).',
+  vNadiDiff: 'Different Nadi.',
+  vGrahaFF: 'Mutual friends.',
+  vGrahaFN: 'One friend, one neutral.',
+  vGrahaNN: 'Both neutral.',
+  vGrahaFE: 'One friend, one enemy.',
+  vGrahaNE: 'One neutral, one enemy.',
+  vGrahaEE: 'Mutual enemies.',
+  dTara: 'A → B: {A}; B → A: {B}.',
+  dBhakoot: 'The two Moon signs are {N} houses apart.',
+  noteBhakootCancel: 'Both signs share a lord, so the Bhakoot dosha is cancelled.',
+  termsNote: 'Koota names are Sanskrit; the Chinese gloss follows in brackets. See the FAQ for the grading tables.',
+  noteDirection: 'Scoring direction: Person A is counted as the groom’s side and Person B as the bride’s side. Swap the two and re-calculate to compare.',
+  faqTitle: 'Vedic Compatibility: Free Matching & FAQ',
+  faqQ1: 'How do I read the 36-point total? What counts as good?',
+  faqA1: 'The conventional bands are: 0–17 not recommended, 18–24 average, 25–32 good, 33–36 excellent. These are the bands traditionally used for marriage matching, not a scientific measure; the score looks only at the Moon sign and birth nakshatra — not the Sun, Venus, Ascendant or dashas — so a low score does not doom a relationship.',
+  faqQ2: 'How do “Person A” and “Person B” map to bride and groom?',
+  faqA2: 'Classical Ashtakoota is directional: Varna asks whether the groom’s rank is at least the bride’s, and the Vashya and Bhakoot tables also have a bride/groom direction. This page counts Person A as the groom’s side and Person B as the bride’s side. If the real genders are the other way round, the Varna and Vashya scores may change; Tara, Yoni, Graha Maitri, Gana, Bhakoot and Nadi are unaffected by direction. Swap the two people and re-calculate to compare.',
+  faqQ3: 'How are the Moon sign and birth nakshatra calculated? Are they accurate?',
+  faqA3: 'Exactly the same method as this site’s single Vedic chart: the tropical longitude comes from the astronomy.browser.js ephemeris, minus the Lahiri ayanamsa approximation (23.85 + (year − 2000) × 0.01396 degrees), giving the sidereal longitude, which is then placed in the twelve signs and twenty-seven nakshatras. The ayanamsa is a linear approximation; its error against the true Lahiri ayanamsa is under about 0.5° for 2000–2030, so a nakshatra near a boundary could shift by one. For arc-minute accuracy, check with professional ephemeris software. The Moon moves about 13° a day, so a birth time off by a few hours can already give the wrong nakshatra.',
+  faqQ4: 'Why does Vashya look at the Moon’s degree for Sagittarius and Capricorn?',
+  faqA4: 'The first 15° of Sagittarius are Manava (human) and the rest Chatushpada (quadruped); the first 15° of Capricorn are Chatushpada and the rest Jalachara (water-dwelling). This is the division in the Muhurta Chintamani, and this page splits by the Moon’s actual degree within the sign; the other ten signs belong wholly to one group. The table is read with Person B’s group as the row and Person A’s as the column; the maximum is 2 points.',
+  faqQ5: 'Why does Bhakoot score 7 when the signs share a lord, even from a 0-point position?',
+  faqA5: 'Bhakoot looks only at the relative placement of the two Moon signs: 2–12 and 6–8 house relationships score 0, everything else scores 7. Traditionally, when both signs share a ruling planet (e.g. Aries and Scorpio both ruled by Mars, Taurus and Libra by Venus, Capricorn and Aquarius by Saturn), the Bhakoot dosha is considered cancelled; this page follows the common calculator practice of giving 7 points and noting it in the table. Whether the cancellation applies is itself debated — that is one of this page’s judgement calls, noted in the method.',
+  faqQ6: 'Why do Yoni friendly/enemy tables differ between sources?',
+  faqA6: 'The friendly and hostile grades of the fourteen animals vary slightly between traditions; the seven sworn-enemy pairs (horse–buffalo, elephant–lion, goat–monkey, serpent–mongoose, dog–deer, cat–rat, cow–tiger) are agreed everywhere and score 0. This page uses the common North Indian Parashari table: same animal 4, friendly 3, neutral 2, hostile 1, sworn enemies 0. Another table could shift a score by 1 point; the total here follows this table.',
+  faqQ7: 'Is matching free? Will my birth data be uploaded?',
+  faqA7: 'Free. Both Moon charts are computed locally in your browser and no birth data is sent to any server; only clicking “AI Reading” sends the result summary to the backend for interpretation.',
+  disclaimer: 'Vedic compatibility is a traditional divination art, for reference only; it is not a basis for decisions.',
+  offlineNote: 'Matching runs fully in your local browser (ephemeris from the same-origin astronomy.browser.js) and no birth data is sent to any server; only clicking “AI Reading” sends a request to the reading service.',
+  langLabel: 'Language',
+  ai_interpret: 'AI Reading'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: 'インド合盤 · ローカル排盤',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '二人の間 · 二つの月',
+  slogan: '二つの月が向き合い、<br>三十六点が決める。',
+  subtitle: 'インド合盤（ヴェーダ・アシュタクータ）無料オンライン相性診断',
+  personA: '本人（あなた）',
+  personB: '相手',
+  labelDate: '生年月日',
+  labelTime: '出生時刻',
+  labelOffset: '出生地の UTC 時差（時間）',
+  noteTimeUnknown: '合盤は月星座と出生宿のみを使い、アセンダントや経緯度は使いません。ただし月は 1 日に約 13° 動くため、出生時刻が不正確だと宿が変わることがあります。',
+  btnSubmit: '合盤する · 八項目を計算',
+  errNoDate: 'まず二人の生年月日を選択してください。',
+  errBadDate: '生年月日の形式が正しくありません。',
+  errBadOffset: '時差は -12 から +14 の範囲で入力してください。',
+  errNoLib: '星暦ライブラリが読み込めませんでした。ページを再読み込みしてください。',
+  resultTitle: '合盤',
+  kootaTitle: '八項目の相性（Ashtakoota · 合計 36 点）',
+  birthLine: '出生',
+  moonLine: '月（恒星）',
+  nakLine: '出生宿',
+  ayanamsaLine: 'アヤナムシャ（Lahiri 近似）',
+  totalLine: '合計',
+  bandLabel: '総合評価',
+  band0: '不向き',
+  band1: '普通',
+  band2: '良好',
+  band3: '極めて良い',
+  colKoota: '項目',
+  colA: '本人',
+  colB: '相手',
+  colScore: '得点',
+  colMeaning: '意味',
+  kVarna: 'Varna · 种姓',
+  kVashya: 'Vashya · 驯服',
+  kTara: 'Tara · 星宿',
+  kYoni: 'Yoni · 兽性',
+  kGraha: 'Graha Maitri · 行星友谊',
+  kGana: 'Gana · 性情',
+  kBhakoot: 'Bhakoot · 月亮宫位',
+  kNadi: 'Nadi · 脉',
+  mVarna: '精神的な位階と気質が合うか。',
+  mVashya: '惹かれ合いと影響の流れ。',
+  mTara: '出生の星宿が互いの運を生かすか。',
+  mYoni: '本能と親密さの相性。',
+  mGraha: '心の通い合いと意思疎通。',
+  mGana: '性質の類が合うか。',
+  mBhakoot: '月星座の相対位置——健康と家庭運。',
+  mNadi: '体質と血脈——同じナーディは 0 点。',
+  vVarnaOk: '本人の位階は相手を下回らない。',
+  vVarnaNo: '本人の位階は相手を下回る。',
+  vYoniSame: '同じ動物。',
+  vYoniFriend: '友好。',
+  vYoniNeutral: '中立。',
+  vYoniEnemy: '敵対。',
+  vYoniSworn: '宿敵。',
+  vGanaSame: '同じ類。',
+  vGanaDevaManu: 'デーヴァとマヌシャは相性が良い。',
+  vGanaRakshasa: 'ラクシャサと衝突する。',
+  vNadiSame: '同じナーディ（Nadi dosha）。',
+  vNadiDiff: '異なるナーディ。',
+  vGrahaFF: '互いに友星。',
+  vGrahaFN: '一方は友、一方は中立。',
+  vGrahaNN: '双方とも中立。',
+  vGrahaFE: '一方は友、一方は敵。',
+  vGrahaNE: '一方は中立、一方は敵。',
+  vGrahaEE: '互いに敵星。',
+  dTara: '本人→相手：{A}；相手→本人：{B}。',
+  dBhakoot: '二つの月星座は {N} 宮離れている。',
+  noteBhakootCancel: '両星座の主星が同じため、Bhakoot dosha は相殺される。',
+  termsNote: '八項目の名称はサンスクリット原名で、括弧内は中国語の意訳です。採点表はよくある質問をご覧ください。',
+  noteDirection: '採点の方向：本人を男性（新郎）側、相手を女性（新婦）側として計算しています。入れ替えて再計算すれば比較できます。',
+  faqTitle: 'インド合盤：無料診断とよくある質問',
+  faqQ1: '合計 36 点はどう読む？何点が良い？',
+  faqA1: '慣例の区分は次の通りです：0–17 点は不向き、18–24 点は普通、25–32 点は良好、33–36 点は極めて良い。これは伝統的な婚配で使われる参考区分で、科学的な測定ではありません。点数は月星座と出生宿のみから算出し、太陽・金星・アセンダント・運勢は見ていません。低くても関係が決定的に悪いわけではありません。',
+  faqQ2: '「本人」「相手」と伝統的な新郎・新婦の対応は？',
+  faqA2: '伝統的な Ashtakoota は方向性があります。Varna は新郎の位階が新婦を下回らないかを見ます。Vashya と Bhakoot の表も男女の方向で変わります。このページは本人を新郎側、相手を新婦側として採点します。実際の性別が逆の場合、Varna と Vashya の点が変わることがあります。Tara・Yoni・Graha Maitri・Gana・Bhakoot・Nadi の六項目は方向に影響されません。入れ替えて再計算すれば比較できます。',
+  faqQ3: '月星座と出生宿はどう計算する？正確？',
+  faqA3: '本サイトのインド占星術単独盤とまったく同じ方法です。回帰黄経は astronomy.browser.js の星暦で計算し、Lahiri アヤナムシャの近似値（23.85 +（年 − 2000）× 0.01396 度）を引いて恒星黄経とし、十二星座と二十七宿に落とします。アヤナムシャは線形近似で、2000～2030 年頃の真の Lahiri アヤナムシャとの誤差は約 0.5° 未満ですが、宿の境界付近では一つずれることがあります。分単位の精度が必要な場合は専門の星暦ソフトで確認してください。月は 1 日に約 13° 動くため、出生時刻が数時間ずれると宿が変わることがあります。',
+  faqQ4: 'Vashya で人馬座・摩羯座だけ月の度数を見るのはなぜ？',
+  faqA4: '人馬座の前 15° は人（Manava）、後 15° は四足（Chatushpada）です。摩羯座の前 15° は四足、後 15° は水生（Jalachara）です。これは『Muhurta Chintamani』の区分で、このページは月が星座内で占める実際の度数で分けます。残りの十星座は星座全体で一つの組に属します。表は相手の組を行、本人の組を列として読み、満点は 2 点です。',
+  faqQ5: 'Bhakoot が 0 点の位置でも、主星が同じだと 7 点になるのはなぜ？',
+  faqA5: 'Bhakoot は二つの月星座の相対位置だけを見ます。2–12 宮と 6–8 宮の関係は 0 点、それ以外は 7 点です。伝統的には両星座の主星が同じ場合（例：白羊と天蝎は火星、金牛と天秤は金星、摩羯と水瓶は土星）、Bhakoot dosha は相殺されるとされます。このページは一般的な計算機の扱いに従い 7 点とし、表に注記します。相殺の可否自体に異論があるため、これも本ページの判断の一つです。',
+  faqQ6: 'Yoni の友好・敵対の表が資料によって違うのはなぜ？',
+  faqA6: '十四の動物の友好・敵対の等級は伝承によってわずかに異なります。七対の宿敵（馬–水牛、象–獅子、羊–猿、蛇–マングース、犬–鹿、猫–鼠、牛–虎）はどの資料でも一致し、0 点です。このページは北インドの Parashari で広く使われる表を採用します：同種 4 点、友好 3 点、中立 2 点、敵対 1 点、宿敵 0 点。別の表では 1 点変わることがあります。合計はこの表に基づきます。',
+  faqQ7: '合盤は無料？出生情報はアップロードされる？',
+  faqA7: '無料です。二つの月盤はすべてブラウザ内で計算され、出生情報は外部サーバーに送信されません。「AI 解釈」をクリックした場合のみ、結果の要約が解釈生成のためにバックエンドへ送信されます。',
+  disclaimer: 'インド合盤は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  offlineNote: 'このページの合盤は完全にローカルのブラウザで動作します（星暦計算は同一生成元の astronomy.browser.js を使用）。出生情報は外部サーバーに送信されません。「AI 解釈」をクリックした場合のみ解釈サービスへリクエストします。',
+  langLabel: '言語',
+  ai_interpret: 'AI 解釈'
+}
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var fe = document.getElementById('form-error'); if (fe) fe.textContent = '';
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// 十二星座（恒星黄道）：中文名 + 吠陀标准英文名（与印度占星单盘相同）
+var SIGNS = [
+{ cn: '白羊座', en: 'Mesha'},
+{ cn: '金牛座', en: 'Vrishabha'},
+{ cn: '双子座', en: 'Mithuna'},
+{ cn: '巨蟹座', en: 'Kataka'},
+{ cn: '狮子座', en: 'Simha'},
+{ cn: '处女座', en: 'Kanya'},
+{ cn: '天秤座', en: 'Tula'},
+{ cn: '天蝎座', en: 'Vrishchika'},
+{ cn: '人马座', en: 'Dhanus'},
+{ cn: '摩羯座', en: 'Makara'},
+{ cn: '水瓶座', en: 'Kumbha'},
+{ cn: '双鱼座', en: 'Meena'}
+];
+// 二十七宿：英文名（梵文原名）+ 中文音译 + 主星 + 性情（0 天 Deva / 1 人 Manushya / 2 罗刹 Rakshasa）
+// + 兽性（动物序号，见 YONI_NAMES）+ 脉（0 初 Adi / 1 中 Madhya / 2 末 Antya）
+var NAKSHATRAS = [
+{ en: 'Ashwini', cn: '阿什维尼', lord: 'Ketu', gana: 0, yoni: 0, nadi: 0},
+{ en: 'Bharani', cn: '婆罗尼', lord: 'Venus', gana: 1, yoni: 1, nadi: 1},
+{ en: 'Krittika', cn: '克里蒂卡', lord: 'Sun', gana: 2, yoni: 2, nadi: 2},
+{ en: 'Rohini', cn: '罗希尼', lord: 'Moon', gana: 1, yoni: 3, nadi: 2},
+{ en: 'Mrigashira', cn: '姆利加希拉', lord: 'Mars', gana: 0, yoni: 3, nadi: 1},
+{ en: 'Ardra', cn: '阿德拉', lord: 'Rahu', gana: 1, yoni: 4, nadi: 0},
+{ en: 'Punarvasu', cn: '普纳尔瓦苏', lord: 'Jupiter', gana: 0, yoni: 5, nadi: 0},
+{ en: 'Pushya', cn: '普沙亚', lord: 'Saturn', gana: 0, yoni: 2, nadi: 1},
+{ en: 'Ashlesha', cn: '阿什莱沙', lord: 'Mercury', gana: 2, yoni: 5, nadi: 2},
+{ en: 'Magha', cn: '玛加', lord: 'Ketu', gana: 2, yoni: 6, nadi: 2},
+{ en: 'Purva Phalguni', cn: '普尔瓦·帕尔古尼', lord: 'Venus', gana: 1, yoni: 6, nadi: 1},
+{ en: 'Uttara Phalguni', cn: '乌塔拉·帕尔古尼', lord: 'Sun', gana: 1, yoni: 7, nadi: 0},
+{ en: 'Hasta', cn: '哈斯塔', lord: 'Moon', gana: 0, yoni: 8, nadi: 0},
+{ en: 'Chitra', cn: '奇特拉', lord: 'Mars', gana: 2, yoni: 9, nadi: 1},
+{ en: 'Swati', cn: '斯瓦蒂', lord: 'Rahu', gana: 0, yoni: 8, nadi: 2},
+{ en: 'Vishakha', cn: '维沙卡', lord: 'Jupiter', gana: 2, yoni: 9, nadi: 2},
+{ en: 'Anuradha', cn: '阿努拉达', lord: 'Saturn', gana: 0, yoni: 10, nadi: 1},
+{ en: 'Jyeshtha', cn: '杰耶什塔', lord: 'Mercury', gana: 2, yoni: 10, nadi: 0},
+{ en: 'Mula', cn: '穆拉', lord: 'Ketu', gana: 2, yoni: 4, nadi: 0},
+{ en: 'Purva Ashadha', cn: '普尔瓦·阿沙达', lord: 'Venus', gana: 1, yoni: 11, nadi: 1},
+{ en: 'Uttara Ashadha', cn: '乌塔拉·阿沙达', lord: 'Sun', gana: 1, yoni: 12, nadi: 2},
+{ en: 'Shravana', cn: '什拉瓦纳', lord: 'Moon', gana: 0, yoni: 11, nadi: 2},
+{ en: 'Dhanishta', cn: '达尼什塔', lord: 'Mars', gana: 2, yoni: 13, nadi: 1},
+{ en: 'Shatabhisha', cn: '沙塔比沙', lord: 'Rahu', gana: 0, yoni: 0, nadi: 0},
+{ en: 'Purva Bhadrapada', cn: '普尔瓦·巴德拉帕达', lord: 'Jupiter', gana: 1, yoni: 13, nadi: 0},
+{ en: 'Uttara Bhadrapada', cn: '乌塔拉·巴德拉帕达', lord: 'Saturn', gana: 1, yoni: 7, nadi: 1},
+{ en: 'Revati', cn: '雷瓦蒂', lord: 'Mercury', gana: 0, yoni: 1, nadi: 2}
+];
+// 种姓：序号 0 婆罗门（级 4）> 1 刹帝利（级 3）> 2 吠舍（级 2）> 3 首陀罗（级 1）
+var VARNA_NAMES = {
+'zh-CN': ['婆罗门', '刹帝利', '吠舍', '首陀罗'],
+'zh-TW': ['婆羅門', '剎帝利', '吠舍', '首陀羅'],
+'en': ['Brahmin', 'Kshatriya', 'Vaishya', 'Shudra'],
+'ja': ['バラモン', 'クシャトリヤ', 'ヴァイシャ', 'シュードラ']
+};
+// 月亮星座 → 种姓序号（水象婆罗门、火象刹帝利、土象吠舍、风象首陀罗）
+var VARNA_BY_SIGN = [1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0];
+// 月亮星座主星
+var SIGN_LORD = ['Mars', 'Venus', 'Mercury', 'Moon', 'Sun', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Saturn', 'Jupiter'];
+var PLANET_NAMES = {
+'Sun': { 'zh-CN': '太阳', 'zh-TW': '太陽', 'en': 'Sun', 'ja': '太陽'},
+'Moon': { 'zh-CN': '月亮', 'zh-TW': '月亮', 'en': 'Moon', 'ja': '月'},
+'Mars': { 'zh-CN': '火星', 'zh-TW': '火星', 'en': 'Mars', 'ja': '火星'},
+'Mercury': { 'zh-CN': '水星', 'zh-TW': '水星', 'en': 'Mercury', 'ja': '水星'},
+'Jupiter': { 'zh-CN': '木星', 'zh-TW': '木星', 'en': 'Jupiter', 'ja': '木星'},
+'Venus': { 'zh-CN': '金星', 'zh-TW': '金星', 'en': 'Venus', 'ja': '金星'},
+'Saturn': { 'zh-CN': '土星', 'zh-TW': '土星', 'en': 'Saturn', 'ja': '土星'}
+};
+// 性情名
+var GANA_NAMES = {
+'zh-CN': ['天', '人', '罗刹'],
+'zh-TW': ['天', '人', '羅剎'],
+'en': ['Deva', 'Manushya', 'Rakshasa'],
+'ja': ['デーヴァ', 'マヌシャ', 'ラクシャサ']
+};
+// 脉名
+var NADI_NAMES = {
+'zh-CN': ['初', '中', '末'],
+'zh-TW': ['初', '中', '末'],
+'en': ['Adi', 'Madhya', 'Antya'],
+'ja': ['アーディ', 'マディヤ', 'アンティヤ']
+};
+// 十四兽性：0 马 1 象 2 羊 3 蛇 4 犬 5 猫 6 鼠 7 牛 8 水牛 9 虎 10 鹿 11 猴 12 獴 13 狮
+var YONI_NAMES = {
+'zh-CN': ['马', '象', '羊', '蛇', '犬', '猫', '鼠', '牛', '水牛', '虎', '鹿', '猴', '獴', '狮'],
+'zh-TW': ['馬', '象', '羊', '蛇', '犬', '貓', '鼠', '牛', '水牛', '虎', '鹿', '猴', '獴', '獅'],
+'en': ['Horse', 'Elephant', 'Goat', 'Serpent', 'Dog', 'Cat', 'Rat', 'Cow', 'Buffalo', 'Tiger', 'Deer', 'Monkey', 'Mongoose', 'Lion'],
+'ja': ['馬', '象', '羊', '蛇', '犬', '猫', '鼠', '牛', '水牛', '虎', '鹿', '猿', 'マングース', '獅子']
+};
+// Vashya 五组：0 四足 Chatushpada / 1 人 Manava / 2 水生 Jalachara / 3 野 Vanachara / 4 虫 Keeta
+var VASHYA_NAMES = {
+'zh-CN': ['四足', '人', '水生', '野', '虫'],
+'zh-TW': ['四足', '人', '水生', '野', '蟲'],
+'en': ['Chatushpada', 'Manava', 'Jalachara', 'Vanachara', 'Keeta'],
+'ja': ['チャトゥシュパダ', 'マーナヴァ', 'ジャラーチャラ', 'ヴァナーチャラ', 'キータ']
+};
+// 九宿曜（Tara）：1 命宿 Janma / 2 荣宿 Sampat / 3 灾宿 Vipat / 4 安宿 Kshema / 5 逆宿 Pratyari
+// 6 成宿 Sadhana / 7 灭宿 Vadha / 8 友宿 Mitra / 9 至友宿 Param Mitra
+var TARA_NAMES = {
+'zh-CN': ['命宿 Janma', '荣宿 Sampat', '灾宿 Vipat', '安宿 Kshema', '逆宿 Pratyari', '成宿 Sadhana', '灭宿 Vadha', '友宿 Mitra', '至友宿 Param Mitra'],
+'zh-TW': ['命宿 Janma', '榮宿 Sampat', '災宿 Vipat', '安宿 Kshema', '逆宿 Pratyari', '成宿 Sadhana', '滅宿 Vadha', '友宿 Mitra', '至友宿 Param Mitra'],
+'en': ['Janma', 'Sampat', 'Vipat', 'Kshema', 'Pratyari', 'Sadhana', 'Vadha', 'Mitra', 'Param Mitra'],
+'ja': ['ジャンマ', 'サンパト', 'ヴィパト', 'クシェーマ', 'プラトヤリ', 'サーダナ', 'ヴァダ', 'ミトラ', 'パラマ・ミトラ']
+};
+
+function L(table) { return table[LANG] || table['zh-CN'];}
+function norm360(x) { x = x % 360; return x < 0? x + 360: x;}
+function fmtLon(x) { return (Math.round(x * 100) / 100).toFixed(2) + '°';}
+function fmtScore(v) { return (v % 1 === 0)? String(v): v.toFixed(1);}
+function signIndex(lon) { return Math.floor(norm360(lon) / 30) % 12;}
+function nakshatraIndex(lon) { return Math.floor(norm360(lon) * 27 / 360) % 27;}
+function signLabel(idx) { var s = SIGNS[idx]; return s.cn + ' · ' + s.en;}
+function nakLabel(idx) {
+var n = NAKSHATRAS[idx];
+if (LANG === 'en' || LANG === 'ja') return n.en;
+return n.cn + ' · ' + n.en;
+}
+function planetLabel(key) { return PLANET_NAMES[key][LANG] || PLANET_NAMES[key]['zh-CN'];}
+
+// Lahiri 岁差近似：2000-01-01 为 23.85°，每年约增 0.01396°（约 50.3 角秒）。
+// 与印度占星单盘完全相同的公式与数值，2000–2030 年间误差小于约 0.5°。
+function ayanamsaFor(year) { return 23.85 + (year - 2000) * 0.01396;}
+
+// 回归黄经：月亮用地心黄经（与单盘相同）。
+function tropicalLongitude(body, time) {
+if (body === 'Sun') return Astronomy.SunPosition(time).elon;
+return Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body[body], time, true)).elon;
+}
+
+// 单人月亮：返回恒星黄经、星座、座内度数、出生宿。
+function computeMoon(y, mo, d, hh, mm, offset) {
+var utcMs = Date.UTC(y, mo - 1, d, hh, mm) - offset * 3600000;
+var time = new Astronomy.AstroTime(new Date(utcMs));
+var aya = ayanamsaFor(y);
+var sl = norm360(tropicalLongitude('Moon', time) - aya);
+return {
+year: y, month: mo, day: d, hour: hh, minute: mm, offset: offset,
+utcMs: utcMs, ayanamsa: aya, sidereal: sl,
+sign: signIndex(sl), degInSign: sl % 30, nak: nakshatraIndex(sl)
+};
+}
+
+// ---- Vashya ----
+// 五组归属：白羊/金牛四足；双子/处女/天秤/水瓶人；巨蟹/双鱼水生；狮子野；天蝎虫。
+// 人马座：前 15°人、后 15°四足；摩羯座：前 15°四足、后 15°水生（Muhurta Chintamani）。
+function vashyaGroup(sign, degInSign) {
+if (sign === 0 || sign === 1) return 0;
+if (sign === 2 || sign === 5 || sign === 6 || sign === 10) return 1;
+if (sign === 3 || sign === 11) return 2;
+if (sign === 4) return 3;
+if (sign === 7) return 4;
+if (sign === 8) return degInSign < 15? 1: 0;
+if (sign === 9) return degInSign < 15? 0: 2;
+return 1;
+}
+// Vashya 查表：行 = 对方（女方）组，列 = 本人（男方）组。
+var VASHYA_GRID = [
+[2, 1, 1, 0, 1],
+[1, 2, 0.5, 0, 1],
+[1, 0.5, 2, 1, 1],
+[0, 0, 1, 2, 0],
+[1, 0, 1, 0, 2]
+];
+
+// ---- Graha Maitri ----
+// 行星天然友谊（Brihat Parashara Hora Shastra 第 3 章）。
+var FRIENDS = {
+'Sun': ['Moon', 'Mars', 'Jupiter'],
+'Moon': ['Sun', 'Mercury'],
+'Mars': ['Sun', 'Moon', 'Jupiter'],
+'Mercury': ['Sun', 'Venus'],
+'Jupiter': ['Sun', 'Moon', 'Mars'],
+'Venus': ['Mercury', 'Saturn'],
+'Saturn': ['Mercury', 'Venus']
+};
+var ENEMIES = {
+'Sun': ['Venus', 'Saturn'],
+'Moon': [],
+'Mars': ['Mercury'],
+'Mercury': ['Moon'],
+'Jupiter': ['Mercury', 'Venus'],
+'Venus': ['Sun', 'Moon'],
+'Saturn': ['Sun', 'Moon', 'Mars']
+};
+function relation(a, b) {
+if (FRIENDS[a].indexOf(b)!== -1) return 'F';
+if (ENEMIES[a].indexOf(b)!== -1) return 'E';
+return 'N';
+}
+
+// ---- Yoni ----
+// 七对宿敌（Muhurta Chintamani，各家一致）：马–水牛、象–狮、羊–猴、蛇–獴、犬–鹿、猫–鼠、牛–虎。
+var YONI_SWORN = ['0-8', '1-13', '2-11', '3-12', '4-10', '5-6', '7-9'];
+// 友好对（北印度 Parashari 常用表）：马–象、羊–象、蛇–羊、犬–猫、鼠–猫、鹿–蛇、猴–虎、狮–猴。
+var YONI_FRIEND = ['0-1', '1-2', '2-3', '4-5', '5-6', '3-10', '9-11', '11-13'];
+// 敌对对（同表敌对栏）：马–犬、犬–猴、猫–猴、鼠–水牛、牛–犬、水牛–虎、虎–象。
+var YONI_ENEMY = ['0-4', '4-11', '5-11', '6-8', '4-7', '8-9', '1-9'];
+function yoniKey(a, b) { return a < b? a + '-' + b: b + '-' + a;}
+
+// ---- Tara ----
+// 九宿曜分值（每方向）：吉（荣/安/成/友/至友）1.5 分，余者 0 分；两方向相加，满分 3 分。
+var TARA_POINTS = [0, 1.5, 0, 1.5, 0, 1.5, 0, 1.5, 1.5];
+function countInclusive(from, to) { return ((to - from + 27) % 27) + 1;}
+function taraNumber(count) { return ((count - 1) % 9) + 1;}
+
+// ---- 主计算 ----
+// a = 本人（按男方一侧计分），b = 对方（按女方一侧计分）。
+function computeMatch(a, b) {
+var kootas = [];
+var i, score, detail;
+var nakA = NAKSHATRAS[a.nak], nakB = NAKSHATRAS[b.nak];
+
+// 1. Varna（1 分）：本人层级不低于对方得 1 分，否则 0 分。
+var rankA = 4 - VARNA_BY_SIGN[a.sign], rankB = 4 - VARNA_BY_SIGN[b.sign];
+score = rankA >= rankB? 1: 0;
+kootas.push({ key: 'varna', max: 1, score: score,
+a: L(VARNA_NAMES)[VARNA_BY_SIGN[a.sign]], b: L(VARNA_NAMES)[VARNA_BY_SIGN[b.sign]],
+detail: score === 1? t('vVarnaOk'): t('vVarnaNo')});
+
+// 2. Vashya（2 分）：查表，行 = 对方组，列 = 本人组。
+var gA = vashyaGroup(a.sign, a.degInSign), gB = vashyaGroup(b.sign, b.degInSign);
+score = VASHYA_GRID[gB][gA];
+kootas.push({ key: 'vashya', max: 2, score: score,
+a: L(VASHYA_NAMES)[gA], b: L(VASHYA_NAMES)[gB], detail: ''});
+
+// 3. Tara（3 分）：两方向各算，吉 1.5 分。
+var cAB = countInclusive(a.nak, b.nak), cBA = countInclusive(b.nak, a.nak);
+var tAB = taraNumber(cAB), tBA = taraNumber(cBA);
+score = TARA_POINTS[tAB - 1] + TARA_POINTS[tBA - 1];
+detail = t('dTara').replace('{A}', L(TARA_NAMES)[tAB - 1]).replace('{B}', L(TARA_NAMES)[tBA - 1]);
+kootas.push({ key: 'tara', max: 3, score: score,
+a: L(TARA_NAMES)[tAB - 1], b: L(TARA_NAMES)[tBA - 1], detail: detail});
+
+// 4. Yoni（4 分）：同种 4，友好 3，中性 2，敌对 1，宿敌 0。
+var yk = yoniKey(nakA.yoni, nakB.yoni);
+var yA = L(YONI_NAMES)[nakA.yoni], yB = L(YONI_NAMES)[nakB.yoni];
+if (nakA.yoni === nakB.yoni) { score = 4; detail = t('vYoniSame');}
+else if (YONI_SWORN.indexOf(yk)!== -1) { score = 0; detail = t('vYoniSworn');}
+else if (YONI_FRIEND.indexOf(yk)!== -1) { score = 3; detail = t('vYoniFriend');}
+else if (YONI_ENEMY.indexOf(yk)!== -1) { score = 1; detail = t('vYoniEnemy');}
+else { score = 2; detail = t('vYoniNeutral');}
+kootas.push({ key: 'yoni', max: 4, score: score, a: yA, b: yB, detail: detail});
+
+// 5. Graha Maitri（5 分）：月亮星座主星的天然友谊。
+var lA = SIGN_LORD[a.sign], lB = SIGN_LORD[b.sign];
+var rAB = relation(lA, lB), rBA = relation(lB, lA);
+if (rAB === 'F' && rBA === 'F') { score = 5; detail = t('vGrahaFF');}
+else if ((rAB === 'F' && rBA === 'N') || (rAB === 'N' && rBA === 'F')) { score = 4; detail = t('vGrahaFN');}
+else if (rAB === 'N' && rBA === 'N') { score = 3; detail = t('vGrahaNN');}
+else if ((rAB === 'F' && rBA === 'E') || (rAB === 'E' && rBA === 'F')) { score = 2; detail = t('vGrahaFE');}
+else if ((rAB === 'N' && rBA === 'E') || (rAB === 'E' && rBA === 'N')) { score = 1; detail = t('vGrahaNE');}
+else { score = 0; detail = t('vGrahaEE');}
+kootas.push({ key: 'graha', max: 5, score: score,
+a: planetLabel(lA), b: planetLabel(lB), detail: detail});
+
+// 6. Gana（6 分）：同类 6，天–人 6，其余 0。
+var gnA = nakA.gana, gnB = nakB.gana;
+if (gnA === gnB) { score = 6; detail = t('vGanaSame');}
+else if ((gnA === 0 && gnB === 1) || (gnA === 1 && gnB === 0)) { score = 6; detail = t('vGanaDevaManu');}
+else { score = 0; detail = t('vGanaRakshasa');}
+kootas.push({ key: 'gana', max: 6, score: score,
+a: L(GANA_NAMES)[gnA], b: L(GANA_NAMES)[gnB], detail: detail});
+
+// 7. Bhakoot（7 分）：从对方星座数到本人星座，相距 1/3/4/5/7/9/10/11 宫得 7 分，
+// 相距 2/6/8/12 宫得 0 分；两星座同主星时 dosha 抵消，给 7 分并注明。
+var dist = ((a.sign - b.sign + 12) % 12) + 1;
+var goodDist = [1, 3, 4, 5, 7, 9, 10, 11].indexOf(dist)!== -1;
+var cancelled = false;
+if (goodDist) { score = 7;}
+else if (SIGN_LORD[a.sign] === SIGN_LORD[b.sign]) { score = 7; cancelled = true;}
+else { score = 0;}
+detail = t('dBhakoot').replace('{N}', String(dist));
+if (cancelled) detail += ' ' + t('noteBhakootCancel');
+kootas.push({ key: 'bhakoot', max: 7, score: score,
+a: signLabel(a.sign), b: signLabel(b.sign), detail: detail});
+
+// 8. Nadi（8 分）：不同脉 8 分，同脉 0 分。
+if (nakA.nadi === nakB.nadi) { score = 0; detail = t('vNadiSame');}
+else { score = 8; detail = t('vNadiDiff');}
+kootas.push({ key: 'nadi', max: 8, score: score,
+a: L(NADI_NAMES)[nakA.nadi], b: L(NADI_NAMES)[nakB.nadi], detail: detail});
+
+var total = 0;
+for (i = 0; i < kootas.length; i++) total += kootas[i].score;
+var band = total <= 17? 0: (total <= 24? 1: (total <= 32? 2: 3));
+return { kootas: kootas, total: total, band: band};
+}
+
+function esc(s) {
+return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function pad2(n) { return (n < 10? '0': '') + n;}
+
+function readPerson(prefix) {
+var dv = document.getElementById(prefix + '-date').value;
+if (!dv) return { error: t('errNoDate')};
+var parts = dv.split('-');
+var y = parseInt(parts[0], 10), mo = parseInt(parts[1], 10), d = parseInt(parts[2], 10);
+if (isNaN(y) || isNaN(mo) || isNaN(d) || mo < 1 || mo > 12 || d < 1 || d > 31) {
+return { error: t('errBadDate')};
+}
+var tv = document.getElementById(prefix + '-time').value || '12:00';
+var tp = tv.split(':');
+var hh = parseInt(tp[0], 10), mm = parseInt(tp[1], 10);
+if (isNaN(hh)) hh = 12;
+if (isNaN(mm)) mm = 0;
+var offset = parseFloat(document.getElementById(prefix + '-offset').value);
+if (isNaN(offset) || offset < -12 || offset > 14) return { error: t('errBadOffset')};
+return { y: y, mo: mo, d: d, hh: hh, mm: mm, offset: offset};
+}
+
+function doMatch() {
+var err = document.getElementById('form-error');
+err.textContent = '';
+if (typeof Astronomy === 'undefined') { err.textContent = t('errNoLib'); return;}
+var pa = readPerson('a'), pb = readPerson('b');
+if (pa.error) { err.textContent = pa.error; return;}
+if (pb.error) { err.textContent = pb.error; return;}
+var aMoon, bMoon;
+try {
+aMoon = computeMoon(pa.y, pa.mo, pa.d, pa.hh, pa.mm, pa.offset);
+bMoon = computeMoon(pb.y, pb.mo, pb.d, pb.hh, pb.mm, pb.offset);
+} catch (e) {
+err.textContent = t('errNoLib');
+return;
+}
+var m = computeMatch(aMoon, bMoon);
+LAST_RESULT = { a: aMoon, b: bMoon, match: m};
+showResult(LAST_RESULT);
+}
+
+function personHead(who, m) {
+var offStr = (m.offset >= 0? '+': '') + m.offset;
+var s = '<b>' + esc(t(who)) + '</b> ' + t('birthLine') + '：' + m.year + '-' + pad2(m.month) + '-' + pad2(m.day) + ' ' + pad2(m.hour) + ':' + pad2(m.minute) + ' UTC' + offStr + '<br>';
+s += t('moonLine') + '：<b>' + esc(signLabel(m.sign)) + ' ' + fmtLon(m.degInSign) + '</b> · ' + t('nakLine') + '：<b>' + esc(nakLabel(m.nak)) + '</b> · ' + t('ayanamsaLine') + '：<b>' + fmtLon(m.ayanamsa) + '</b><br>';
+return s;
+}
+
+function showResult(r, noScroll) {
+LAST_RESULT = r;
+document.getElementById('result-head').innerHTML = personHead('personA', r.a) + personHead('personB', r.b);
+var bandKey = ['band0', 'band1', 'band2', 'band3'][r.match.band];
+document.getElementById('verdict').innerHTML =
+t('totalLine') + '：<span class="total">' + fmtScore(r.match.total) + ' / 36</span><br>' +
+t('bandLabel') + '：<span class="level">' + t(bandKey) + '</span>';
+
+var kNames = { varna: 'kVarna', vashya: 'kVashya', tara: 'kTara', yoni: 'kYoni', graha: 'kGraha', gana: 'kGana', bhakoot: 'kBhakoot', nadi: 'kNadi'};
+var kMean = { varna: 'mVarna', vashya: 'mVashya', tara: 'mTara', yoni: 'mYoni', graha: 'mGraha', gana: 'mGana', bhakoot: 'mBhakoot', nadi: 'mNadi'};
+var html = '<table class="chart-table"><thead><tr><th>' + t('colKoota') + '</th><th>' + t('colA') + '</th><th>' + t('colB') + '</th><th>' + t('colScore') + '</th><th>' + t('colMeaning') + '</th></tr></thead><tbody>';
+var i, k;
+for (i = 0; i < r.match.kootas.length; i++) {
+k = r.match.kootas[i];
+html += '<tr><td>' + esc(t(kNames[k.key])) + '</td><td>' + esc(k.a) + '</td><td>' + esc(k.b) + '</td><td class="num">' + fmtScore(k.score) + ' / ' + k.max + '</td><td>' + esc(t(kMean[k.key])) + (k.detail? '<br><span class="sub">' + esc(k.detail) + '</span>': '') + '</td></tr>';
+}
+html += '</tbody></table>';
+document.getElementById('koota-table').innerHTML = html;
+document.getElementById('result-note').textContent = t('termsNote') + ' ' + t('noteDirection');
+
+document.getElementById('result-card').classList.remove('hidden');
+if (!noScroll) document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start'});
+}
+
+// ---- AI 解读：供 /js/ai-jiegua.js 调用 ----
+// 只读 LAST_RESULT 的已算结果，不改任何合盘计算逻辑；未合盘时返回 null。
+window.getJieguaSummary = function() {
+if (!LAST_RESULT) return null;
+var r = LAST_RESULT;
+var kNames = { varna: 'kVarna', vashya: 'kVashya', tara: 'kTara', yoni: 'kYoni', graha: 'kGraha', gana: 'kGana', bhakoot: 'kBhakoot', nadi: 'kNadi'};
+var lines = [];
+lines.push('印度合盘 Ashtakoota');
+var offA = (r.a.offset >= 0? '+': '') + r.a.offset;
+var offB = (r.b.offset >= 0? '+': '') + r.b.offset;
+lines.push('本人出生 ' + r.a.year + '-' + pad2(r.a.month) + '-' + pad2(r.a.day) + ' ' + pad2(r.a.hour) + ':' + pad2(r.a.minute) + ' UTC' + offA + '，月亮（恒星）' + SIGNS[r.a.sign].cn + fmtLon(r.a.degInSign) + '，出生宿 ' + NAKSHATRAS[r.a.nak].en + '。');
+lines.push('对方出生 ' + r.b.year + '-' + pad2(r.b.month) + '-' + pad2(r.b.day) + ' ' + pad2(r.b.hour) + ':' + pad2(r.b.minute) + ' UTC' + offB + '，月亮（恒星）' + SIGNS[r.b.sign].cn + fmtLon(r.b.degInSign) + '，出生宿 ' + NAKSHATRAS[r.b.nak].en + '。');
+var i, k;
+for (i = 0; i < r.match.kootas.length; i++) {
+k = r.match.kootas[i];
+lines.push(t(kNames[k.key]) + '：' + fmtScore(k.score) + ' / ' + k.max + '（本人 ' + k.a + '，对方 ' + k.b + (k.detail? '；' + k.detail: '') + '）。');
+}
+var bandKey = ['band0', 'band1', 'band2', 'band3'][r.match.band];
+lines.push('总分 ' + fmtScore(r.match.total) + ' / 36，总评' + t(bandKey) + '（0–17 不宜，18–24 一般，25–32 良好，33–36 极佳）。');
+lines.push('注：本人按男方一侧、对方按女方一侧计分；岁差为 Lahiri 线性近似，与本站印度占星单盘相同。');
+return lines.join('\n');
+};
+
+// 初始化界面语言（localStorage 优先，否则按浏览器语言自动检测）
+applyI18n();
+</script>
+<script src="/js/ai-jiegua.js"></script>
+<script>
+// 共享脚本与本页主脚本都已加载后再挂接（getJieguaSummary 已定义）。
+if (window.AIInterpret) window.AIInterpret.attach();
+</script>
+</body>
+</html>

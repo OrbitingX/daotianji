@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 诸葛神数</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .method-row { display: flex; gap: 2rem; }
+  .method-row > .field { flex: 1; min-width: 0; }
+  .num-row { display: flex; gap: 2rem; }
+  .num-row > .field { flex: 1; min-width: 0; }
+  .hint { font-size: .85rem; color: #9a9aab; line-height: 1.8; padding-top: .55rem; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .qian-no {
+    font-family: "Noto Serif SC","Songti SC","SimSun",serif;
+    font-size: 2rem; color: #c9a962; text-align: center; letter-spacing: .12em; margin: .4rem 0 1.4rem;
+  }
+  .verse {
+    font-family: "Noto Serif SC","Songti SC","SimSun",serif;
+    font-size: 1.3rem; line-height: 2; color: #f0ead8; text-align: center; letter-spacing: .06em;
+    padding: 1.4rem 1rem; border-top: 1px solid rgba(201,169,98,.35); border-bottom: 1px solid rgba(201,169,98,.35);
+  }
+  .verse-note { font-size: .78rem; color: #6f6f80; margin-top: .5rem; line-height: 1.6; text-align: center; }
+  .verdict { margin-top: 1.4rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .jie-label { color: #c9a962; font-weight: 700; }
+  .derive { margin-top: 1.2rem; font-size: .9rem; line-height: 1.9; color: #9a9aab; }
+  .derive b { color: #c9a962; font-weight: 600; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .method-row, .num-row { flex-direction: column; gap: 0; }
+    .verse { font-size: 1.15rem; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">诸葛神数 · 本地占卜</div>
+    </div>
+  </a>
+                <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></span>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">第一幕 · 心有所问</div>
+  <h1 class="slogan" data-i18n-html="slogan">三字成签，<br>诸葛有言。</h1>
+  <p class="subtitle" data-i18n="subtitle">诸葛神数免费在线占卜</p>
+
+  <section class="section">
+    <div class="field">
+      <label for="question" data-i18n="labelQuestion">所问之事</label>
+      <input type="text" id="question" placeholder="例如：这份工作要不要继续做？" data-i18n-ph="phQuestion">
+    </div>
+    <div class="method-row">
+      <div class="field">
+        <label for="method" data-i18n="labelMethod">起签方式</label>
+        <select id="method" onchange="switchTab(this.value)">
+          <option value="question" selected data-i18n="optQuestion">问事起签</option>
+          <option value="number" data-i18n="optNumber">报数起签</option>
+        </select>
+      </div>
+      <div class="field" id="panel-question">
+        <label data-i18n="labelHint">取字说明</label>
+        <div class="hint" data-i18n="hintQuestion">取问题中前三个汉字的笔画数相加起签。</div>
+      </div>
+    </div>
+    <div id="panel-number" class="hidden">
+      <div class="num-row">
+        <div class="field">
+          <label for="num1" data-i18n="labelNum1">数字一</label>
+          <input type="number" id="num1" min="1" step="1" placeholder="如 1" data-i18n-ph="phNum1">
+        </div>
+        <div class="field">
+          <label for="num2" data-i18n="labelNum2">数字二</label>
+          <input type="number" id="num2" min="1" step="1" placeholder="如 2" data-i18n-ph="phNum2">
+        </div>
+        <div class="field">
+          <label for="num3" data-i18n="labelNum3">数字三</label>
+          <input type="number" id="num3" min="1" step="1" placeholder="如 3" data-i18n-ph="phNum3">
+        </div>
+      </div>
+    </div>
+    <div class="error" id="cast-error"></div>
+    <button class="submit-btn" onclick="doCast()" data-i18n="btnSubmit">起签 · 问诸葛</button>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">签文</div>
+    <div class="result-head" id="result-head"></div>
+    <div class="qian-no" id="qian-no"></div>
+    <div class="verse" id="verse"></div>
+    <div class="verse-note" id="verse-note"></div>
+    <div class="verdict" id="jie"></div>
+    <div class="derive" id="derive"></div>
+      <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="zhuge" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+</section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">诸葛神数：免费占卜与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">诸葛神数是什么？</summary>
+      <p data-i18n="faqA1">诸葛神数是流传已久的签文占卜，相传为诸葛亮所传。问事者以三字或三数起签，对应三百八十四签中的一签，以签诗与解签参详所问之事。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">为什么是 384 签？</summary>
+      <p data-i18n="faqA2">384 是《易经》六十四卦乘以每卦六爻之数（64 × 6 = 384）。诸葛神数以 384 签涵盖人事变化，故签号以 384 取余而定。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">问事起签和报数起签有什么区别？</summary>
+      <p data-i18n="faqA3">问事起签取你问题中前三个汉字的笔画数相加；报数起签直接用你报出的三个数字相加。两种方法都是三数相加后除以 384 取余，余数为 0 时取第 384 签。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">签号是怎么算出来的？</summary>
+      <p data-i18n="faqA4">三数之和除以 384，取余数作为签号；若整除（余数为 0），则为第 384 签。例如 1 + 2 + 3 = 6，得第 6 签。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">诸葛神数占卜免费吗？</summary>
+      <p data-i18n="faqA5">免费。本页起签在本地完成，签文按需从本站读取，不收费，也不会保存你输入的问题。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">诸葛神数属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="offlineNote">本页起签在本地完成；签文与笔画数据按需从本站 /data/ 读取，不会上传你输入的问题。</span>
+  </footer>
+</div>
+</main>
+
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。签诗原文一律保留中文，见 verseNote。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '诸葛神数 · 本地占卜',
+  navGroup: '占卜',
+  nav_1: '解梦', nav_2: '六爻占卜', nav_3: '梅花易数', nav_4: '小六壬', nav_5: '塔罗牌',
+  nav_6: '雷诺曼', nav_7: '北欧卢恩符文', nav_8: '奇门遁甲', nav_9: '印度占星卜卦', nav_10: '西方卜卦占星',
+  nav_11: '大六壬', nav_12: '金口诀', nav_13: '太乙神数', nav_14: '占星骰子',
+  nav_15: '生命灵数', nav_16: '测字', nav_17: '诸葛神数', nav_18: '灵棋', nav_19: '称骨',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '第一幕 · 心有所问',
+  slogan: '三字成签，<br>诸葛有言。',
+  subtitle: '诸葛神数免费在线占卜',
+  labelQuestion: '所问之事',
+  phQuestion: '例如：这份工作要不要继续做？',
+  labelMethod: '起签方式',
+  optQuestion: '问事起签',
+  optNumber: '报数起签',
+  labelHint: '取字说明',
+  hintQuestion: '取问题中前三个汉字的笔画数相加起签。',
+  labelNum1: '数字一',
+  phNum1: '如 1',
+  labelNum2: '数字二',
+  phNum2: '如 2',
+  labelNum3: '数字三',
+  phNum3: '如 3',
+  btnSubmit: '起签 · 问诸葛',
+  errNoQuestion: '请先写下所问之事（至少三个汉字）。',
+  errFewChars: '问题中至少需要三个汉字，请补写或改用报数起签。',
+  errNoStroke: '「{ch}」字查不到笔画，请改用报数起签。',
+  errNums: '数字一、数字二、数字三均为必填正整数。',
+  errData: '签文数据加载失败，请刷新页面重试。',
+  errStrokes: '笔画数据加载失败，请刷新页面重试，或改用报数起签。',
+  resultTitle: '签文',
+  ai_interpret: 'AI 解读',
+  qianNo: '第 {n} 签',
+  verseLabel: '签诗',
+  jieLabel: '解签',
+  verseNote: '',
+  asked: '所问',
+  deriveQ: '取字',
+  deriveN: '报数',
+  strokeUnit: '画',
+  sumWord: '三数之和',
+  modWord: '除以 384 取余',
+  colon: '：', comma: '，', plus: ' + ', equals: ' = ',
+  faqTitle: '诸葛神数：免费占卜与使用常见问题',
+  faqQ1: '诸葛神数是什么？',
+  faqA1: '诸葛神数是流传已久的签文占卜，相传为诸葛亮所传。问事者以三字或三数起签，对应三百八十四签中的一签，以签诗与解签参详所问之事。',
+  faqQ2: '为什么是 384 签？',
+  faqA2: '384 是《易经》六十四卦乘以每卦六爻之数（64 × 6 = 384）。诸葛神数以 384 签涵盖人事变化，故签号以 384 取余而定。',
+  faqQ3: '问事起签和报数起签有什么区别？',
+  faqA3: '问事起签取你问题中前三个汉字的笔画数相加；报数起签直接用你报出的三个数字相加。两种方法都是三数相加后除以 384 取余，余数为 0 时取第 384 签。',
+  faqQ4: '签号是怎么算出来的？',
+  faqA4: '三数之和除以 384，取余数作为签号；若整除（余数为 0），则为第 384 签。例如 1 + 2 + 3 = 6，得第 6 签。',
+  faqQ5: '诸葛神数占卜免费吗？',
+  faqA5: '免费。本页起签在本地完成，签文按需从本站读取，不收费，也不会保存你输入的问题。',
+  disclaimer: '诸葛神数属传统术数，仅供参考，不构成决策依据。',
+  offlineNote: '本页起签在本地完成；签文与笔画数据按需从本站 /data/ 读取，不会上传你输入的问题。',
+  langLabel: '语言'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '諸葛神數 · 本地占卜',
+  navGroup: '占卜',
+  nav_1: '解夢', nav_2: '六爻占卜', nav_3: '梅花易數', nav_4: '小六壬', nav_5: '塔羅牌',
+  nav_6: '雷諾曼', nav_7: '北歐盧恩符文', nav_8: '奇門遁甲', nav_9: '印度占星卜卦', nav_10: '西方卜卦占星',
+  nav_11: '大六壬', nav_12: '金口訣', nav_13: '太乙神數', nav_14: '占星骰子',
+  nav_15: '生命靈數', nav_16: '測字', nav_17: '諸葛神數', nav_18: '靈棋', nav_19: '稱骨',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '第一幕 · 心有所問',
+  slogan: '三字成籤，<br>諸葛有言。',
+  subtitle: '諸葛神數免費線上占卜',
+  labelQuestion: '所問之事',
+  phQuestion: '例如：這份工作要不要繼續做？',
+  labelMethod: '起籤方式',
+  optQuestion: '問事起籤',
+  optNumber: '報數起籤',
+  labelHint: '取字說明',
+  hintQuestion: '取問題中前三個漢字的筆畫數相加起籤。',
+  labelNum1: '數字一',
+  phNum1: '如 1',
+  labelNum2: '數字二',
+  phNum2: '如 2',
+  labelNum3: '數字三',
+  phNum3: '如 3',
+  btnSubmit: '起籤 · 問諸葛',
+  errNoQuestion: '請先寫下所問之事（至少三個漢字）。',
+  errFewChars: '問題中至少需要三個漢字，請補寫或改用報數起籤。',
+  errNoStroke: '「{ch}」字查不到筆畫，請改用報數起籤。',
+  errNums: '數字一、數字二、數字三均為必填正整數。',
+  errData: '籤文數據加載失敗，請刷新頁面重試。',
+  errStrokes: '筆畫數據加載失敗，請刷新頁面重試，或改用報數起籤。',
+  resultTitle: '籤文',
+  ai_interpret: 'AI 解讀',
+  qianNo: '第 {n} 籤',
+  verseLabel: '籤詩',
+  jieLabel: '解籤',
+  verseNote: '',
+  asked: '所問',
+  deriveQ: '取字',
+  deriveN: '報數',
+  strokeUnit: '畫',
+  sumWord: '三數之和',
+  modWord: '除以 384 取餘',
+  colon: '：', comma: '，', plus: ' + ', equals: ' = ',
+  faqTitle: '諸葛神數：免費占卜與使用常見問題',
+  faqQ1: '諸葛神數是什麼？',
+  faqA1: '諸葛神數是流傳已久的籤文占卜，相傳為諸葛亮所傳。問事者以三字或三數起籤，對應三百八十四籤中的一籤，以籤詩與解籤參詳所問之事。',
+  faqQ2: '為什麼是 384 籤？',
+  faqA2: '384 是《易經》六十四卦乘以每卦六爻之數（64 × 6 = 384）。諸葛神數以 384 籤涵蓋人事變化，故籤號以 384 取餘而定。',
+  faqQ3: '問事起籤和報數起籤有什麼區別？',
+  faqA3: '問事起籤取你問題中前三個漢字的筆畫數相加；報數起籤直接用你報出的三個數字相加。兩種方法都是三數相加後除以 384 取餘，餘數為 0 時取第 384 籤。',
+  faqQ4: '籤號是怎麼算出來的？',
+  faqA4: '三數之和除以 384，取餘數作為籤號；若整除（餘數為 0），則為第 384 籤。例如 1 + 2 + 3 = 6，得第 6 籤。',
+  faqQ5: '諸葛神數占卜免費嗎？',
+  faqA5: '免費。本頁起籤在本地完成，籤文按需從本站讀取，不收費，也不會保存你輸入的問題。',
+  disclaimer: '諸葛神數屬傳統術數，僅供參考，不構成決策依據。',
+  offlineNote: '本頁起籤在本地完成；籤文與筆畫數據按需從本站 /data/ 讀取，不會上傳你輸入的問題。',
+  langLabel: '語言'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: "Zhuge's Oracles · Local Divination",
+  navGroup: 'Divination',
+  nav_1: 'Dream Interpretation', nav_2: 'Six Lines (Liu Yao)', nav_3: 'Meihua Yishu', nav_4: 'Xiao Liuren', nav_5: 'Tarot',
+  nav_6: 'Lenormand', nav_7: 'Norse Runes', nav_8: 'Qimen Dunjia', nav_9: 'Vedic Astrology', nav_10: 'Western Horary Astrology',
+  nav_11: 'Da Liuren', nav_12: 'Jinkou Jue', nav_13: 'Taiyi Shenshu', nav_14: 'Astrology Dice',
+  nav_15: 'Life Path Numbers', nav_16: 'Character Divination', nav_17: "Zhuge's 384 Oracles", nav_18: 'Lingqi', nav_19: 'Bone Weighing',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'Act I · A Question in Mind',
+  slogan: 'Three words cast the lot,<br>Zhuge has the word.',
+  subtitle: 'Free online Zhuge divination',
+  labelQuestion: 'Your question',
+  phQuestion: 'e.g. Should I keep doing this job?',
+  labelMethod: 'Casting method',
+  optQuestion: 'Cast from a question',
+  optNumber: 'Cast from numbers',
+  labelHint: 'How characters are taken',
+  hintQuestion: 'The stroke counts of the first three Chinese characters in your question are added up to cast the lot.',
+  labelNum1: 'Number 1',
+  phNum1: 'e.g. 1',
+  labelNum2: 'Number 2',
+  phNum2: 'e.g. 2',
+  labelNum3: 'Number 3',
+  phNum3: 'e.g. 3',
+  btnSubmit: 'Cast the Oracle',
+  errNoQuestion: 'Please write your question first (at least three Chinese characters).',
+  errFewChars: 'Your question needs at least three Chinese characters. Please add more, or use number-based casting instead.',
+  errNoStroke: 'No stroke count found for “{ch}”. Please use number-based casting instead.',
+  errNums: 'Numbers 1, 2 and 3 are all required positive integers.',
+  errData: 'Failed to load the oracle data. Please refresh the page and try again.',
+  errStrokes: 'Failed to load the stroke data. Please refresh and try again, or use number-based casting instead.',
+  resultTitle: 'The Oracle',
+  ai_interpret: 'AI Reading',
+  qianNo: 'Oracle No. {n}',
+  verseLabel: 'Oracle verse',
+  jieLabel: 'Interpretation',
+  verseNote: 'Oracle verse shown in classical Chinese.',
+  asked: 'Question',
+  deriveQ: 'Characters',
+  deriveN: 'Numbers',
+  strokeUnit: ' strokes',
+  sumWord: 'Sum of the three',
+  modWord: 'mod 384',
+  colon: ': ', comma: ', ', plus: ' + ', equals: ' = ',
+  faqTitle: "Zhuge's Oracles: Free Divination & FAQ",
+  faqQ1: "What is Zhuge's divination?",
+  faqA1: "Zhuge's divination is a long-standing oracle-lot tradition, said to have been handed down by Zhuge Liang. The seeker casts a lot from three words or three numbers, matching one of 384 oracles, and reads the verse and its interpretation against the question asked.",
+  faqQ2: 'Why 384 oracles?',
+  faqA2: '384 is the sixty-four hexagrams of the Book of Changes times six lines per hexagram (64 × 6 = 384). The 384 oracles cover the changes of human affairs, so the oracle number is fixed by taking a remainder modulo 384.',
+  faqQ3: 'What is the difference between casting from a question and from numbers?',
+  faqA3: 'Casting from a question adds the stroke counts of the first three Chinese characters in your question; casting from numbers adds the three numbers you give. Both take the sum modulo 384, and a remainder of 0 gives oracle No. 384.',
+  faqQ4: 'How is the oracle number calculated?',
+  faqA4: 'Add the three numbers and take the remainder when divided by 384; if it divides exactly (remainder 0), the oracle is No. 384. For example, 1 + 2 + 3 = 6 gives oracle No. 6.',
+  faqQ5: 'Is the Zhuge divination free?',
+  faqA5: 'Yes, free. Casting is done locally in your browser, the oracle text is read from this site as needed, and your question is never saved.',
+  disclaimer: "Zhuge's divination is a traditional divination art, for reference only; it is not a basis for decisions.",
+  offlineNote: 'Casting is done locally; the oracle and stroke data are read from this site under /data/ as needed, and your question is never uploaded.',
+  langLabel: 'Language'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '諸葛神数 · ローカル占い',
+  navGroup: '占い',
+  nav_1: '夢占い', nav_2: '六爻占い', nav_3: '梅花易数', nav_4: '小六壬', nav_5: 'タロット',
+  nav_6: 'ルノルマン', nav_7: '北欧ルーン', nav_8: '奇門遁甲', nav_9: 'インド占星術', nav_10: '西洋ホラリー占星術',
+  nav_11: '大六壬', nav_12: '金口訣', nav_13: '太乙神数', nav_14: '占星ダイス',
+  nav_15: '生命霊数', nav_16: '測字占い', nav_17: '諸葛神数', nav_18: '霊棋', nav_19: '称骨占い',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '第一幕 · 心に問う',
+  slogan: '三字で籤を引き、<br>諸葛に言あり。',
+  subtitle: '諸葛神数 無料オンライン占い',
+  labelQuestion: '問うこと',
+  phQuestion: '例：この仕事を続けるべき？',
+  labelMethod: '起籤方法',
+  optQuestion: '問事起籤',
+  optNumber: '報数起籤',
+  labelHint: '取字の説明',
+  hintQuestion: '質問の最初の三文字の画数を合計して起籤します。',
+  labelNum1: '数字一',
+  phNum1: '例 1',
+  labelNum2: '数字二',
+  phNum2: '例 2',
+  labelNum3: '数字三',
+  phNum3: '例 3',
+  btnSubmit: '起籤 · 諸葛に問う',
+  errNoQuestion: 'まず質問を書いてください（漢字三文字以上）。',
+  errFewChars: '質問には漢字が三文字以上必要です。補うか、報数起籤をお使いください。',
+  errNoStroke: '「{ch}」の画数が見つかりません。報数起籤をお使いください。',
+  errNums: '数字一・数字二・数字三はすべて必須の正の整数です。',
+  errData: '籤文データの読み込みに失敗しました。ページを更新して再試行してください。',
+  errStrokes: '画数データの読み込みに失敗しました。更新して再試行するか、報数起籤をお使いください。',
+  resultTitle: '籤文',
+  ai_interpret: 'AI 解釈',
+  qianNo: '第 {n} 籤',
+  verseLabel: '籤詩',
+  jieLabel: '解籤',
+  verseNote: '籤詩は中国語原文のまま表示しています。',
+  asked: '質問',
+  deriveQ: '取字',
+  deriveN: '報数',
+  strokeUnit: '画',
+  sumWord: '三数の合計',
+  modWord: '384 で割った余り',
+  colon: '：', comma: '、', plus: ' + ', equals: ' = ',
+  faqTitle: '諸葛神数：無料占いとよくある質問',
+  faqQ1: '諸葛神数とは？',
+  faqA1: '諸葛神数は古くから伝わる籤文占いで、諸葛亮に由来すると伝えられています。三字または三数で起籤し、三百八十四籤のうち一籤に対応させ、籤詩と解籤で問う事柄を参詳します。',
+  faqQ2: 'なぜ 384 籤なのですか？',
+  faqA2: '384 は『易経』六十四卦に各卦六爻を掛けた数（64 × 6 = 384）です。諸葛神数は 384 籤で人事の変化を網羅するため、籤番号は 384 での剰余で決まります。',
+  faqQ3: '問事起籤と報数起籤の違いは？',
+  faqA3: '問事起籤は質問の最初の三文字の画数を合計し、報数起籤は入力した三つの数字を合計します。どちらも三数の合計を 384 で割り、余りが 0 のときは第 384 籤となります。',
+  faqQ4: '籤番号はどう計算しますか？',
+  faqA4: '三数の合計を 384 で割り、その余りを籤番号とします。割り切れる場合（余り 0）は第 384 籤です。例えば 1 + 2 + 3 = 6 で第 6 籤となります。',
+  faqQ5: '諸葛神数の占いは無料ですか？',
+  faqA5: '無料です。起籤はローカルで計算され、籤文は必要に応じて本サイトから読み込みます。料金もかからず、入力した質問も保存されません。',
+  disclaimer: '諸葛神数は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  offlineNote: '起籤はローカルで計算します。籤文と画数データは必要に応じて本サイトの /data/ から読み込み、質問がアップロードされることはありません。',
+  langLabel: '言語'
+}
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function fmt(tpl, map) {
+  var out = tpl;
+  for (var k in map) out = out.split('{' + k + '}').join(String(map[k]));
+  return out;
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var err = document.getElementById('cast-error'); if (err) err.textContent = '';
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// 数据来自本站 /data/：zhuge_384.json（384 签，字段 no / poem / jie），
+// hanzi_strokes.json（汉字 → 笔画数，扁平字典）。均为同站读取，不上传任何输入。
+var ZHUGE = null;
+var STROKES = null;
+var strokesPromise = null;
+
+function loadZhuge() {
+  if (ZHUGE) return Promise.resolve(ZHUGE);
+  return fetch('/data/zhuge_384.json').then(function (r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function (d) { ZHUGE = d; return d; });
+}
+
+function loadStrokes() {
+  if (STROKES) return Promise.resolve(STROKES);
+  if (!strokesPromise) {
+    strokesPromise = fetch('/data/hanzi_strokes.json').then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }).then(function (d) { STROKES = d; return d; });
+  }
+  return strokesPromise;
+}
+
+function qianNoFromSum(sum) {
+  var r = sum % 384;
+  return r === 0 ? 384 : r;
+}
+
+function findQian(no) {
+  if (!ZHUGE || !ZHUGE.qians) return null;
+  for (var i = 0; i < ZHUGE.qians.length; i++) {
+    if (ZHUGE.qians[i].no === no) return ZHUGE.qians[i];
+  }
+  return null;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function switchTab(mode) {
+  document.getElementById('panel-question').classList.toggle('hidden', mode !== 'question');
+  document.getElementById('panel-number').classList.toggle('hidden', mode !== 'number');
+  document.getElementById('cast-error').textContent = '';
+}
+
+function firstThreeCJK(text) {
+  var m = text.match(/[\u4e00-\u9fff]/g) || [];
+  return m.slice(0, 3);
+}
+
+function doCast() {
+  var mode = document.getElementById('method').value;
+  var err = document.getElementById('cast-error');
+  err.textContent = '';
+  if (mode === 'question') return doQuestionCast(err);
+  return doNumberCast(err);
+}
+
+function doQuestionCast(err) {
+  var q = document.getElementById('question').value.trim();
+  if (!q) { err.textContent = t('errNoQuestion'); return; }
+  var chars = firstThreeCJK(q);
+  if (chars.length < 3) { err.textContent = t('errFewChars'); return; }
+  loadZhuge().then(function () {
+    return loadStrokes();
+  }).then(function (strokes) {
+    var counts = [];
+    for (var i = 0; i < 3; i++) {
+      var c = strokes[chars[i]];
+      if (c === undefined || c === null) {
+        err.textContent = fmt(t('errNoStroke'), { ch: chars[i] });
+        return;
+      }
+      counts.push(c);
+    }
+    var sum = counts[0] + counts[1] + counts[2];
+    showResult({
+      mode: 'question', question: q,
+      chars: chars, counts: counts, sum: sum,
+      no: qianNoFromSum(sum)
+    });
+  }).catch(function (e) {
+    err.textContent = ZHUGE ? t('errStrokes') : t('errData');
+  });
+}
+
+function doNumberCast(err) {
+  var n1 = parseInt(document.getElementById('num1').value, 10);
+  var n2 = parseInt(document.getElementById('num2').value, 10);
+  var n3 = parseInt(document.getElementById('num3').value, 10);
+  if (isNaN(n1) || n1 < 1 || isNaN(n2) || n2 < 1 || isNaN(n3) || n3 < 1) {
+    err.textContent = t('errNums');
+    return;
+  }
+  loadZhuge().then(function () {
+    var sum = n1 + n2 + n3;
+    showResult({
+      mode: 'number',
+      question: document.getElementById('question').value.trim(),
+      nums: [n1, n2, n3], sum: sum,
+      no: qianNoFromSum(sum)
+    });
+  }).catch(function (e) {
+    err.textContent = t('errData');
+  });
+}
+
+function showResult(r, noScroll) {
+  LAST_RESULT = r;
+  var qian = findQian(r.no);
+  if (!qian) {
+    document.getElementById('cast-error').textContent = t('errData');
+    return;
+  }
+  var q = r.question || '';
+
+  var head = '';
+  if (q) head += t('asked') + t('colon') + '<b>' + esc(q) + '</b>';
+  document.getElementById('result-head').innerHTML = head;
+
+  document.getElementById('qian-no').textContent = fmt(t('qianNo'), { n: r.no });
+  document.getElementById('verse').textContent = qian.poem;
+  var note = t('verseNote');
+  document.getElementById('verse-note').textContent = note;
+  document.getElementById('jie').innerHTML =
+    '<span class="jie-label">' + t('jieLabel') + t('colon') + '</span>' + esc(qian.jie);
+
+  var derive = '';
+  if (r.mode === 'question') {
+    var parts = [];
+    for (var i = 0; i < 3; i++) {
+      parts.push('「' + esc(r.chars[i]) + '」' + '<b>' + r.counts[i] + '</b>' + t('strokeUnit'));
+    }
+    derive = t('deriveQ') + t('colon') + parts.join(t('comma')) + '<br>' +
+      t('sumWord') + t('colon') + '<b>' + r.counts.join(t('plus')) + t('equals') + r.sum + '</b>' + t('comma') +
+      r.sum + ' ' + t('modWord') + t('equals') + '<b>' + r.no + '</b>';
+  } else {
+    derive = t('deriveN') + t('colon') + '<b>' + r.nums.join(t('plus')) + '</b><br>' +
+      t('sumWord') + t('colon') + '<b>' + r.nums.join(t('plus')) + t('equals') + r.sum + '</b>' + t('comma') +
+      r.sum + ' ' + t('modWord') + t('equals') + '<b>' + r.no + '</b>';
+  }
+  document.getElementById('derive').innerHTML = derive;
+
+  document.getElementById('result-card').classList.remove('hidden');
+  if (!noScroll) document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+// ==LOGIC-END==
+
+// 预加载签文数据，起签时不再等待
+loadZhuge().catch(function () {});
+// 初始化界面语言（localStorage 优先，否则按浏览器语言自动检测）
+applyI18n();
+
+// ==AI-INTERPRET==
+// Shared AI 解读 button (/js/ai-jiegua.js). Summary comes from this page's
+// own result state; null/'' means "no result yet" and the button only shows
+// a hint instead of calling the backend.
+function aiTrunc(s, n) { s = String(s == null ? '' : s); return s.length > n ? s.slice(0, n) + '…' : s; }
+window.getJieguaSummary = function() {
+if (!LAST_RESULT) return null;
+var r = LAST_RESULT;
+var qian = findQian(r.no);
+if (!qian) return null;
+var parts = [];
+parts.push('诸葛神数第 ' + r.no + ' 签（共384签）');
+if (r.mode === 'question') {
+parts.push('起签：' + r.chars.map(function (c, i) { return '「' + c + '」' + r.counts[i] + '画'; }).join(' + ') + ' = ' + r.sum + '，' + r.sum + ' mod 384 = ' + r.no);
+} else {
+parts.push('起签：' + r.nums.join(' + ') + ' = ' + r.sum + '，' + r.sum + ' mod 384 = ' + r.no);
+}
+if (qian.poem) parts.push('签诗：' + qian.poem);
+if (qian.jie) parts.push('解签：' + aiTrunc(qian.jie, 400));
+return parts.join('\n');
+};
+window.getJieguaQuestion = function() { var el = document.getElementById('question'); return el ? el.value.trim() : ''; };
+if (window.AIInterpret) { window.AIInterpret.attach(); }
+else { document.addEventListener('DOMContentLoaded', function () { if (window.AIInterpret) window.AIInterpret.attach(); }); }
+</script>
+<script src="/js/ai-jiegua.js"></script>
+</body>
+</html>

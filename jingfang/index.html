@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 京房易</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+  .gua-name-cn { display: block; font-size: .85rem; color: #9a9aab; font-weight: 400; margin-top: .2rem; letter-spacing: .05em; }
+  .guaci-note { font-size: .78rem; color: #6f6f80; margin-top: .5rem; line-height: 1.6; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  select option { background: #12121c; color: #f0ead8; }
+  .method-row { display: flex; gap: 2rem; }
+  .method-row > .field { flex: 1; min-width: 0; }
+  .link-btn { background: none; border: none; color: #c9a962; font-size: .75rem; cursor: pointer; letter-spacing: .1em; padding: 0; margin-left: .5rem; font-family: inherit; }
+  .link-btn:hover { text-decoration: underline; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .ghost-btn {
+    background: transparent; border: 1px solid rgba(201,169,98,.5); border-radius: 999px;
+    color: #9a9aab; font-size: .9rem; letter-spacing: .15em; padding: .8rem 1.2rem; cursor: pointer; font-family: inherit;
+  }
+  .ghost-btn:hover { color: #c9a962; border-color: #c9a962; }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+  .hint { color: #9a9aab; font-size: .85rem; line-height: 1.8; margin-bottom: 1rem; }
+  .toss-log { list-style: none; margin-top: 1rem; }
+  .toss-log li { display: flex; align-items: baseline; gap: .7rem; flex-wrap: wrap; padding: .55rem 0; border-bottom: 1px solid rgba(201,169,98,.12); font-size: .92rem; line-height: 1.7; }
+  .toss-log .toss-num { color: #c9a962; width: 4.2em; flex-shrink: 0; }
+  .coin-chip { display: inline-block; min-width: 1.7em; text-align: center; border: 1px solid rgba(201,169,98,.6); border-radius: 50%; color: #f0ead8; font-size: .85rem; padding: .05rem .2rem; margin-right: .25rem; }
+  .toss-val { color: #f0ead8; font-weight: 600; }
+  .toss-val.old { color: #e8c97a; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .verdict { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .level { color: #c9a962; font-weight: 700; }
+  .hex-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-top: 1.4rem; }
+  .hex-card { background: transparent; border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1.1rem 1.2rem; }
+  .hex-card h3 { font-size: .8rem; color: #b08d3e; font-weight: 400; letter-spacing: .25em; margin-bottom: .6rem; }
+  .hex-card .gua-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.25rem; font-weight: 700; color: #f0ead8; }
+  .hex-card .tri-info { font-size: .85rem; color: #9a9aab; margin: .4rem 0 .8rem; line-height: 1.7; }
+  .hex-card .tri-info b { color: #f0ead8; font-weight: 600; }
+  .hex-card .guaci { font-size: .88rem; color: #c8c2ae; line-height: 1.7; border-top: 1px dashed rgba(201,169,98,.35); padding-top: .7rem; margin-top: .7rem; }
+  .hex-diagram { width: 170px; margin: .2rem auto .7rem; }
+  .hex-row { display: flex; align-items: center; height: 13px; margin: 7px 0; }
+  .hex-row .bar { flex: 1; height: 13px; display: flex; }
+  .hex-row .bar .seg { flex: 1; background: #c9a962; border-radius: 2px; }
+  .hex-row.yin .bar { gap: 14px; }
+  .hex-row.changing .bar .seg { background: #e8c97a; box-shadow: 0 0 10px rgba(201,169,98,.7); }
+  .hex-row .mark { width: 22px; text-align: right; color: #c9a962; font-size: .8rem; flex-shrink: 0; }
+  .hex-row .mark .dot { font-size: .7rem; }
+  .hex-row .lbl { width: 22px; color: #6f6f80; font-size: .7rem; flex-shrink: 0; }
+
+  /* ---- 装卦表 ---- */
+  .table-wrap { overflow-x: auto; margin-top: 1.2rem; }
+  table.chart { width: 100%; border-collapse: collapse; font-size: .88rem; min-width: 600px; }
+  table.chart th { color: #b08d3e; font-weight: 400; letter-spacing: .18em; text-align: left; padding: .5rem .6rem; border-bottom: 1px solid rgba(201,169,98,.45); white-space: nowrap; }
+  table.chart td { padding: .55rem .6rem; border-bottom: 1px solid rgba(201,169,98,.12); color: #c8c2ae; white-space: nowrap; line-height: 1.6; }
+  table.chart tr.shi td { color: #f0ead8; background: rgba(201,169,98,.06); }
+  table.chart tr.moving td { color: #f0ead8; }
+  table.chart td .flag { color: #e8c97a; font-weight: 700; }
+  .mini-bar { display: inline-block; width: 44px; height: 9px; vertical-align: middle; }
+  .mini-bar .seg { display: block; height: 9px; background: #c9a962; border-radius: 2px; }
+  .mini-bar.yin { display: inline-flex; gap: 6px; }
+  .mini-bar.yin .seg { flex: 1; }
+  .mini-bar.moving .seg { background: #e8c97a; box-shadow: 0 0 8px rgba(201,169,98,.7); }
+
+  /* ---- 飞伏 / 原文 / 断法 ---- */
+  .feifu-block { margin-top: 1.6rem; }
+  .feifu-block h3 { font-size: .85rem; color: #c9a962; letter-spacing: .25em; font-weight: 400; margin-bottom: .7rem; }
+  .feifu-item { padding: .7rem 0; border-bottom: 1px solid rgba(201,169,98,.12); font-size: .92rem; line-height: 1.9; color: #c8c2ae; }
+  .feifu-item:last-child { border-bottom: none; }
+  .feifu-item b { color: #f0ead8; font-weight: 600; }
+  .feifu-note { font-size: .82rem; color: #6f6f80; line-height: 1.8; margin-top: .6rem; }
+  .data-status { font-size: .82rem; color: #6f6f80; margin-top: 1rem; line-height: 1.8; }
+  .data-status.err { color: #d97b6c; }
+  details.refbox { margin-top: 1.6rem; border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1rem 1.2rem; }
+  details.refbox summary { cursor: pointer; color: #c9a962; font-size: .9rem; letter-spacing: .12em; list-style: none; }
+  details.refbox summary::-webkit-details-marker { display: none; }
+  details.refbox summary::after { content: ' +'; }
+  details.refbox[open ] summary::after { content: ' −'; }
+  .yuanwen { white-space: pre-wrap; font-size: .9rem; line-height: 2; color: #c8c2ae; margin-top: 1rem; }
+  .duanfa-item { padding: .7rem 0; border-bottom: 1px solid rgba(201,169,98,.12); font-size: .9rem; line-height: 1.9; color: #c8c2ae; }
+  .duanfa-item:last-child { border-bottom: none; }
+  .duanfa-item b { color: #c9a962; font-weight: 600; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .method-row { flex-direction: column; gap: 0; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">京房易 · 本地排盘</div>
+    </div>
+  </a>
+            <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></span>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">一生之图 · 京房八宫</div>
+  <h1 class="slogan" data-i18n-html="slogan">八宫分定，<br>世应自分。</h1>
+  <p class="subtitle" data-i18n="subtitle">京房易免费在线排盘</p>
+
+  <section class="section">
+    <div class="field">
+      <label for="question" data-i18n="labelQuestion">所问之事（可选）</label>
+      <input type="text" id="question" placeholder="例如：这个机会要不要接？" data-i18n-ph="phQuestion">
+    </div>
+    <div class="method-row">
+      <div class="field">
+        <label for="method" data-i18n="labelMethod">起卦方式</label>
+        <select id="method" onchange="switchMethod(this.value)">
+          <option value="pick" selected data-i18n="optPick">自选卦象</option>
+          <option value="coin" data-i18n="optCoin">铜钱起卦</option>
+          <option value="time" data-i18n="optTime">时间起卦</option>
+        </select>
+      </div>
+      <div class="field" id="panel-pick">
+        <label for="hex-select" data-i18n="labelHex">卦象（按八宫分）</label>
+        <select id="hex-select"></select>
+      </div>
+    </div>
+
+    <div id="panel-coin" class="hidden">
+      <p class="hint" data-i18n="coinHint">心中默念所问之事，连掷六次，从初爻到上爻。每枚铜钱：字面计三，花面计二；三字为老阳（动），三花为老阴（动）。</p>
+      <button class="submit-btn" id="toss-btn" onclick="autoCast()" data-i18n="btnAuto">掷六次铜钱</button>
+      <ul class="toss-log" id="toss-log"></ul>
+    </div>
+
+    <div id="panel-time" class="hidden">
+      <div class="field">
+        <label for="datetime"><span data-i18n="labelTime">时间</span> <button type="button" class="link-btn" onclick="useNow()" data-i18n="btnNow">用当前时间</button></label>
+        <input type="datetime-local" id="datetime">
+        <div class="error" id="time-error"></div>
+      </div>
+      <button class="submit-btn" onclick="doTimeCast()" data-i18n="btnTimeCast">按时起卦</button>
+    </div>
+
+    <div id="panel-pick-btn">
+      <button class="submit-btn" onclick="doPickCast()" data-i18n="btnPickCast">起此卦</button>
+    </div>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">排盘结果</div>
+    <div class="result-head" id="result-head"></div>
+    <div class="hex-grid" id="hex-grid"></div>
+    <div class="section-title" style="margin-top:1.8rem" data-i18n="secChart">纳甲装卦</div>
+    <div class="table-wrap"><table class="chart" id="chart-table"></table></div>
+    <div class="feifu-block" id="feifu-block"></div>
+    <div class="data-status" id="data-status"></div>
+    <details class="refbox" id="yuanwen-ref">
+      <summary data-i18n="yuanwenBtn">展开《京氏易传》原文</summary>
+      <div class="yuanwen" id="yuanwen-text"></div>
+      <div class="feifu-note" id="yuanwen-note"></div>
+    </details>
+    <details class="refbox" id="duanfa-ref">
+      <summary data-i18n="duanfaBtn">展开京房断法纲要</summary>
+      <div id="duanfa-list"></div>
+    </details>
+      <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="jingfang" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+</section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">京房易：免费排盘与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">京房易与六爻有什么区别？</summary>
+      <p data-i18n="faqA1">六爻以铜钱摇卦，纳甲装卦，重动变、用神与日月旺衰；京房易以八宫统六十四卦，重世应、纳甲、飞伏与积算建候，卦未动先看世应与宫位。本页京房排盘以本卦纳甲为主，动爻只作标记。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">纳甲、世应、六亲、飞伏分别怎么定？</summary>
+      <p data-i18n="faqA2">纳甲按京房纳甲歌：乾金甲子外壬午，坤土乙未外癸丑，震木庚子外庚午，巽木辛丑外辛未，坎水戊寅外戊申，离火己卯外己酉，艮土丙辰外丙戌，兑金丁巳外丁亥。世按八宫位次：本卦世在上爻，一世初爻、二世二爻、三世三爻、四世四爻、五世五爻、游魂四爻、归魂三爻；应与世隔三爻。六亲以本宫五行为我，生我者父母，我生者子孙，克我者官鬼，我克者妻财，同我者兄弟。飞伏见下条。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">飞伏神怎么看？</summary>
+      <p data-i18n="faqA3">飞神是本卦之爻，伏神是隐于其下的对应爻。伏卦取法：一世至五世，伏卦为本宫首卦；本卦、游魂、归魂，伏卦为飞伏配卦（乾坤、震巽、坎离、艮兑相配）。伏卦既定，六爻伏神皆取伏卦同位爻的干支与六亲。本页世爻飞伏与《京氏易传》原文所载逐卦核对：六十四卦中六十卦原文直接相合，另四卦原文有虎易注指为误字——遁卦伏神丙寅当为甲寅，蒙卦伏神乙酉当为己酉，晋卦飞伏配卦当为艮而非离，颐卦当为离而非震，本页从注改正；蒙卦原文乙酉不在纳甲表内，尤见其误。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">为什么本页的应爻与数据文件里的应爻数字不同？</summary>
+      <p data-i18n="faqA4">数据文件 jingfang.json 的 ying_yao 字段按世加四爻计（如乾卦世六爻、应四爻），与通行规则世隔三爻（乾卦世六爻、应三爻）不合，也与该文件同一条目原文「九三，三公为应」不合，故本页不取该字段，应爻一律按通行规则（世隔三爻）排布。数据文件的宫与世爻则与通行表六十四卦全合，本页照用。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">京房易排盘免费吗？数据从哪里来？</summary>
+      <p data-i18n="faqA5">免费。本页排盘在本地完成，不联网、不收费，也不会保存你输入的问题。纳甲、世应、宫位、六亲按通行京房规则内置排布；飞伏配卦与断法纲要同源内置；各卦《京氏易传》原文按需从本站数据文件 jingfang.json 加载（comprehensive-shushu-engine，GPL-3.0）。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">京房易属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="attrLine">数据：《京氏易传》（京房易），comprehensive-shushu-engine（GPL-3.0）；纳甲、世应、六亲按通行京房规则排布。</span><br>
+    <span data-i18n="offlineNote">本页排盘完全离线运行，农历换算使用本地 lunar.js，不向任何服务器发送数据；卦爻原文按需从本站数据文件加载。</span>
+  </footer>
+</div>
+</main>
+<script src="lunar.js"></script>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。古典原文一律保留中文，见 guaciNote。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '京房易 · 本地排盘',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '一生之图 · 京房八宫',
+  slogan: '八宫分定，<br>世应自分。',
+  subtitle: '京房易免费在线排盘',
+  labelQuestion: '所问之事（可选）',
+  phQuestion: '例如：这个机会要不要接？',
+  labelMethod: '起卦方式',
+  optPick: '自选卦象',
+  optCoin: '铜钱起卦',
+  optTime: '时间起卦',
+  labelHex: '卦象（按八宫分）',
+  labelTime: '时间',
+  btnNow: '用当前时间',
+  btnAuto: '掷六次铜钱',
+  btnTimeCast: '按时起卦',
+  btnPickCast: '起此卦',
+  coinHint: '心中默念所问之事，连掷六次，从初爻到上爻。每枚铜钱：字面计三，花面计二；三字为老阳（动），三花为老阴（动）。',
+  coinWord: '字',
+  coinTail: '花',
+  oldYang: '老阳',
+  youngYang: '少阳',
+  youngYin: '少阴',
+  oldYin: '老阴',
+  errNoTime: '请先选择时间。',
+  errBadTime: '时间格式不正确。',
+  errNoLunar: '农历换算未加载，时间起卦暂不可用。',
+  resultTitle: '排盘结果',
+  ai_interpret: 'AI 解读',
+  secChart: '纳甲装卦',
+  secFeifu: '飞伏',
+  secYuanwen: '京氏易传原文',
+  secDuanfa: '京房断法纲要',
+  colLine: '爻位',
+  colYao: '爻象',
+  colGanzhi: '干支',
+  colWx: '五行',
+  colQin: '六亲',
+  colFushi: '伏神',
+  colMark: '标记',
+  markShi: '世',
+  markYing: '应',
+  markMoving: '动',
+  cardOrig: '本卦',
+  moving: '● 动',
+  guaciLabel: '卦辞：',
+  guaciNote: '',
+  asked: '所问',
+  lunar: '农历',
+  castMethod: '起卦方式',
+  methodPick: '自选卦象',
+  methodCoin: '铜钱摇卦',
+  methodTime: '时间起卦',
+  year: '年', month: '月', day: '日', hour: '时',
+  upperTri: '上卦', lowerTri: '下卦',
+  gongLabel: '宫',
+  posLabel: '位次',
+  shiLabel: '世在',
+  yingLabel: '应',
+  flyingPair: '飞伏配卦',
+  fuGua: '伏卦',
+  shiFei: '世爻飞神',
+  shiFu: '世爻伏神',
+  feifuNote: '伏卦取法：一世至五世取本宫首卦，本卦、游魂、归魂取飞伏配卦；六爻伏神皆取伏卦同位爻。世爻飞伏已与《京氏易传》原文逐卦核对，见常见问题第三条。',
+  yuanwenBtn: '展开《京氏易传》原文',
+  duanfaBtn: '展开京房断法纲要',
+  yuanwenNote: '原文繁体见 data 文本；此处按语言显示简体或繁体。虎易注为通行本校注，随原文照录。',
+  dataLoading: '原文数据加载中……',
+  dataFail: '原文数据未能加载，仅显示排盘；可刷新后重试。',
+  dataReady: '原文数据已加载。',
+  duanfaWangfei: '旺废冲刑',
+  duanfaJinghui: '静悔发贞',
+  duanfaDefs: '名义',
+  duanfaLunfa: '论法',
+  duanfaLunfaTail: '结语',
+  faqTitle: '京房易：免费排盘与使用常见问题',
+  faqQ1: '京房易与六爻有什么区别？',
+  faqA1: '六爻以铜钱摇卦，纳甲装卦，重动变、用神与日月旺衰；京房易以八宫统六十四卦，重世应、纳甲、飞伏与积算建候，卦未动先看世应与宫位。本页京房排盘以本卦纳甲为主，动爻只作标记。',
+  faqQ2: '纳甲、世应、六亲、飞伏分别怎么定？',
+  faqA2: '纳甲按京房纳甲歌：乾金甲子外壬午，坤土乙未外癸丑，震木庚子外庚午，巽木辛丑外辛未，坎水戊寅外戊申，离火己卯外己酉，艮土丙辰外丙戌，兑金丁巳外丁亥。世按八宫位次：本卦世在上爻，一世初爻、二世二爻、三世三爻、四世四爻、五世五爻、游魂四爻、归魂三爻；应与世隔三爻。六亲以本宫五行为我，生我者父母，我生者子孙，克我者官鬼，我克者妻财，同我者兄弟。飞伏见下条。',
+  faqQ3: '飞伏神怎么看？',
+  faqA3: '飞神是本卦之爻，伏神是隐于其下的对应爻。伏卦取法：一世至五世，伏卦为本宫首卦；本卦、游魂、归魂，伏卦为飞伏配卦（乾坤、震巽、坎离、艮兑相配）。伏卦既定，六爻伏神皆取伏卦同位爻的干支与六亲。本页世爻飞伏与《京氏易传》原文所载逐卦核对：六十四卦中六十卦原文直接相合，另四卦原文有虎易注指为误字——遁卦伏神丙寅当为甲寅，蒙卦伏神乙酉当为己酉，晋卦飞伏配卦当为艮而非离，颐卦当为离而非震，本页从注改正；蒙卦原文乙酉不在纳甲表内，尤见其误。',
+  faqQ4: '为什么本页的应爻与数据文件里的应爻数字不同？',
+  faqA4: '数据文件 jingfang.json 的 ying_yao 字段按世加四爻计（如乾卦世六爻、应四爻），与通行规则世隔三爻（乾卦世六爻、应三爻）不合，也与该文件同一条目原文「九三，三公为应」不合，故本页不取该字段，应爻一律按通行规则（世隔三爻）排布。数据文件的宫与世爻则与通行表六十四卦全合，本页照用。',
+  faqQ5: '京房易排盘免费吗？数据从哪里来？',
+  faqA5: '免费。本页排盘在本地完成，不联网、不收费，也不会保存你输入的问题。纳甲、世应、宫位、六亲按通行京房规则内置排布；飞伏配卦与断法纲要同源内置；各卦《京氏易传》原文按需从本站数据文件 jingfang.json 加载（comprehensive-shushu-engine，GPL-3.0）。',
+  disclaimer: '京房易属传统术数，仅供参考，不构成决策依据。',
+  attrLine: '数据：《京氏易传》（京房易），comprehensive-shushu-engine（GPL-3.0）；纳甲、世应、六亲按通行京房规则排布。',
+  offlineNote: '本页排盘完全离线运行，农历换算使用本地 lunar.js，不向任何服务器发送数据；卦爻原文按需从本站数据文件加载。',
+  langLabel: '语言'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '京房易 · 本地排盤',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '一生之圖 · 京房八宮',
+  slogan: '八宮分定，<br>世應自分。',
+  subtitle: '京房易免費線上排盤',
+  labelQuestion: '所問之事（可選）',
+  phQuestion: '例如：這個機會要不要接？',
+  labelMethod: '起卦方式',
+  optPick: '自選卦象',
+  optCoin: '銅錢起卦',
+  optTime: '時間起卦',
+  labelHex: '卦象（按八宮分）',
+  labelTime: '時間',
+  btnNow: '用當前時間',
+  btnAuto: '擲六次銅錢',
+  btnTimeCast: '按時起卦',
+  btnPickCast: '起此卦',
+  coinHint: '心中默念所問之事，連擲六次，從初爻到上爻。每枚銅錢：字面計三，花面計二；三字為老陽（動），三花為老陰（動）。',
+  coinWord: '字',
+  coinTail: '花',
+  oldYang: '老陽',
+  youngYang: '少陽',
+  youngYin: '少陰',
+  oldYin: '老陰',
+  errNoTime: '請先選擇時間。',
+  errBadTime: '時間格式不正確。',
+  errNoLunar: '農曆換算未加載，時間起卦暫不可用。',
+  resultTitle: '排盤結果',
+  ai_interpret: 'AI 解讀',
+  secChart: '納甲裝卦',
+  secFeifu: '飛伏',
+  secYuanwen: '京氏易傳原文',
+  secDuanfa: '京房斷法綱要',
+  colLine: '爻位',
+  colYao: '爻象',
+  colGanzhi: '干支',
+  colWx: '五行',
+  colQin: '六親',
+  colFushi: '伏神',
+  colMark: '標記',
+  markShi: '世',
+  markYing: '應',
+  markMoving: '動',
+  cardOrig: '本卦',
+  moving: '● 動',
+  guaciLabel: '卦辭：',
+  guaciNote: '',
+  asked: '所問',
+  lunar: '農曆',
+  castMethod: '起卦方式',
+  methodPick: '自選卦象',
+  methodCoin: '銅錢搖卦',
+  methodTime: '時間起卦',
+  year: '年', month: '月', day: '日', hour: '時',
+  upperTri: '上卦', lowerTri: '下卦',
+  gongLabel: '宮',
+  posLabel: '位次',
+  shiLabel: '世在',
+  yingLabel: '應',
+  flyingPair: '飛伏配卦',
+  fuGua: '伏卦',
+  shiFei: '世爻飛神',
+  shiFu: '世爻伏神',
+  feifuNote: '伏卦取法：一世至五世取本宮首卦，本卦、遊魂、歸魂取飛伏配卦；六爻伏神皆取伏卦同位爻。世爻飛伏已與《京氏易傳》原文逐卦核對，見常見問題第三條。',
+  yuanwenBtn: '展開《京氏易傳》原文',
+  duanfaBtn: '展開京房斷法綱要',
+  yuanwenNote: '原文繁體見 data 文本；此處按語言顯示簡體或繁體。虎易注為通行本校注，隨原文照錄。',
+  dataLoading: '原文數據加載中……',
+  dataFail: '原文數據未能加載，僅顯示排盤；可刷新後重試。',
+  dataReady: '原文數據已加載。',
+  duanfaWangfei: '旺廢沖刑',
+  duanfaJinghui: '靜悔發貞',
+  duanfaDefs: '名義',
+  duanfaLunfa: '論法',
+  duanfaLunfaTail: '結語',
+  faqTitle: '京房易：免費排盤與使用常見問題',
+  faqQ1: '京房易與六爻有什麼區別？',
+  faqA1: '六爻以銅錢搖卦，納甲裝卦，重動變、用神與日月旺衰；京房易以八宮統六十四卦，重世應、納甲、飛伏與積算建候，卦未動先看世應與宮位。本頁京房排盤以本卦納甲為主，動爻只作標記。',
+  faqQ2: '納甲、世應、六親、飛伏分別怎麼定？',
+  faqA2: '納甲按京房納甲歌：乾金甲子外壬午，坤土乙未外癸丑，震木庚子外庚午，巽木辛丑外辛未，坎水戊寅外戊申，離火己卯外己酉，艮土丙辰外丙戌，兌金丁巳外丁亥。世按八宮位次：本卦世在上爻，一世初爻、二世二爻、三世三爻、四世四爻、五世五爻、遊魂四爻、歸魂三爻；應與世隔三爻。六親以本宮五行為我，生我者父母，我生者子孫，克我者官鬼，我克者妻財，同我者兄弟。飛伏見下條。',
+  faqQ3: '飛伏神怎麼看？',
+  faqA3: '飛神是本卦之爻，伏神是隱於其下的對應爻。伏卦取法：一世至五世，伏卦為本宮首卦；本卦、遊魂、歸魂，伏卦為飛伏配卦（乾坤、震巽、坎離、艮兌相配）。伏卦既定，六爻伏神皆取伏卦同位爻的干支與六親。本頁世爻飛伏與《京氏易傳》原文所載逐卦核對：六十四卦中六十卦原文直接相合，另四卦原文有虎易注指為誤字——遁卦伏神丙寅當為甲寅，蒙卦伏神乙酉當為己酉，晉卦飛伏配卦當為艮而非離，頤卦當為離而非震，本頁從注改正；蒙卦原文乙酉不在納甲表內，尤見其誤。',
+  faqQ4: '為什麼本頁的應爻與數據文件裡的應爻數字不同？',
+  faqA4: '數據文件 jingfang.json 的 ying_yao 字段按世加四爻計（如乾卦世六爻、應四爻），與通行規則世隔三爻（乾卦世六爻、應三爻）不合，也與該文件同一條目原文「九三，三公為應」不合，故本頁不取該字段，應爻一律按通行規則（世隔三爻）排布。數據文件的宮與世爻則與通行表六十四卦全合，本頁照用。',
+  faqQ5: '京房易排盤免費嗎？數據從哪裡來？',
+  faqA5: '免費。本頁排盤在本地完成，不聯網、不收費，也不會保存你輸入的問題。納甲、世應、宮位、六親按通行京房規則內置排布；飛伏配卦與斷法綱要同源內置；各卦《京氏易傳》原文按需從本站數據文件 jingfang.json 加載（comprehensive-shushu-engine，GPL-3.0）。',
+  disclaimer: '京房易屬傳統術數，僅供參考，不構成決策依據。',
+  attrLine: '數據：《京氏易傳》（京房易），comprehensive-shushu-engine（GPL-3.0）；納甲、世應、六親按通行京房規則排布。',
+  offlineNote: '本頁排盤完全離線運行，農曆換算使用本地 lunar.js，不向任何伺服器發送數據；卦爻原文按需從本站數據文件加載。',
+  langLabel: '語言'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Jingfang Yi · Local Chart',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'Life Chart · The Eight Palaces',
+  slogan: 'Eight palaces fixed,<br>the Self and Other lines decide.',
+  subtitle: 'Free online Jingfang Yi divination chart',
+  labelQuestion: 'Your question (optional)',
+  phQuestion: 'e.g. Should I take this opportunity?',
+  labelMethod: 'Casting method',
+  optPick: 'Choose a hexagram',
+  optCoin: 'Three-coin casting',
+  optTime: 'Time-based casting',
+  labelHex: 'Hexagram (by palace)',
+  labelTime: 'Time',
+  btnNow: 'Use now',
+  btnAuto: 'Cast six times',
+  btnTimeCast: 'Cast by time',
+  btnPickCast: 'Cast this hexagram',
+  coinHint: 'Hold your question in mind and cast six times, from the first line to the top line. Each coin: heads (characters) counts 3, tails counts 2; three heads is Old Yang (moving), three tails is Old Yin (moving).',
+  coinWord: 'Heads',
+  coinTail: 'Tails',
+  oldYang: 'Old Yang',
+  youngYang: 'Young Yang',
+  youngYin: 'Young Yin',
+  oldYin: 'Old Yin',
+  errNoTime: 'Please choose a time first.',
+  errBadTime: 'The time format is invalid.',
+  errNoLunar: 'Lunar conversion is not loaded; time-based casting is unavailable.',
+  resultTitle: 'The Chart',
+  ai_interpret: 'AI Reading',
+  secChart: 'The Six Lines (Najia Chart)',
+  secFeifu: 'Flying & Hidden Lines',
+  secYuanwen: 'Jingfang Yizhuan (Original Text)',
+  secDuanfa: 'Jingfang Reading Principles',
+  colLine: 'Line',
+  colYao: 'Image',
+  colGanzhi: 'Stem-Branch',
+  colWx: 'Element',
+  colQin: 'Relative',
+  colFushi: 'Hidden line',
+  colMark: 'Marks',
+  markShi: 'Self',
+  markYing: 'Other',
+  markMoving: 'Moving',
+  cardOrig: 'Primary Hexagram',
+  moving: '● Moving',
+  guaciLabel: 'Hexagram text: ',
+  guaciNote: 'Hexagram text shown in classical Chinese.',
+  asked: 'Question',
+  lunar: 'Lunar date',
+  castMethod: 'Casting method',
+  methodPick: 'Chosen hexagram',
+  methodCoin: 'Three-coin casting',
+  methodTime: 'Time-based casting',
+  year: 'Year', month: 'Month', day: 'Day', hour: 'Hour',
+  upperTri: 'Upper trigram', lowerTri: 'Lower trigram',
+  gongLabel: 'Palace',
+  posLabel: 'Position',
+  shiLabel: 'Self line',
+  yingLabel: 'Other',
+  flyingPair: 'Flying-Void pair',
+  fuGua: 'Hidden hexagram',
+  shiFei: 'Flying line (Self)',
+  shiFu: 'Hidden line (Self)',
+  feifuNote: 'How the hidden hexagram is found: for generations 1–5 it is the palace-head hexagram; for the home, wandering-soul and returning-soul hexagrams it is the Flying-Void paired trigram (Qian-Kun, Zhen-Xun, Kan-Li, Gen-Dui). Every line’s hidden line comes from the same position in the hidden hexagram. The Self line’s flying/hidden stems were checked against the Jingfang Yizhuan text for all 64 hexagrams — see FAQ 3.',
+  yuanwenBtn: 'Show the Jingfang Yizhuan text',
+  duanfaBtn: 'Show the Jingfang reading principles',
+  yuanwenNote: 'The original text is shown in simplified or traditional Chinese according to the language setting. The Húyì notes are the edition’s own corrections and are quoted with the text.',
+  dataLoading: 'Loading the original text…',
+  dataFail: 'The original text could not be loaded; only the chart is shown. Please refresh and try again.',
+  dataReady: 'Original text loaded.',
+  duanfaWangfei: 'Flourishing, Waste, Clash & Punishment',
+  duanfaJinghui: 'Stillness, Regret, Movement & Constancy',
+  duanfaDefs: 'Definitions',
+  duanfaLunfa: 'Method',
+  duanfaLunfaTail: 'Closing',
+  faqTitle: 'Jingfang Yi: Free Chart & FAQ',
+  faqQ1: 'How is Jingfang Yi different from Six Lines (Liu Yao)?',
+  faqA1: 'Six Lines casts by shaking coins, assigns stems and branches to every line, and focuses on moving lines, the useful line, and the day and month strength. Jingfang Yi arranges all 64 hexagrams under the eight palaces and focuses on the Self/Other lines, Najia, the flying and hidden lines, and the accumulated-count and seasonal methods — the palace and the Self line are read before any movement. This page charts the primary hexagram in Najia; moving lines are only marked.',
+  faqQ2: 'How are Najia, the Self/Other lines, the six relatives and the flying/hidden lines fixed?',
+  faqA2: 'Najia follows the Jingfang Najia song: Qian metal Jia-Zi outside Ren-Wu, Kun earth Yi-Wei outside Gui-Chou, Zhen wood Geng-Zi outside Geng-Wu, Xun wood Xin-Chou outside Xin-Wei, Kan water Wu-Yin outside Wu-Shen, Li fire Ji-Mao outside Ji-You, Gen earth Bing-Chen outside Bing-Xu, Dui metal Ding-Si outside Ding-Hai. The Self line follows the palace position: home hexagram top line, 1st generation 1st line, 2nd generation 2nd line, 3rd generation 3rd line, 4th generation 4th line, 5th generation 5th line, wandering soul 4th line, returning soul 3rd line; the Other line is three lines from the Self line. The six relatives take the palace element as “self”: what generates self is Parents, what self generates is Children, what controls self is Officer, what self controls is Wife-Wealth, and what shares self’s element is Siblings. Flying and hidden lines: see the next answer.',
+  faqQ3: 'How do I read the flying and hidden lines?',
+  faqA3: 'The flying line is the line of the hexagram itself; the hidden line is the corresponding line hidden beneath it. The hidden hexagram: for generations 1–5 it is the palace-head hexagram; for the home, wandering-soul and returning-soul hexagrams it is the Flying-Void paired trigram (Qian-Kun, Zhen-Xun, Kan-Li, Gen-Dui). Once the hidden hexagram is fixed, every line’s hidden line takes the stem-branch and relative of the same position in it. This page checked the Self line’s flying/hidden stems against the Jingfang Yizhuan text for all 64 hexagrams: 60 match the text directly, and the other four carry the edition’s own Húyì note marking a scribal error — Dun’s hidden stem Bing-Yin should be Jia-Yin, Meng’s hidden stem Yi-You should be Ji-You, Jin’s Flying-Void pair should be Gen not Li, and Yi’s should be Li not Zhen. This page follows the notes; Meng’s Yi-You does not occur in the Najia table at all, which confirms the error.',
+  faqQ4: 'Why does this page’s Other line differ from the number in the data file?',
+  faqA4: 'The data file jingfang.json has a ying_yao field counted as Self-plus-four (for Qian: Self line 6, Other line 4), which disagrees with the standard rule of Self-plus-three (for Qian: Self line 6, Other line 3) and with the same entry’s own text, “the ninth line in the third place, the Three Dukes, is the Other.” So this page does not use that field; the Other line always follows the standard rule (three lines from the Self line). The data file’s palace and Self line agree with the standard table for all 64 hexagrams, and this page uses them as given.',
+  faqQ5: 'Is the Jingfang Yi chart free? Where does the data come from?',
+  faqA5: 'Yes, free. The chart is computed locally in your browser — no internet, no charge, and your question is never saved. Najia, the Self/Other lines, palaces and the six relatives follow the standard Jingfang rules and are built in; the Flying-Void pairs and reading principles come from the same source and are built in; each hexagram’s Jingfang Yizhuan text is loaded on demand from this site’s data file jingfang.json (comprehensive-shushu-engine, GPL-3.0).',
+  disclaimer: 'Jingfang Yi is a traditional divination art, for reference only; it is not a basis for decisions.',
+  attrLine: 'Data: Jingfang Yizhuan (Jingfang Yi), comprehensive-shushu-engine (GPL-3.0); Najia, Self/Other lines and relatives follow the standard Jingfang rules.',
+  offlineNote: 'Charting runs fully offline. Lunar conversion uses the local lunar.js and no data is sent to any server; the hexagram texts are loaded on demand from this site’s data files.',
+  langLabel: 'Language'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '京房易 · ローカル排盤',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '一生之図 · 京房八宮',
+  slogan: '八宮分定まれば、<br>世応自ずと分つ。',
+  subtitle: '京房易 無料オンライン排盤',
+  labelQuestion: '質問（任意）',
+  phQuestion: '例：このチャンスを受けるべき？',
+  labelMethod: '起卦方法',
+  optPick: '卦を選ぶ',
+  optCoin: '銅銭起卦',
+  optTime: '時間起卦',
+  labelHex: '卦象（八宮別）',
+  labelTime: '時間',
+  btnNow: '現在時刻を使う',
+  btnAuto: '六回振る',
+  btnTimeCast: '時間で起卦',
+  btnPickCast: 'この卦で占う',
+  coinHint: '質問を心に念じ、初爻から上爻まで六回振ります。銅銭一枚：字面が三、花面が二。三字は老陽（動）、三花は老陰（動）。',
+  coinWord: '字',
+  coinTail: '花',
+  oldYang: '老陽',
+  youngYang: '少陽',
+  youngYin: '少陰',
+  oldYin: '老陰',
+  errNoTime: 'まず時間を選択してください。',
+  errBadTime: '時間の形式が正しくありません。',
+  errNoLunar: '旧暦換算が読み込まれていないため、時間起卦は使えません。',
+  resultTitle: '排盤結果',
+  ai_interpret: 'AI 解釈',
+  secChart: '納甲装卦',
+  secFeifu: '飛伏',
+  secYuanwen: '京氏易伝原文',
+  secDuanfa: '京房断法綱要',
+  colLine: '爻位',
+  colYao: '爻象',
+  colGanzhi: '干支',
+  colWx: '五行',
+  colQin: '六親',
+  colFushi: '伏神',
+  colMark: '標記',
+  markShi: '世',
+  markYing: '応',
+  markMoving: '動',
+  cardOrig: '本卦',
+  moving: '● 動',
+  guaciLabel: '卦辞：',
+  guaciNote: '卦辞は中国語原文のまま表示しています。',
+  asked: '質問',
+  lunar: '旧暦',
+  castMethod: '起卦方法',
+  methodPick: '卦を選択',
+  methodCoin: '銅銭起卦',
+  methodTime: '時間起卦',
+  year: '年', month: '月', day: '日', hour: '時',
+  upperTri: '上卦', lowerTri: '下卦',
+  gongLabel: '宮',
+  posLabel: '位次',
+  shiLabel: '世在',
+  yingLabel: '応',
+  flyingPair: '飛伏配卦',
+  fuGua: '伏卦',
+  shiFei: '世爻飛神',
+  shiFu: '世爻伏神',
+  feifuNote: '伏卦の取り方：一世から五世は本宮首卦、本卦・遊魂・帰魂は飛伏配卦（乾坤・震巽・坎離・艮兌）。伏卦が決まれば、六爻の伏神はすべて伏卦の同位爻から取る。世爻の飛伏は『京氏易伝』原文と六十四卦すべて照合済み。詳しくはよくある質問の三番目へ。',
+  yuanwenBtn: '『京氏易伝』原文を表示',
+  duanfaBtn: '京房断法綱要を表示',
+  yuanwenNote: '原文は言語設定に応じて簡体字または繁体字で表示します。虎易注は通行本の校注で、原文とともに収録しています。',
+  dataLoading: '原文データを読み込み中……',
+  dataFail: '原文データを読み込めませんでした。排盤のみ表示します。更新して再試行してください。',
+  dataReady: '原文データを読み込みました。',
+  duanfaWangfei: '旺廃沖刑',
+  duanfaJinghui: '静悔発貞',
+  duanfaDefs: '名義',
+  duanfaLunfa: '論法',
+  duanfaLunfaTail: '結語',
+  faqTitle: '京房易：無料排盤とよくある質問',
+  faqQ1: '京房易と六爻占いの違いは？',
+  faqA1: '六爻は銅銭を振って起卦し、納甲装卦して動変・用神・日月の旺衰を重んじます。京房易は八宮で六十四卦を統べ、世応・納甲・飛伏・積算建候を重んじ、卦が動く前に世応と宮位を見ます。このページの京房排盤は本卦の納甲が中心で、動爻は標記のみです。',
+  faqQ2: '納甲・世応・六親・飛伏はどう決まりますか？',
+  faqA2: '納甲は京房納甲歌によります：乾金甲子外壬午、坤土乙未外癸丑、震木庚子外庚午、巽木辛丑外辛未、坎水戊寅外戊申、離火己卯外己酉、艮土丙辰外丙戌、兌金丁巳外丁亥。世は八宮の位次によります：本卦は上爻、一世は初爻、二世は二爻、三世は三爻、四世は四爻、五世は五爻、遊魂は四爻、帰魂は三爻。応は世から三爻隔てた位置です。六親は本宮五行を我として、生我者父母、我生者子孫、剋我者官鬼、我剋者妻財、同我者兄弟です。飛伏は次の問をご覧ください。',
+  faqQ3: '飛伏神はどう見ますか？',
+  faqA3: '飛神は本卦の爻、伏神はその下に隠れた対応爻です。伏卦の取り方：一世から五世は本宮首卦、本卦・遊魂・帰魂は飛伏配卦（乾坤・震巽・坎離・艮兌の相配）です。伏卦が決まれば、六爻の伏神はすべて伏卦同位爻の干支と六親を取ります。このページでは世爻の飛伏を『京氏易伝』原文と六十四卦すべて照合しました。六十卦は原文と直接一致し、残る四卦は原文中の虎易注が誤字と指摘しています——遁卦の伏神丙寅は甲寅、蒙卦の伏神乙酉は己酉、晋卦の飛伏配卦は離ではなく艮、頤卦は震ではなく離が正しく、このページは注に従って改正しています。蒙卦原文の乙酉は納甲表に存在しない干支で、誤りであることが裏付けられます。',
+  faqQ4: 'なぜこのページの応爻はデータファイルの数字と違うのですか？',
+  faqA4: 'データファイル jingfang.json の ying_yao 欄は世に四爻を加えて数えています（乾卦は世六爻・応四爻）。これは通行規則の世から三爻隔てる取り方（乾卦は世六爻・応三爻）と合わず、同ファイルの当該条目原文「九三、三公為應」とも合いません。そのためこのページでは当該欄を使わず、応爻はすべて通行規則（世から三爻隔てる）で排布しています。データファイルの宮と世爻は通行表と六十四卦すべて一致しており、そのまま用いています。',
+  faqQ5: '京房易の排盤は無料ですか？データはどこから来ますか？',
+  faqA5: '無料です。このページの排盤はローカルで計算され、ネット接続も料金も不要で、入力した質問は保存されません。納甲・世応・宮位・六親は通行する京房規則で内蔵し、飛伏配卦と断法綱要も同源で内蔵しています。各卦の『京氏易伝』原文は本站のデータファイル jingfang.json から必要に応じて読み込みます（comprehensive-shushu-engine、GPL-3.0）。',
+  disclaimer: '京房易は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  attrLine: 'データ：『京氏易伝』（京房易）、comprehensive-shushu-engine（GPL-3.0）。納甲・世応・六親は通行する京房規則で排布。',
+  offlineNote: 'このページの排盤は完全オフラインで動作します。旧暦換算はローカルの lunar.js を使い、データは外部サーバーに送信されません。卦爻原文は本站のデータファイルから必要に応じて読み込みます。',
+  langLabel: '言語'
+}
+};
+
+// 六十四卦英文名（Wilhelm 式），按序号 1-64；zh-TW / ja 仍用中文卦名
+var HEX_EN = [null,
+'The Creative','The Receptive','Difficulty at the Beginning','Youthful Folly','Waiting','Conflict','The Army','Holding Together','The Taming Power of the Small','Treading',
+'Peace','Standstill','Fellowship','Possession in Great Measure','Modesty','Enthusiasm','Following','Work on What Has Been Spoiled','Approach','Contemplation',
+'Biting Through','Grace','Splitting Apart','Return','Innocence','The Taming Power of the Great','The Corners of the Mouth','Preponderance of the Great','The Abysmal','The Clinging',
+'Influence','Duration','Retreat','The Power of the Great','Progress','Darkening of the Light','The Family','Opposition','Obstruction','Deliverance',
+'Decrease','Increase','Breakthrough','Coming to Meet','Gathering Together','Pushing Upward','Oppression','The Well','Revolution','The Cauldron',
+'The Arousing','Keeping Still','Development','The Marrying Maiden','Abundance','The Wanderer','The Gentle','The Joyous','Dissolution','Limitation',
+'Inner Truth','Preponderance of the Small','After Completion','Before Completion'];
+var TRIGRAM_EN = {'乾':'Heaven','兑':'Lake','离':'Fire','震':'Thunder','巽':'Wind','坎':'Water','艮':'Mountain','坤':'Earth'};
+var ELEMENT_EN = {'金':'Metal','木':'Wood','水':'Water','火':'Fire','土':'Earth'};
+var BRANCH_EN = {'子':'Zi','丑':'Chou','寅':'Yin','卯':'Mao','辰':'Chen','巳':'Si','午':'Wu','未':'Wei','申':'Shen','酉':'You','戌':'Xu','亥':'Hai'};
+var STEM_EN = {'甲':'Jia','乙':'Yi','丙':'Bing','丁':'Ding','戊':'Wu','己':'Ji','庚':'Geng','辛':'Xin','壬':'Ren','癸':'Gui'};
+var LINE_EN = ['','1st line','2nd line','3rd line','4th line','5th line','Top line'];
+var QIN_EN = {'父母':'Parents','子孙':'Children','官鬼':'Officer','妻财':'Wealth','兄弟':'Siblings'};
+var QIN_TW = {'父母':'父母','子孙':'子孫','官鬼':'官鬼','妻财':'妻財','兄弟':'兄弟'};
+var QIN_JA = {'父母':'父母','子孙':'子孫','官鬼':'官鬼','妻财':'妻財','兄弟':'兄弟'};
+var GONG_EN = {'乾':'Qian','坤':'Kun','震':'Zhen','巽':'Xun','坎':'Kan','离':'Li','艮':'Gen','兑':'Dui'};
+var POS_EN = {'本卦':'Home Hexagram','一世':'1st Generation','二世':'2nd Generation','三世':'3rd Generation','四世':'4th Generation','五世':'5th Generation','游魂':'Wandering Soul','归魂':'Returning Soul'};
+var POS_TW = {'本卦':'本卦','一世':'一世','二世':'二世','三世':'三世','四世':'四世','五世':'五世','游魂':'遊魂','归魂':'歸魂'};
+var POS_JA = {'本卦':'本卦','一世':'一世','二世':'二世','三世':'三世','四世':'四世','五世':'五世','游魂':'遊魂','归魂':'帰魂'};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function hexName(hex) { return LANG === 'en' ? HEX_EN[hex.n] : hex.name; }
+function trigramName(n) { var nm = TRIGRAMS[n].name; return LANG === 'en' ? TRIGRAM_EN[nm] : nm; }
+function elementName(el) { return LANG === 'en' ? ELEMENT_EN[el] : el; }
+function branchName(b) { return LANG === 'en' ? BRANCH_EN[b] : b; }
+function lineName(i) { return LANG === 'en' ? LINE_EN[i] : LINE_NAMES[i]; }
+function qinName(q) {
+  if (LANG === 'en') return QIN_EN[q] || q;
+  if (LANG === 'zh-TW') return QIN_TW[q] || q;
+  if (LANG === 'ja') return QIN_JA[q] || q;
+  return q;
+}
+function gongName(g) {
+  if (LANG === 'en') return (GONG_EN[g] || g) + ' Palace';
+  if (LANG === 'zh-TW' || LANG === 'ja') return g + '宮';
+  return g + '宫';
+}
+function posName(p) {
+  if (LANG === 'en') return POS_EN[p] || p;
+  if (LANG === 'zh-TW') return POS_TW[p] || p;
+  if (LANG === 'ja') return POS_JA[p] || p;
+  return p;
+}
+function ganzhiName(g, z) {
+  if (LANG === 'en') return g + z + ' (' + (STEM_EN[g] || g) + '-' + (BRANCH_EN[z] || z) + ')';
+  return g + z;
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var te = document.getElementById('time-error'); if (te) te.textContent = '';
+  buildHexSelect();
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// 八卦：编号、名称、五行、爻（下→上，0 阴断、1 阳实）
+var TRIGRAMS = {
+  1: { name: '乾', element: '金', lines: [1,1,1] },
+  2: { name: '兑', element: '金', lines: [1,1,0] },
+  3: { name: '离', element: '火', lines: [1,0,1] },
+  4: { name: '震', element: '木', lines: [1,0,0] },
+  5: { name: '巽', element: '木', lines: [0,1,1] },
+  6: { name: '坎', element: '水', lines: [0,1,0] },
+  7: { name: '艮', element: '土', lines: [0,0,1] },
+  8: { name: '坤', element: '土', lines: [0,0,0] }
+};
+var TRIGRAM_NUM_BY_NAME = { '乾':1, '兑':2, '离':3, '震':4, '巽':5, '坎':6, '艮':7, '坤':8 };
+var BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var LINE_NAMES = ['', '初爻', '二爻', '三爻', '四爻', '五爻', '上爻'];
+var SHENG = { '木':'火', '火':'土', '土':'金', '金':'水', '水':'木' };
+var KE = { '木':'土', '土':'水', '水':'火', '火':'金', '金':'木' };
+var ZHI_WX = { '子':'水', '丑':'土', '寅':'木', '卯':'木', '辰':'土', '巳':'火', '午':'火', '未':'土', '申':'金', '酉':'金', '戌':'土', '亥':'水' };
+var QINS = ['父母','子孙','官鬼','妻财','兄弟'];
+
+// 六十四卦（文王序）：[上卦名，下卦名，序号，卦名，卦辞]
+var HEXAGRAM_LIST = [
+  ['乾','乾',1,'乾为天','元亨利贞，自强不息，刚健中正。'],
+  ['坤','坤',2,'坤为地','厚德载物，柔顺贞吉，利于安守。'],
+  ['坎','震',3,'水雷屯','万物始生，艰难初创，宜守不宜进。'],
+  ['艮','坎',4,'山水蒙','启蒙求教，诚心向学，宜拜师问路。'],
+  ['坎','乾',5,'水天需','等待时机，饮食宴乐，耐心守候。'],
+  ['乾','坎',6,'天水讼','争讼不利，宜退让和解，慎言。'],
+  ['坤','坎',7,'地水师','兴师动众，须得人心，宜有长者领。'],
+  ['坎','坤',8,'水地比','亲附相助，得贵人扶，宜团结。'],
+  ['巽','乾',9,'风天小畜','小有积蓄，密云不雨，宜蓄势待发。'],
+  ['乾','兑',10,'天泽履','如履虎尾，谨慎守礼，可行。'],
+  ['坤','乾',11,'地天泰','天地交泰，小往大来，通达顺遂。'],
+  ['乾','坤',12,'天地否','否塞不通，君子退守，宜静待转机。'],
+  ['乾','离',13,'天火同人','同心同德，利见大人，宜合作。'],
+  ['离','乾',14,'火天大有','大有收获，丰盛亨通，宜守谦。'],
+  ['坤','艮',15,'地山谦','谦逊受益，卑以自牧，吉。'],
+  ['震','坤',16,'雷地豫','安乐喜悦，宜顺势而为，防怠惰。'],
+  ['兑','震',17,'泽雷随','随从时势，择善而从，宜顺势。'],
+  ['艮','巽',18,'山风蛊','整饬积弊，革新除旧，宜果断。'],
+  ['坤','兑',19,'地泽临','君临天下，利见大人，宜亲近。'],
+  ['巽','坤',20,'风地观','观摩省察，展示德行，宜观望。'],
+  ['离','震',21,'火雷噬嗑','咬合决断，明罚敕法，宜果决。'],
+  ['艮','离',22,'山火贲','文饰光彩，柔来文刚，宜适度。'],
+  ['艮','坤',23,'山地剥','阴剥阳落，小人得势，宜守正。'],
+  ['坤','震',24,'地雷复','阳气复返，一阳来复，转机已至。'],
+  ['乾','震',25,'天雷无妄','诚实无妄，勿生妄念，宜守正。'],
+  ['艮','乾',26,'山天大畜','积蓄力量，止健养贤，宜厚积。'],
+  ['艮','震',27,'山雷颐','颐养之道，慎言节食，养身养德。'],
+  ['兑','巽',28,'泽风大过','大有过越，栋桡将倾，宜谨慎。'],
+  ['坎','坎',29,'坎为水','重险在前，诚信维心，可渡险。'],
+  ['离','离',30,'离为火','附丽光明，柔顺中正，宜守正。'],
+  ['兑','艮',31,'泽山咸','感应相通，心意相合，宜婚嫁。'],
+  ['震','巽',32,'雷风恒','恒久之道，守常不变，宜持久。'],
+  ['乾','艮',33,'天山遁','退避远遁，小利贞，宜退守。'],
+  ['震','乾',34,'雷天大壮','刚健壮盛，利贞，勿逞强。'],
+  ['离','坤',35,'火地晋','晋升光明，柔进上行，宜进取。'],
+  ['坤','离',36,'地火明夷','光明受损，晦藏其明，宜韬光。'],
+  ['巽','离',37,'风火家人','家道正和，言行有物，宜齐家。'],
+  ['离','兑',38,'火泽睽','乖违相异，小事吉，宜求同存异。'],
+  ['坎','艮',39,'水山蹇','行路艰难，利见大人，宜止。'],
+  ['震','坎',40,'雷水解','解除困厄，动而免乎险，转危为安。'],
+  ['艮','兑',41,'山泽损','损下益上，损益有度，宜节制。'],
+  ['巽','震',42,'风雷益','损上益下，利有攸往，大吉。'],
+  ['兑','乾',43,'泽天夬','决断果敢，扬于王庭，宜决去小人。'],
+  ['乾','巽',44,'天风姤','邂逅相遇，勿用取女，宜防微。'],
+  ['兑','坤',45,'泽地萃','荟萃聚集，利见大人，宜聚众。'],
+  ['坤','巽',46,'地风升','上升顺利，积小成大，宜进取。'],
+  ['兑','坎',47,'泽水困','困顿穷厄，致命遂志，宜守志。'],
+  ['坎','巽',48,'水风井','井养不穷，改邑不改井，宜守成。'],
+  ['兑','离',49,'泽火革','变革鼎新，顺天应人，宜革新。'],
+  ['离','巽',50,'火风鼎','鼎新固位，正位凝命，宜稳重。'],
+  ['震','震',51,'震为雷','震动惊惧，恐致福，宜戒惧。'],
+  ['艮','艮',52,'艮为山','止于其所，动静不失其时。'],
+  ['巽','艮',53,'风山渐','循序渐进，女归吉，宜渐进。'],
+  ['震','兑',54,'雷泽归妹','归妹之象，征凶无攸利，宜慎。'],
+  ['震','离',55,'雷火丰','丰盛之时，宜日中，防盈满。'],
+  ['离','艮',56,'火山旅','旅途漂泊，小亨，宜守正。'],
+  ['巽','巽',57,'巽为风','顺从入微，小亨，宜谦逊。'],
+  ['兑','兑',58,'兑为泽','喜悦和合，亨利贞，宜和悦。'],
+  ['巽','坎',59,'风水涣','涣散离散，利涉大川，宜聚。'],
+  ['坎','兑',60,'水泽节','节制有度，苦节不可贞，宜适度。'],
+  ['巽','兑',61,'风泽中孚','诚信在中，豚鱼吉，宜守信。'],
+  ['震','艮',62,'雷山小过','小有过越，可小事，不可大事。'],
+  ['坎','离',63,'水火既济','既济已成，初吉终乱，宜防患。'],
+  ['离','坎',64,'火水未济','未济将成，小狐汔济，宜谨慎。'],
+];
+var HEXAGRAMS = {};
+HEXAGRAM_LIST.forEach(function(h) {
+  HEXAGRAMS[TRIGRAM_NUM_BY_NAME[h[0]] + ',' + TRIGRAM_NUM_BY_NAME[h[1]]] = { upper: TRIGRAM_NUM_BY_NAME[h[0]], lower: TRIGRAM_NUM_BY_NAME[h[1]], n: h[2], name: h[3], gua: h[4] };
+});
+
+// 世应与宫：通行京房八宫表，[宫，宫五行，世爻，应爻]；应与世隔三爻。
+// 注意：jingfang.json 的 ying_yao 字段按世加四爻计，与通行规则及该文件原文「九三，三公为应」均不合，故不用（见 FAQ 第四条）。
+var SHI_YING = {"乾为天": ["乾", "金", 6, 3], "天风姤": ["乾", "金", 1, 4], "天山遁": ["乾", "金", 2, 5], "天地否": ["乾", "金", 3, 6], "风地观": ["乾", "金", 4, 1], "山地剥": ["乾", "金", 5, 2], "火地晋": ["乾", "金", 4, 1], "火天大有": ["乾", "金", 3, 6], "坎为水": ["坎", "水", 6, 3], "水泽节": ["坎", "水", 1, 4], "水雷屯": ["坎", "水", 2, 5], "水火既济": ["坎", "水", 3, 6], "泽火革": ["坎", "水", 4, 1], "雷火丰": ["坎", "水", 5, 2], "地火明夷": ["坎", "水", 4, 1], "地水师": ["坎", "水", 3, 6], "艮为山": ["艮", "土", 6, 3], "山火贲": ["艮", "土", 1, 4], "山天大畜": ["艮", "土", 2, 5], "山泽损": ["艮", "土", 3, 6], "火泽睽": ["艮", "土", 4, 1], "天泽履": ["艮", "土", 5, 2], "风泽中孚": ["艮", "土", 4, 1], "风山渐": ["艮", "土", 3, 6], "震为雷": ["震", "木", 6, 3], "雷地豫": ["震", "木", 1, 4], "雷水解": ["震", "木", 2, 5], "雷风恒": ["震", "木", 3, 6], "地风升": ["震", "木", 4, 1], "水风井": ["震", "木", 5, 2], "泽风大过": ["震", "木", 4, 1], "泽雷随": ["震", "木", 3, 6], "巽为风": ["巽", "木", 6, 3], "风天小畜": ["巽", "木", 1, 4], "风火家人": ["巽", "木", 2, 5], "风雷益": ["巽", "木", 3, 6], "天雷无妄": ["巽", "木", 4, 1], "火雷噬嗑": ["巽", "木", 5, 2], "山雷颐": ["巽", "木", 4, 1], "山风蛊": ["巽", "木", 3, 6], "离为火": ["离", "火", 6, 3], "火山旅": ["离", "火", 1, 4], "火风鼎": ["离", "火", 2, 5], "火水未济": ["离", "火", 3, 6], "山水蒙": ["离", "火", 4, 1], "风水涣": ["离", "火", 5, 2], "天水讼": ["离", "火", 4, 1], "天火同人": ["离", "火", 3, 6], "坤为地": ["坤", "土", 6, 3], "地雷复": ["坤", "土", 1, 4], "地泽临": ["坤", "土", 2, 5], "地天泰": ["坤", "土", 3, 6], "雷天大壮": ["坤", "土", 4, 1], "泽天夬": ["坤", "土", 5, 2], "水天需": ["坤", "土", 4, 1], "水地比": ["坤", "土", 3, 6], "兑为泽": ["兑", "金", 6, 3], "泽水困": ["兑", "金", 1, 4], "泽地萃": ["兑", "金", 2, 5], "泽山咸": ["兑", "金", 3, 6], "水山蹇": ["兑", "金", 4, 1], "地山谦": ["兑", "金", 5, 2], "雷山小过": ["兑", "金", 4, 1], "雷泽归妹": ["兑", "金", 3, 6]};
+
+// 八宫位次：卦名 -> 本卦 / 一世 / 二世 / 三世 / 四世 / 五世 / 游魂 / 归魂（据 jingfang.json entries.pos）
+// POS_MAP: 卦名 -> 京房八宫位次（据 jingfang.json entries.pos）
+var POS_MAP = {"乾为天": "本卦", "天风姤": "一世", "天山遁": "二世", "天地否": "三世", "风地观": "四世", "山地剥": "五世", "火地晋": "游魂", "火天大有": "归魂", "震为雷": "本卦", "雷地豫": "一世", "雷水解": "二世", "雷风恒": "三世", "地风升": "四世", "水风井": "五世", "泽风大过": "游魂", "泽雷随": "归魂", "坎为水": "本卦", "水泽节": "一世", "水雷屯": "二世", "水火既济": "三世", "泽火革": "四世", "雷火丰": "五世", "地火明夷": "游魂", "地水师": "归魂", "艮为山": "本卦", "山火贲": "一世", "山天大畜": "二世", "山泽损": "三世", "火泽睽": "四世", "天泽履": "五世", "风泽中孚": "游魂", "风山渐": "归魂", "坤为地": "本卦", "地雷复": "一世", "地泽临": "二世", "地天泰": "三世", "雷天大壮": "四世", "泽天夬": "五世", "水天需": "游魂", "水地比": "归魂", "巽为风": "本卦", "风天小畜": "一世", "风火家人": "二世", "风雷益": "三世", "天雷无妄": "四世", "火雷噬嗑": "五世", "山雷颐": "游魂", "山风蛊": "归魂", "离为火": "本卦", "火山旅": "一世", "火风鼎": "二世", "火水未济": "三世", "山水蒙": "四世", "风水涣": "五世", "天水讼": "游魂", "天火同人": "归魂", "兑为泽": "本卦", "泽水困": "一世", "泽地萃": "二世", "泽山咸": "三世", "水山蹇": "四世", "地山谦": "五世", "雷山小过": "游魂", "雷泽归妹": "归魂"};
+// FLYING_MAP: 卦名 -> 飞伏配卦（据 jingfang.json f.flying；数据原文作“干”者统一为“乾”；火地晋、山雷颐二卦从原文虎易注改正：晋与艮、颐与离为飞伏）
+var FLYING_MAP = {"乾为天": "坤", "天风姤": "巽", "天山遁": "艮", "天地否": "坤", "风地观": "巽", "山地剥": "艮", "火地晋": "艮", "火天大有": "坤", "震为雷": "巽", "雷地豫": "坤", "雷水解": "坎", "雷风恒": "巽", "地风升": "坤", "水风井": "坎", "泽风大过": "坎", "泽雷随": "巽", "坎为水": "离", "水泽节": "兑", "水雷屯": "震", "水火既济": "离", "泽火革": "兑", "雷火丰": "震", "地火明夷": "震", "地水师": "离", "艮为山": "兑", "山火贲": "离", "山天大畜": "乾", "山泽损": "兑", "火泽睽": "离", "天泽履": "乾", "风泽中孚": "乾", "风山渐": "兑", "坤为地": "乾", "地雷复": "震", "地泽临": "兑", "地天泰": "乾", "雷天大壮": "震", "泽天夬": "兑", "水天需": "兑", "水地比": "乾", "巽为风": "震", "风天小畜": "乾", "风火家人": "离", "风雷益": "震", "天雷无妄": "乾", "火雷噬嗑": "离", "山雷颐": "离", "山风蛊": "震", "离为火": "坎", "火山旅": "艮", "火风鼎": "巽", "火水未济": "坎", "山水蒙": "艮", "风水涣": "巽", "天水讼": "巽", "天火同人": "坎", "兑为泽": "艮", "泽水困": "坎", "泽地萃": "坤", "泽山咸": "艮", "水山蹇": "坎", "地山谦": "坤", "雷山小过": "坤", "雷泽归妹": "艮"};
+
+// 飞伏配卦：乾坤、震巽、坎离、艮兑相配（据 jingfang.json f.flying）
+var FLYING_PAIR = { '乾':'坤', '坤':'乾', '震':'巽', '巽':'震', '坎':'离', '离':'坎', '艮':'兑', '兑':'艮' };
+
+// 纳甲歌：乾金甲子外壬午，坤土乙未外癸丑，震木庚子外庚午，巽木辛丑外辛未，
+// 坎水戊寅外戊申，离火己卯外己酉，艮土丙辰外丙戌，兑金丁巳外丁亥。
+// 每卦三爻一组：内卦（初二三爻）+ 外卦（四五上爻），自下而上。
+var NAJIA = {
+  '乾': { inner: [['甲','子'],['甲','寅'],['甲','辰']], outer: [['壬','午'],['壬','申'],['壬','戌']] },
+  '坤': { inner: [['乙','未'],['乙','巳'],['乙','卯']], outer: [['癸','丑'],['癸','亥'],['癸','酉']] },
+  '震': { inner: [['庚','子'],['庚','寅'],['庚','辰']], outer: [['庚','午'],['庚','申'],['庚','戌']] },
+  '巽': { inner: [['辛','丑'],['辛','亥'],['辛','酉']], outer: [['辛','未'],['辛','巳'],['辛','卯']] },
+  '坎': { inner: [['戊','寅'],['戊','辰'],['戊','午']], outer: [['戊','申'],['戊','戌'],['戊','子']] },
+  '离': { inner: [['己','卯'],['己','丑'],['己','亥']], outer: [['己','酉'],['己','未'],['己','巳']] },
+  '艮': { inner: [['丙','辰'],['丙','午'],['丙','申']], outer: [['丙','戌'],['丙','子'],['丙','寅']] },
+  '兑': { inner: [['丁','巳'],['丁','卯'],['丁','丑']], outer: [['丁','亥'],['丁','酉'],['丁','未']] }
+};
+
+// 京房断法纲要（据 jingfang.json duanfa；内置，原文照录）
+var DUANFA = {
+  wangfei: '于六十四卦，遇王则吉，废则凶，冲则破，刑则败，死则危，生则荣。',
+  jinghui: '静为悔，发为贞，贞为本，悔为末。',
+  defs: '而为一卦之主者，谓之世。奇偶相与，据一以起二，而为主之相者，谓之应。世之所位，而阴阳之肆者，谓之飞。阴阳肇乎所配，〈乾与坤，震与坎，巽与离，艮与兑。〉以隐显佐神明者，谓之伏。起乎世而周乎内外，参乎本数以纪月者，谓之建。终之始之，极乎数而不可穷以纪日者，谓之积。会于中，而以四为用，一卦备四卦者，谓之互。',
+  lunfa: '若夫象遗乎意，意遗乎言，则错综其用，唯变所适。',
+  lunfaTail: '故曰：死于位，生于时；死于时，生于位。'
+};
+
+function mod8(n) { var r = n % 8; return r === 0 ? 8 : r; }
+function generates(a, b) { return SHENG[a] === b; }
+function controls(a, b) { return KE[a] === b; }
+function qinFrom(wx, gongWx) {
+  if (wx === gongWx) return '兄弟';
+  if (generates(gongWx, wx)) return '子孙';
+  if (generates(wx, gongWx)) return '父母';
+  if (controls(gongWx, wx)) return '妻财';
+  return '官鬼';
+}
+function hexagramOf(upperNum, lowerNum) { return HEXAGRAMS[upperNum + ',' + lowerNum]; }
+function trigramNumFromLines(lines3) {
+  for (var num in TRIGRAMS) {
+    var l = TRIGRAMS[num].lines;
+    if (l[0] === lines3[0] && l[1] === lines3[1] && l[2] === lines3[2]) return parseInt(num, 10);
+  }
+  return null;
+}
+function hourBranchNum(hour) {
+  if (hour >= 23 || hour < 1) return 1;
+  return Math.floor((hour + 1) / 2) + 1;
+}
+function dateInfo(date) {
+  var solar = Solar.fromYmdHms(date.getFullYear(), date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), 0);
+  var lunar = solar.getLunar();
+  var yearGZ = lunar.getYearInGanZhi();
+  var monthGZ = lunar.getMonthInGanZhi();
+  var dayGZ = lunar.getDayInGanZhi();
+  var timeGZ = lunar.getTimeInGanZhi();
+  var yearNum = BRANCHES.indexOf(yearGZ.charAt(1)) + 1;
+  return {
+    date: date,
+    lunarYear: lunar.getYear(), lunarMonth: lunar.getMonth(), lunarDay: lunar.getDay(),
+    monthCN: lunar.getMonthInChinese(), dayCN: lunar.getDayInChinese(),
+    yearGZ: yearGZ, monthGZ: monthGZ, dayGZ: dayGZ, timeGZ: timeGZ,
+    yearNum: yearNum, monthNum: lunar.getMonth(), dayNum: lunar.getDay(), hourNum: hourBranchNum(date.getHours())
+  };
+}
+
+// 纳甲装卦：自下而上六爻，每爻 {gan, zhi, wx, qin}
+function najiaLines(hex, gongWx) {
+  var out = [];
+  for (var i = 0; i < 6; i++) {
+    var triName = i < 3 ? TRIGRAMS[hex.lower].name : TRIGRAMS[hex.upper].name;
+    var pair = NAJIA[triName][i < 3 ? 'inner' : 'outer'][i % 3];
+    var wx = ZHI_WX[pair[1]];
+    out.push({ gan: pair[0], zhi: pair[1], wx: wx, qin: qinFrom(wx, gongWx) });
+  }
+  return out;
+}
+
+// 伏卦：本卦、游魂、归魂取飞伏配卦（纯卦）；一世至五世取本宫首卦（纯卦）。
+// 伏神皆取伏卦同位爻。世爻飞伏与《京氏易传》原文逐卦核对，六十卦直接相合，
+// 另四卦从原文虎易注改正（见 FAQ 第三条）。
+function fuGuaOf(hex) {
+  var pos = POS_MAP[hex.name];
+  var sy = SHI_YING[hex.name];
+  var tri = (pos === '本卦' || pos === '游魂' || pos === '归魂') ? FLYING_MAP[hex.name] : sy[0];
+  return { upper: TRIGRAM_NUM_BY_NAME[tri], lower: TRIGRAM_NUM_BY_NAME[tri], tri: tri };
+}
+function fuGuaName(hex) {
+  var fg = fuGuaOf(hex);
+  var h = hexagramOf(fg.upper, fg.lower);
+  return h ? h.name : fg.tri;
+}
+
+function buildChart(upper, lower, movingIdxs, method, di, tosses) {
+  var linesYang = TRIGRAMS[lower].lines.concat(TRIGRAMS[upper].lines);
+  var hex = hexagramOf(upper, lower);
+  var sy = SHI_YING[hex.name];
+  var gong = sy[0], gongWx = sy[1], shi = sy[2], ying = sy[3];
+  var pos = POS_MAP[hex.name] || '';
+  var base = najiaLines(hex, gongWx);
+  var fg = fuGuaOf(hex);
+  var fuHex = hexagramOf(fg.upper, fg.lower);
+  var fuBase = najiaLines(fuHex, gongWx);
+  var lines = [];
+  for (var i = 0; i < 6; i++) {
+    lines.push({
+      idx: i, yang: linesYang[i], moving: movingIdxs.indexOf(i) >= 0,
+      gan: base[i].gan, zhi: base[i].zhi, wx: base[i].wx, qin: base[i].qin,
+      fuGan: fuBase[i].gan, fuZhi: fuBase[i].zhi, fuWx: fuBase[i].wx, fuQin: fuBase[i].qin
+    });
+  }
+  return {
+    hex: hex, linesYang: linesYang, movingIdxs: movingIdxs,
+    gong: gong, gongWx: gongWx, shi: shi, ying: ying, pos: pos,
+    lines: lines, fuGua: fuHex, flying: FLYING_MAP[hex.name],
+    method: method, di: di || null, tosses: tosses || null
+  };
+}
+
+// ---- 卦象下拉（按八宫分，宫内按位次排） ----
+var PALACE_ORDER = ['乾','震','坎','艮','坤','巽','离','兑'];
+var POS_ORDER = ['本卦','一世','二世','三世','四世','五世','游魂','归魂'];
+function buildHexSelect() {
+  var sel = document.getElementById('hex-select');
+  if (!sel) return;
+  var keep = sel.value;
+  var html = '';
+  PALACE_ORDER.forEach(function(p) {
+    var members = HEXAGRAM_LIST.filter(function(h) { return SHI_YING[h[3]][0] === p; });
+    members.sort(function(a, b) { return POS_ORDER.indexOf(POS_MAP[a[3]]) - POS_ORDER.indexOf(POS_MAP[b[3]]); });
+    html += '<optgroup label="' + esc(gongName(p)) + '">';
+    members.forEach(function(h) {
+      var hex = HEXAGRAMS[TRIGRAM_NUM_BY_NAME[h[0]] + ',' + TRIGRAM_NUM_BY_NAME[h[1]]];
+      var label = hexName(hex) + ' · ' + posName(POS_MAP[hex.name]);
+      if (LANG === 'en') label += ' (' + hex.name + ')';
+      html += '<option value="' + h[0] + ',' + h[1] + '"' + (hex.name === '乾为天' ? ' selected' : '') + '>' + esc(label) + '</option>';
+    });
+    html += '</optgroup>';
+  });
+  sel.innerHTML = html;
+  if (keep) sel.value = keep;
+}
+
+// ---- 起卦方式切换 ----
+function switchMethod(v) {
+  var pick = document.getElementById('panel-pick');
+  var pickBtn = document.getElementById('panel-pick-btn');
+  var coin = document.getElementById('panel-coin');
+  var time = document.getElementById('panel-time');
+  if (pick) pick.classList.toggle('hidden', v !== 'pick');
+  if (pickBtn) pickBtn.classList.toggle('hidden', v !== 'pick');
+  if (coin) coin.classList.toggle('hidden', v !== 'coin');
+  if (time) time.classList.toggle('hidden', v !== 'time');
+}
+function useNow() {
+  var el = document.getElementById('datetime');
+  if (!el) return;
+  var d = new Date();
+  function p(n) { return (n < 10 ? '0' : '') + n; }
+  el.value = d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + 'T' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+function questionValue() {
+  var q = document.getElementById('question');
+  return q ? q.value.trim() : '';
+}
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function doPickCast() {
+  var sel = document.getElementById('hex-select');
+  if (!sel || !sel.value) return;
+  var parts = sel.value.split(',');
+  var upper = TRIGRAM_NUM_BY_NAME[parts[0]], lower = TRIGRAM_NUM_BY_NAME[parts[1]];
+  showResult(buildChart(upper, lower, [], 'pick', null, null));
+}
+
+function tossCoins() {
+  var coins = [];
+  for (var c = 0; c < 3; c++) coins.push(Math.random() < 0.5 ? 3 : 2);
+  var sum = coins[0] + coins[1] + coins[2];
+  var kind = sum === 9 ? 'oldYang' : sum === 6 ? 'oldYin' : sum === 7 ? 'youngYang' : 'youngYin';
+  return { coins: coins, sum: sum, kind: kind, yang: (kind === 'oldYang' || kind === 'youngYang') ? 1 : 0, moving: (kind === 'oldYang' || kind === 'oldYin') };
+}
+function autoCast() {
+  var log = document.getElementById('toss-log');
+  if (log) log.innerHTML = '';
+  var linesYang = [], movingIdxs = [], tosses = [];
+  for (var i = 0; i < 6; i++) {
+    var r = tossCoins();
+    tosses.push(r);
+    linesYang.push(r.yang);
+    if (r.moving) movingIdxs.push(i);
+    if (log) {
+      var chips = r.coins.map(function(v) { return '<span class="coin-chip">' + (v === 3 ? t('coinWord') : t('coinTail')) + '</span>'; }).join('');
+      log.innerHTML += '<li><span class="toss-num">' + lineName(i + 1) + '</span>' + chips +
+        '<span class="toss-val' + (r.moving ? ' old' : '') + '">' + r.sum + ' · ' + t(r.kind) + (r.moving ? ' ' + t('markMoving') : '') + '</span></li>';
+    }
+  }
+  var lower = trigramNumFromLines(linesYang.slice(0, 3));
+  var upper = trigramNumFromLines(linesYang.slice(3, 6));
+  showResult(buildChart(upper, lower, movingIdxs, 'coin', null, tosses));
+}
+
+function doTimeCast() {
+  var el = document.getElementById('datetime');
+  var err = document.getElementById('time-error');
+  var v = el ? el.value : '';
+  if (!v) { if (err) err.textContent = t('errNoTime'); return; }
+  var d = new Date(v);
+  if (isNaN(d.getTime())) { if (err) err.textContent = t('errBadTime'); return; }
+  if (err) err.textContent = '';
+  if (typeof Solar === 'undefined') { if (err) err.textContent = t('errNoLunar'); return; }
+  var di = dateInfo(d);
+  var sum = di.yearNum + di.monthNum + di.dayNum;
+  var upper = mod8(sum), lower = mod8(sum + di.hourNum);
+  var moving = (sum + di.hourNum) % 6;
+  showResult(buildChart(upper, lower, [moving], 'time', di, null));
+}
+
+// ---- 数据（懒加载，首绘后才取；排盘本身不依赖数据） ----
+var dataPromise = null;
+var DATA = null;
+function fetchJson(path) {
+  return fetch(path).then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
+}
+function setStatus(kind) {
+  var el = document.getElementById('data-status');
+  if (!el) return;
+  el.classList.toggle('err', kind === 'fail');
+  el.textContent = kind === 'loading' ? t('dataLoading') : kind === 'fail' ? t('dataFail') : kind === 'ready' ? t('dataReady') : '';
+}
+function ensureData() {
+  if (dataPromise) return dataPromise;
+  setStatus('loading');
+  dataPromise = fetchJson('/data/jingfang.json').then(function(j) {
+    DATA = j;
+    if (!j || !j.entries) { setStatus('fail'); return null; }
+    setStatus('ready');
+    return j;
+  });
+  return dataPromise;
+}
+function entryOf(hex) {
+  if (!DATA || !DATA.entries) return null;
+  for (var i = 0; i < DATA.entries.length; i++) {
+    var e = DATA.entries[i];
+    if (e.upper === TRIGRAMS[hex.upper].name && e.lower === TRIGRAMS[hex.lower].name) return e;
+  }
+  return null;
+}
+
+// ---- 渲染 ----
+function hexDiagram(linesBottomUp, highlightIdxs) {
+  var html = '<div class="hex-diagram">';
+  for (var i = 5; i >= 0; i--) {
+    var v = linesBottomUp[i];
+    var isChanging = highlightIdxs && highlightIdxs.indexOf(i) >= 0;
+    var cls = 'hex-row ' + (v === 1 ? 'yang' : 'yin') + (isChanging ? ' changing' : '');
+    var segs = v === 1
+      ? '<div class="bar"><span class="seg"></span></div>'
+      : '<div class="bar"><span class="seg"></span><span class="seg"></span></div>';
+    html += '<div class="' + cls + '"><span class="lbl">' + (i + 1) + '</span>' + segs +
+      '<span class="mark">' + (isChanging ? '<span class="dot">' + t('moving') + '</span>' : '') + '</span></div>';
+  }
+  return html + '</div>';
+}
+function miniBar(yang, moving) {
+  if (yang === 1) return '<span class="mini-bar' + (moving ? ' moving' : '') + '"><span class="seg"></span></span>';
+  return '<span class="mini-bar yin' + (moving ? ' moving' : '') + '"><span class="seg"></span><span class="seg"></span></span>';
+}
+function hexCard(chart) {
+  var hex = chart.hex;
+  var up = TRIGRAMS[hex.upper], low = TRIGRAMS[hex.lower];
+  var numLabel = LANG === 'en' ? 'Hexagram ' + hex.n : '第 ' + hex.n + ' 卦';
+  var cnSub = (LANG === 'en') ? '<span class="gua-name-cn">' + esc(hex.name) + '</span>' : '';
+  var sym = '';
+  var e = entryOf(hex);
+  if (e && e.sym) sym = ' ' + e.sym;
+  return '<div class="hex-card"><h3>' + t('cardOrig') + '</h3>' +
+    '<div class="gua-name">' + numLabel + ' · ' + esc(hexName(hex)) + sym + '</div>' + cnSub +
+    '<div class="tri-info">' + t('upperTri') + ' <b>' + trigramName(hex.upper) + ' · ' + elementName(up.element) + '</b>　' + t('lowerTri') + ' <b>' + trigramName(hex.lower) + ' · ' + elementName(low.element) + '</b></div>' +
+    '<div class="tri-info">' + t('gongLabel') + ' <b>' + gongName(chart.gong) + ' · ' + elementName(chart.gongWx) + '</b> · ' + t('posLabel') + ' <b>' + posName(chart.pos) + '</b></div>' +
+    '<div class="tri-info">' + t('shiLabel') + ' <b>' + lineName(chart.shi) + '</b> · ' + t('yingLabel') + ' <b>' + lineName(chart.ying) + '</b></div>' +
+    hexDiagram(chart.linesYang, chart.movingIdxs) +
+    '<div class="guaci">' + t('guaciLabel') + esc(hex.gua) + (t('guaciNote') ? '<div class="guaci-note">' + t('guaciNote') + '</div>' : '') + '</div></div>';
+}
+function renderChartTable(chart) {
+  var th = '<tr><th>' + t('colLine') + '</th><th>' + t('colYao') + '</th><th>' + t('colGanzhi') + '</th><th>' + t('colWx') + '</th><th>' + t('colQin') + '</th><th>' + t('colFushi') + '</th><th>' + t('colMark') + '</th></tr>';
+  var rows = '';
+  for (var i = 5; i >= 0; i--) {
+    var ln = chart.lines[i];
+    var marks = [];
+    if (i + 1 === chart.shi) marks.push('<span class="flag">' + t('markShi') + '</span>');
+    if (i + 1 === chart.ying) marks.push('<span class="flag">' + t('markYing') + '</span>');
+    if (ln.moving) marks.push('<span class="flag">' + t('markMoving') + '</span>');
+    var cls = (i + 1 === chart.shi) ? ' class="shi"' : (ln.moving ? ' class="moving"' : '');
+    rows += '<tr' + cls + '><td>' + lineName(i + 1) + '</td><td>' + miniBar(ln.yang, ln.moving) + '</td>' +
+      '<td>' + ganzhiName(ln.gan, ln.zhi) + '</td><td>' + elementName(ln.wx) + '</td><td>' + qinName(ln.qin) + '</td>' +
+      '<td>' + ganzhiName(ln.fuGan, ln.fuZhi) + ' · ' + qinName(ln.fuQin) + '</td>' +
+      '<td>' + marks.join(' ') + '</td></tr>';
+  }
+  document.getElementById('chart-table').innerHTML = th + rows;
+}
+function renderFeifu(chart) {
+  var shiLine = chart.lines[chart.shi - 1];
+  var html = '<h3>' + t('secFeifu') + '</h3>' +
+    '<div class="feifu-item">' + t('flyingPair') + ' <b>' + (LANG === 'en' ? (GONG_EN[chart.flying] || chart.flying) : chart.flying) + '</b>　' +
+    t('fuGua') + ' <b>' + esc(hexName(chart.fuGua)) + '</b></div>' +
+    '<div class="feifu-item">' + t('shiFei') + ' <b>' + ganzhiName(shiLine.gan, shiLine.zhi) + ' · ' + qinName(shiLine.qin) + '</b>　' +
+    t('shiFu') + ' <b>' + ganzhiName(shiLine.fuGan, shiLine.fuZhi) + ' · ' + qinName(shiLine.fuQin) + '</b></div>' +
+    '<div class="feifu-note">' + t('feifuNote') + '</div>';
+  document.getElementById('feifu-block').innerHTML = html;
+}
+function renderDuanfa() {
+  var d = (DATA && DATA.duanfa) ? DATA.duanfa : DUANFA;
+  var items = [
+    [t('duanfaWangfei'), d.wangfei || DUANFA.wangfei],
+    [t('duanfaJinghui'), d.jinghui || DUANFA.jinghui],
+    [t('duanfaDefs'), d.defs || DUANFA.defs],
+    [t('duanfaLunfa'), d.lunfa || DUANFA.lunfa],
+    [t('duanfaLunfaTail'), d.lunfaTail || DUANFA.lunfaTail]
+  ];
+  var html = '';
+  items.forEach(function(it) {
+    html += '<div class="duanfa-item"><b>' + it[0] + '：</b>' + esc(it[1]) + '</div>';
+  });
+  if (LANG === 'en' || LANG === 'ja') html += '<div class="feifu-note">' + t('guaciNote') + '</div>';
+  document.getElementById('duanfa-list').innerHTML = html;
+}
+function renderYuanwen(chart) {
+  var box = document.getElementById('yuanwen-text');
+  var note = document.getElementById('yuanwen-note');
+  var e = entryOf(chart.hex);
+  if (!e) { if (box) box.textContent = ''; return; }
+  if (box) box.textContent = (LANG === 'zh-TW' ? (e.text || e.text_simp) : (e.text_simp || e.text)) || '';
+  if (note) note.textContent = t('yuanwenNote');
+}
+function showResult(chart, reRender) {
+  LAST_RESULT = chart;
+  var card = document.getElementById('result-card');
+  if (card) card.classList.remove('hidden');
+  var q = questionValue();
+  var head = '';
+  if (q) head += t('asked') + ' <b>' + esc(q) + '</b><br>';
+  head += t('castMethod') + ' <b>' + t(chart.method === 'pick' ? 'methodPick' : chart.method === 'coin' ? 'methodCoin' : 'methodTime') + '</b>';
+  if (chart.di) {
+    head += ' · ' + t('lunar') + ' <b>' + chart.di.yearGZ + t('year') + ' ' + chart.di.monthCN + t('month') + chart.di.dayCN + t('day') + ' ' + chart.di.timeGZ + t('hour') + '</b>';
+  }
+  document.getElementById('result-head').innerHTML = head;
+  document.getElementById('hex-grid').innerHTML = hexCard(chart);
+  renderChartTable(chart);
+  renderFeifu(chart);
+  renderDuanfa();
+  ensureData().then(function() { renderYuanwen(chart); renderDuanfa(); });
+  if (card && card.scrollIntoView && !reRender) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+applyI18n();
+switchMethod('pick');
+
+// ==AI-INTERPRET==
+// Shared AI 解读 button (/js/ai-jiegua.js). Summary comes from this page's
+// own result state; null/'' means "no result yet" and the button only shows
+// a hint instead of calling the backend.
+function aiTrunc(s, n) { s = String(s == null ? '' : s); return s.length > n ? s.slice(0, n) + '…' : s; }
+window.getJieguaSummary = function() {
+if (!LAST_RESULT) return null;
+var c = LAST_RESULT;
+var parts = [];
+parts.push('京房易·' + hexName(c.hex));
+if (c.di) parts.push('时间：' + c.di.yearGZ + '年 ' + c.di.monthCN + '月' + c.di.dayCN + '日 ' + c.di.timeGZ + '时');
+parts.push('宫：' + c.gong + ' · 世：' + c.shi + ' · 应：' + c.ying + (c.pos ? ' · ' + c.pos : ''));
+parts.push('飞伏：' + fuGuaName(c.hex) + (c.flying ? '（' + c.flying + '）' : ''));
+if (c.movingIdxs && c.movingIdxs.length) parts.push('动爻：' + c.movingIdxs.map(function (i) { return '第' + (i + 1) + '爻'; }).join('、'));
+var e = entryOf(c.hex);
+if (e) parts.push('京氏易传：' + aiTrunc(e.text_simp || e.text || '', 300));
+return parts.join('\n');
+};
+window.getJieguaQuestion = function() { var el = document.getElementById('question'); return el ? el.value.trim() : ''; };
+if (window.AIInterpret) { window.AIInterpret.attach(); }
+else { document.addEventListener('DOMContentLoaded', function () { if (window.AIInterpret) window.AIInterpret.attach(); }); }
+</script>
+<script src="/js/ai-jiegua.js"></script>
+</body>
+</html>

@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 皇极经世</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+  .gua-name-cn { display: block; font-size: .85rem; color: #9a9aab; font-weight: 400; margin-top: .2rem; letter-spacing: .05em; }
+  .guaci-note { font-size: .78rem; color: #6f6f80; margin-top: .5rem; line-height: 1.6; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="date"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(.8) sepia(.5) saturate(3) hue-rotate(5deg); cursor: pointer; }
+  .method-row { display: flex; gap: 2rem; }
+  .method-row > .field { flex: 1; min-width: 0; }
+  .method-row > .field.era-field { flex: 0 0 150px; }
+  .link-btn { background: none; border: none; color: #c9a962; font-size: .75rem; cursor: pointer; letter-spacing: .1em; padding: 0; margin-left: .5rem; font-family: inherit; }
+  .link-btn:hover { text-decoration: underline; }
+  .hint { color: #9a9aab; font-size: .85rem; line-height: 1.8; margin-bottom: 1rem; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .verdict { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .level { color: #c9a962; font-weight: 700; }
+  .hex-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-top: 1.4rem; }
+  .hex-card { background: transparent; border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1.1rem 1.2rem; }
+  .hex-card h3 { font-size: .8rem; color: #b08d3e; font-weight: 400; letter-spacing: .25em; margin-bottom: .6rem; }
+  .hex-card .gua-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.25rem; font-weight: 700; color: #f0ead8; }
+  .hex-card .tri-info { font-size: .85rem; color: #9a9aab; margin: .4rem 0 .8rem; line-height: 1.7; }
+  .hex-card .tri-info b { color: #f0ead8; font-weight: 600; }
+  .hex-card .guaci { font-size: .88rem; color: #c8c2ae; line-height: 1.7; border-top: 1px dashed rgba(201,169,98,.35); padding-top: .7rem; margin-top: .7rem; }
+  .hex-card .span-line { font-size: .82rem; color: #9a9aab; margin-top: .6rem; line-height: 1.7; }
+  .hex-card .span-line b { color: #c9a962; font-weight: 600; }
+  .hex-diagram { width: 170px; margin: .2rem auto .7rem; }
+  .hex-row { display: flex; align-items: center; height: 13px; margin: 7px 0; }
+  .hex-row .bar { flex: 1; height: 13px; display: flex; }
+  .hex-row .bar .seg { flex: 1; background: #c9a962; border-radius: 2px; }
+  .hex-row.yin .bar { gap: 14px; }
+  .hex-row .mark { width: 22px; text-align: right; color: #c9a962; font-size: .8rem; flex-shrink: 0; }
+  .hex-row .lbl { width: 22px; color: #6f6f80; font-size: .7rem; flex-shrink: 0; }
+
+  /* ---- 位置表 ---- */
+  .table-wrap { overflow-x: auto; margin-top: 1.2rem; }
+  table.chart { width: 100%; border-collapse: collapse; font-size: .88rem; min-width: 560px; }
+  table.chart th { color: #b08d3e; font-weight: 400; letter-spacing: .18em; text-align: left; padding: .5rem .6rem; border-bottom: 1px solid rgba(201,169,98,.45); white-space: nowrap; }
+  table.chart td { padding: .55rem .6rem; border-bottom: 1px solid rgba(201,169,98,.12); color: #c8c2ae; white-space: nowrap; line-height: 1.6; }
+  table.chart td b { color: #f0ead8; font-weight: 600; }
+  table.chart td .gold { color: #c9a962; font-weight: 600; }
+
+  /* ---- 纪事与干支 ---- */
+  .chronicle-text { font-size: .92rem; line-height: 1.9; color: #c8c2ae; }
+  .chronicle-text b { color: #c9a962; font-weight: 600; }
+  .chronicle-quote { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: .98rem; line-height: 1.9; color: #f0ead8; border-left: 2px solid #c9a962; padding-left: 1rem; margin: .6rem 0; }
+  .chronicle-cite { font-size: .82rem; color: #6f6f80; margin-top: .4rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+  .chip { border: 1px solid rgba(201,169,98,.3); border-radius: 999px; padding: .3rem .7rem; font-size: .82rem; color: #9a9aab; line-height: 1.5; }
+  .chip.now { color: #0b0b14; background: #c9a962; border-color: #c9a962; font-weight: 700; }
+  .layers { font-size: .85rem; color: #9a9aab; line-height: 1.9; margin-top: 1.4rem; }
+  .layers b { color: #c9a962; font-weight: 600; }
+  .data-status { font-size: .82rem; color: #6f6f80; margin-top: 1rem; line-height: 1.8; }
+  .data-status.err { color: #d97b6c; }
+  details.refbox { margin-top: 1.6rem; border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1rem 1.2rem; }
+  details.refbox summary { cursor: pointer; color: #c9a962; font-size: .9rem; letter-spacing: .12em; list-style: none; }
+  details.refbox summary::-webkit-details-marker { display: none; }
+  details.refbox summary::after { content: ' +'; }
+  details.refbox[open ] summary::after { content: ' −'; }
+  .refbox-body { font-size: .88rem; color: #9a9aab; line-height: 1.9; margin-top: .8rem; white-space: pre-wrap; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .method-row { flex-direction: column; gap: 0; }
+    .method-row > .field.era-field { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">皇极经世 · 本地排盘</div>
+    </div>
+  </a>
+                <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></span>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">一生之图 · 元会运世</div>
+  <h1 class="slogan" data-i18n-html="slogan">元经会，会经运，<br>运经世，世三十年。</h1>
+  <p class="subtitle" data-i18n="subtitle">皇极经世免费在线排盘</p>
+
+  <section class="section">
+    <div class="method-row">
+      <div class="field era-field">
+        <label for="era" data-i18n="labelEra">纪元</label>
+        <select id="era">
+          <option value="CE" selected data-i18n="eraCE">公元</option>
+          <option value="BCE" data-i18n="eraBCE">公元前</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="year" data-i18n="labelYear">年份</label>
+        <input type="number" id="year" min="1" max="99999" step="1" placeholder="例如 2026" data-i18n-ph="phYear">
+      </div>
+      <div class="field">
+        <label for="date"><span data-i18n="labelDate">日期（可选）</span> <button type="button" class="link-btn" onclick="useThisYear()" data-i18n="btnToday">今年</button></label>
+        <input type="date" id="date" onchange="useDateYear()">
+      </div>
+    </div>
+    <p class="hint" data-i18n="dateHint">只取日期中的年份；元会运世以年推算。公元前年份请在“纪元”中选“公元前”。</p>
+    <div class="error" id="year-error"></div>
+    <button class="submit-btn" onclick="doCompute()" data-i18n="btnSubmit">推元会运世</button>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">推算结果</div>
+    <div class="result-head" id="result-head"></div>
+    <div class="verdict" id="yuan-note"></div>
+    <div class="section-title" style="margin-top:1.8rem" data-i18n="secPosition">元会运世</div>
+    <div class="table-wrap"><table class="chart" id="pos-table"></table></div>
+    <div class="section-title" style="margin-top:1.8rem" data-i18n="secHex">配卦</div>
+    <div class="hex-grid" id="hex-grid"></div>
+    <div class="layers" id="layers-line"></div>
+    <div class="section-title" style="margin-top:1.8rem" data-i18n="secShiYears">世内三十年</div>
+    <p class="hint" data-i18n="shiYearsNote">本世三十年的干支；金色为所查之年。</p>
+    <div class="chips" id="shi-chips"></div>
+    <div class="section-title" style="margin-top:1.8rem" data-i18n="secChronicle">本世纪事</div>
+    <div class="chronicle-text" id="chronicle-body"></div>
+    <details class="refbox hidden" id="chronicle-ref">
+      <summary data-i18n="chronicleDetails">展开本世纪事原文</summary>
+      <div class="refbox-body" id="chronicle-full"></div>
+    </details>
+    <div class="data-status" id="data-status"></div>
+      <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="huangji" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+</section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">皇极经世：免费排盘与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">皇极经世的元会运世是怎样算的？</summary>
+      <p data-i18n="faqA1">三十年为一世，十二世为一运（360 年），三十运为一会（10800 年），十二会为一元（129600 年）。输入年份后，本页按此层级算出该年所在的元、会、运、世与世内第几年，并给出年干支。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">纪元起点为什么是公元前 67017 年？</summary>
+      <p data-i18n="faqA2">第一元第一年取公元前 67017 年（甲子），不是原书直接写出的公历年份，而是由原书历史锚点反推：帝尧甲辰（公元前 2357 年）是第 2156 世第 11 年；汉孝武皇帝五十四年（公元前 87 年）是第 2232 世首年甲午；梁武帝四十三年（公元 544 年）是第 2253 世首年甲子；后周显德六年己未（公元 959 年）是第 2266 世第 26 年。几个锚点反推得到同一纪元。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">会卦、运卦、世卦、年卦是怎么配出来的？</summary>
+      <p data-i18n="faqA3">会卦用十二消息卦（子会复、午会姤、未会遁……）；运卦、世卦（甲子卦）、年卦用马振国、曾华才 2020 年《邵雍皇极经世 129,600 年配卦表》的规则：先天圆图去乾坤坎离四正卦余六十值卦，2160 年一值卦，变爻得运卦，再变爻得甲子卦，年卦在甲子卦起顺时针逐年推进。这是具名现代重建，不是邵雍原文直接给出的唯一算法；原书本身没有一张现成的年份—卦对照表。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">为什么 2026 年查不到原书记事？</summary>
+      <p data-i18n="faqA4">原书《以运经世》的编年从帝尧甲辰写到后周显德六年（公元 959 年），表格覆盖到第 2268 世（约公元 1054 年）。此后的年份只有按周期推算的位置与配卦，没有原书记事；本页如实显示“原书无纪事”，不虚构条文。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">皇极经世排盘免费吗？数据从哪里来？</summary>
+      <p data-i18n="faqA5">免费。本页推算在本地完成，不收费、不保存你输入的年份。纪事原文来自《皇极经世书》十四卷全文（宋·邵雍）；卦象辞来自卜筮全书六十四卦卦象；配卦算法参照马振国、曾华才 2020 年配卦表。古典原文保留中文。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">皇极经世属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="attrLine">纪事：《皇极经世书》十四卷全文（宋·邵雍）；卦象辞：卜筮全书 · 六十四卦卦象；配卦：马振国、曾华才 2020 年配卦表（现代重建）。</span><br>
+    <span data-i18n="offlineNote">本页推算完全离线运行，不向任何服务器发送数据；纪事与卦象辞按需从本站数据文件加载。</span>
+  </footer>
+</div>
+</main>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。古典原文一律保留中文，见 guaciNote。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '皇极经世 · 本地排盘',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '一生之图 · 元会运世',
+  slogan: '元经会，会经运，<br>运经世，世三十年。',
+  subtitle: '皇极经世免费在线排盘',
+  labelEra: '纪元',
+  eraCE: '公元',
+  eraBCE: '公元前',
+  labelYear: '年份',
+  phYear: '例如 2026',
+  labelDate: '日期（可选）',
+  btnToday: '今年',
+  dateHint: '只取日期中的年份；元会运世以年推算。公元前年份请在“纪元”中选“公元前”。',
+  btnSubmit: '推元会运世',
+  errNoYear: '请先输入年份。',
+  errBadYear: '年份须为正整数。',
+  errRangeBCE: '公元前最早到公元前 67017 年（第一元第一年）。',
+  errRangeCE: '公元年份最大为 99999 年。',
+  resultTitle: '推算结果',
+  ai_interpret: 'AI 解读',
+  secPosition: '元会运世',
+  colLevel: '层级',
+  colNo: '序号',
+  colName: '名',
+  colYearIn: '本层第几年',
+  colRange: '起止年份',
+  lvlYuan: '元',
+  lvlHui: '会',
+  lvlYun: '运',
+  lvlShi: '世',
+  yearInYuan: '元内第 {n} 年',
+  yearInHui: '会内第 {n} 年',
+  yearInYun: '运内第 {n} 年',
+  yearInShi: '世内第 {n} 年',
+  yunInHui: '本会第 {n} 运',
+  shiInYun: '本运第 {n} 世',
+  yuanPart: '第 {n} 元',
+  huiPart: '第 {n} 会',
+  yunPart: '第 {n} 运',
+  shiPart: '第 {n} 世',
+  yuanExtNote: '第 {n} 元超出第一元（公元前 67017 年 – 公元 62583 年），按 129600 年循环延拓推算，属现代重建的数学延伸。',
+  yuanNote1: '第一元第一年为公元前 67017 年（甲子），由原书历史锚点反推，见常见问题。',
+  secHex: '配卦',
+  cardHui: '会卦',
+  cardYun: '运卦',
+  cardShi: '世卦 · 甲子卦',
+  cardAnnual: '年卦',
+  huiSpan: '{b}会',
+  yunSpan: '第 {n} 运',
+  shiSpan: '甲子卦 · 60 年',
+  upperTri: '上卦',
+  lowerTri: '下卦',
+  annualSpan: '{y} 年',
+  xiangLabel: '卦象：',
+  guaciNote: '',
+  layerYuan: '元卦',
+  layerSeason: '四季正卦',
+  layerTerm: '节卦',
+  layerOnDuty: '2160 年值卦',
+  secShiYears: '世内三十年',
+  shiYearsNote: '本世三十年的干支；金色为所查之年。',
+  secChronicle: '本世纪事',
+  chronicleLoading: '纪事原文加载中……',
+  chronicleFail: '纪事原文未能加载，可刷新后重试。',
+  chronicleNoneYear: '是年原书无纪事。',
+  chronicleNoneShi: '本世原书无纪事。',
+  chronicleOut: '原书《以运经世》的编年止于后周显德六年（公元 959 年），表格覆盖到第 2268 世（约公元 1054 年）。此年超出原书编年范围，只有按周期推算的位置与配卦，没有原书记事。',
+  chronicleDetails: '展开本世纪事原文',
+  tiyaoQuote: '其书以元经会，以会经运，以运经世，起于帝尧甲辰，至后周显德六年己未，而兴亡治乱之迹皆以卦象推之。',
+  tiyaoCite: '——《皇极经世书 · 提要》',
+  dataLoading: '卦象辞加载中……',
+  dataFail: '卦象辞未能加载，仅显示推算；可刷新后重试。',
+  dataReady: '卦象辞已加载。',
+  ceYear: '公元 {n} 年',
+  bceYear: '公元前 {n} 年',
+  rangeCE: '公元 {a}–{b} 年',
+  rangeBCE: '公元前 {a}–{b} 年',
+  rangeMixed: '公元前 {a} 年 – 公元 {b} 年',
+  yearShortCE: '{n}',
+  yearShortBCE: '前 {n}',
+  faqTitle: '皇极经世：免费排盘与使用常见问题',
+  faqQ1: '皇极经世的元会运世是怎样算的？',
+  faqA1: '三十年为一世，十二世为一运（360 年），三十运为一会（10800 年），十二会为一元（129600 年）。输入年份后，本页按此层级算出该年所在的元、会、运、世与世内第几年，并给出年干支。',
+  faqQ2: '纪元起点为什么是公元前 67017 年？',
+  faqA2: '第一元第一年取公元前 67017 年（甲子），不是原书直接写出的公历年份，而是由原书历史锚点反推：帝尧甲辰（公元前 2357 年）是第 2156 世第 11 年；汉孝武皇帝五十四年（公元前 87 年）是第 2232 世首年甲午；梁武帝四十三年（公元 544 年）是第 2253 世首年甲子；后周显德六年己未（公元 959 年）是第 2266 世第 26 年。几个锚点反推得到同一纪元。',
+  faqQ3: '会卦、运卦、世卦、年卦是怎么配出来的？',
+  faqA3: '会卦用十二消息卦（子会复、午会姤、未会遁……）；运卦、世卦（甲子卦）、年卦用马振国、曾华才 2020 年《邵雍皇极经世 129,600 年配卦表》的规则：先天圆图去乾坤坎离四正卦余六十值卦，2160 年一值卦，变爻得运卦，再变爻得甲子卦，年卦在甲子卦起顺时针逐年推进。这是具名现代重建，不是邵雍原文直接给出的唯一算法；原书本身没有一张现成的年份—卦对照表。',
+  faqQ4: '为什么 2026 年查不到原书记事？',
+  faqA4: '原书《以运经世》的编年从帝尧甲辰写到后周显德六年（公元 959 年），表格覆盖到第 2268 世（约公元 1054 年）。此后的年份只有按周期推算的位置与配卦，没有原书记事；本页如实显示“原书无纪事”，不虚构条文。',
+  faqQ5: '皇极经世排盘免费吗？数据从哪里来？',
+  faqA5: '免费。本页推算在本地完成，不收费、不保存你输入的年份。纪事原文来自《皇极经世书》十四卷全文（宋·邵雍）；卦象辞来自卜筮全书六十四卦卦象；配卦算法参照马振国、曾华才 2020 年配卦表。古典原文保留中文。',
+  disclaimer: '皇极经世属传统术数，仅供参考，不构成决策依据。',
+  attrLine: '纪事：《皇极经世书》十四卷全文（宋·邵雍）；卦象辞：卜筮全书 · 六十四卦卦象；配卦：马振国、曾华才 2020 年配卦表（现代重建）。',
+  offlineNote: '本页推算完全离线运行，不向任何服务器发送数据；纪事与卦象辞按需从本站数据文件加载。',
+  langLabel: '语言'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '皇極經世 · 本地排盤',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '一生之圖 · 元會運世',
+  slogan: '元經會，會經運，<br>運經世，世三十年。',
+  subtitle: '皇極經世免費線上排盤',
+  labelEra: '紀元',
+  eraCE: '公元',
+  eraBCE: '公元前',
+  labelYear: '年份',
+  phYear: '例如 2026',
+  labelDate: '日期（可選）',
+  btnToday: '今年',
+  dateHint: '只取日期中的年份；元會運世以年推算。公元前年份請在「紀元」中選「公元前」。',
+  btnSubmit: '推元會運世',
+  errNoYear: '請先輸入年份。',
+  errBadYear: '年份須為正整數。',
+  errRangeBCE: '公元前最早到公元前 67017 年（第一元第一年）。',
+  errRangeCE: '公元年份最大為 99999 年。',
+  resultTitle: '推算結果',
+  ai_interpret: 'AI 解讀',
+  secPosition: '元會運世',
+  colLevel: '層級',
+  colNo: '序號',
+  colName: '名',
+  colYearIn: '本層第幾年',
+  colRange: '起止年份',
+  lvlYuan: '元',
+  lvlHui: '會',
+  lvlYun: '運',
+  lvlShi: '世',
+  yearInYuan: '元內第 {n} 年',
+  yearInHui: '會內第 {n} 年',
+  yearInYun: '運內第 {n} 年',
+  yearInShi: '世內第 {n} 年',
+  yunInHui: '本會第 {n} 運',
+  shiInYun: '本運第 {n} 世',
+  yuanPart: '第 {n} 元',
+  huiPart: '第 {n} 會',
+  yunPart: '第 {n} 運',
+  shiPart: '第 {n} 世',
+  yuanExtNote: '第 {n} 元超出第一元（公元前 67017 年 – 公元 62583 年），按 129600 年循環延拓推算，屬現代重建的數學延伸。',
+  yuanNote1: '第一元第一年為公元前 67017 年（甲子），由原書歷史錨點反推，見常見問題。',
+  secHex: '配卦',
+  cardHui: '會卦',
+  cardYun: '運卦',
+  cardShi: '世卦 · 甲子卦',
+  cardAnnual: '年卦',
+  huiSpan: '{b}會',
+  yunSpan: '第 {n} 運',
+  shiSpan: '甲子卦 · 60 年',
+  upperTri: '上卦',
+  lowerTri: '下卦',
+  annualSpan: '{y} 年',
+  xiangLabel: '卦象：',
+  guaciNote: '',
+  layerYuan: '元卦',
+  layerSeason: '四季正卦',
+  layerTerm: '節卦',
+  layerOnDuty: '2160 年值卦',
+  secShiYears: '世內三十年',
+  shiYearsNote: '本世三十年的干支；金色為所查之年。',
+  secChronicle: '本世紀事',
+  chronicleLoading: '紀事原文加載中……',
+  chronicleFail: '紀事原文未能加載，可刷新後重試。',
+  chronicleNoneYear: '是年原書無紀事。',
+  chronicleNoneShi: '本世原書無紀事。',
+  chronicleOut: '原書《以運經世》的編年止於後周顯德六年（公元 959 年），表格覆蓋到第 2268 世（約公元 1054 年）。此年超出原書編年範圍，只有按週期推算的位置與配卦，沒有原書紀事。',
+  chronicleDetails: '展開本世紀事原文',
+  tiyaoQuote: '其書以元經會，以會經運，以運經世，起於帝堯甲辰，至後周顯德六年己未，而興亡治亂之跡皆以卦象推之。',
+  tiyaoCite: '——《皇極經世書 · 提要》',
+  dataLoading: '卦象辭加載中……',
+  dataFail: '卦象辭未能加載，僅顯示推算；可刷新後重試。',
+  dataReady: '卦象辭已加載。',
+  ceYear: '公元 {n} 年',
+  bceYear: '公元前 {n} 年',
+  rangeCE: '公元 {a}–{b} 年',
+  rangeBCE: '公元前 {a}–{b} 年',
+  rangeMixed: '公元前 {a} 年 – 公元 {b} 年',
+  yearShortCE: '{n}',
+  yearShortBCE: '前 {n}',
+  faqTitle: '皇極經世：免費排盤與使用常見問題',
+  faqQ1: '皇極經世的元會運世是怎樣算的？',
+  faqA1: '三十年為一世，十二世為一運（360 年），三十運為一會（10800 年），十二會為一元（129600 年）。輸入年份後，本頁按此層級算出該年所在的元、會、運、世與世內第幾年，並給出年干支。',
+  faqQ2: '紀元起點為什麼是公元前 67017 年？',
+  faqA2: '第一元第一年取公元前 67017 年（甲子），不是原書直接寫出的公曆年份，而是由原書歷史錨點反推：帝堯甲辰（公元前 2357 年）是第 2156 世第 11 年；漢孝武皇帝五十四年（公元前 87 年）是第 2232 世首年甲午；梁武帝四十三年（公元 544 年）是第 2253 世首年甲子；後周顯德六年己未（公元 959 年）是第 2266 世第 26 年。幾個錨點反推得到同一紀元。',
+  faqQ3: '會卦、運卦、世卦、年卦是怎麼配出來的？',
+  faqA3: '會卦用十二消息卦（子會復、午會姤、未會遁……）；運卦、世卦（甲子卦）、年卦用馬振國、曾華才 2020 年《邵雍皇極經世 129,600 年配卦表》的規則：先天圓圖去乾坤坎離四正卦餘六十值卦，2160 年一值卦，變爻得運卦，再變爻得甲子卦，年卦在甲子卦起順時針逐年推進。這是具名現代重建，不是邵雍原文直接給出的唯一算法；原書本身沒有一張現成的年份—卦對照表。',
+  faqQ4: '為什麼 2026 年查不到原書紀事？',
+  faqA4: '原書《以運經世》的編年從帝堯甲辰寫到後周顯德六年（公元 959 年），表格覆蓋到第 2268 世（約公元 1054 年）。此後的年份只有按週期推算的位置與配卦，沒有原書紀事；本頁如實顯示「原書無紀事」，不虛構條文。',
+  faqQ5: '皇極經世排盤免費嗎？數據從哪裡來？',
+  faqA5: '免費。本頁推算在本地完成，不收費、不保存你輸入的年份。紀事原文來自《皇極經世書》十四卷全文（宋·邵雍）；卦象辭來自卜筮全書六十四卦卦象；配卦算法參照馬振國、曾華才 2020 年配卦表。古典原文保留中文。',
+  disclaimer: '皇極經世屬傳統術數，僅供參考，不構成決策依據。',
+  attrLine: '紀事：《皇極經世書》十四卷全文（宋·邵雍）；卦象辭：卜筮全書 · 六十四卦卦象；配卦：馬振國、曾華才 2020 年配卦表（現代重建）。',
+  offlineNote: '本頁推算完全離線運行，不向任何伺服器發送數據；紀事與卦象辭按需從本站數據文件加載。',
+  langLabel: '語言'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Huangji Jingshi · Local Chart',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'Life Chart · Yuan, Hui, Yun & Shi',
+  slogan: 'Yuan governs Hui, Hui governs Yun,<br>Yun governs Shi — thirty years a Shi.',
+  subtitle: 'Free online Huangji Jingshi chart',
+  labelEra: 'Era',
+  eraCE: 'CE',
+  eraBCE: 'BCE',
+  labelYear: 'Year',
+  phYear: 'e.g. 2026',
+  labelDate: 'Date (optional)',
+  btnToday: 'This year',
+  dateHint: 'Only the year of the date is used; Yuan-Hui-Yun-Shi is computed by year. For a BCE year, choose “BCE” under Era.',
+  btnSubmit: 'Calculate Yuan-Hui-Yun-Shi',
+  errNoYear: 'Please enter a year first.',
+  errBadYear: 'The year must be a positive integer.',
+  errRangeBCE: 'The earliest BCE year is 67017 BCE (the first year of the first Yuan).',
+  errRangeCE: 'The largest CE year is 99999.',
+  resultTitle: 'The Calculation',
+  ai_interpret: 'AI Reading',
+  secPosition: 'Yuan · Hui · Yun · Shi',
+  colLevel: 'Level',
+  colNo: 'Number',
+  colName: 'Name',
+  colYearIn: 'Year within the level',
+  colRange: 'Years covered',
+  lvlYuan: 'Yuan',
+  lvlHui: 'Hui',
+  lvlYun: 'Yun',
+  lvlShi: 'Shi',
+  yearInYuan: 'Year {n} of the Yuan',
+  yearInHui: 'Year {n} of the Hui',
+  yearInYun: 'Year {n} of the Yun',
+  yearInShi: 'Year {n} of the Shi',
+  yunInHui: 'Yun {n} of the Hui',
+  shiInYun: 'Shi {n} of the Yun',
+  yuanPart: 'Yuan {n}',
+  huiPart: 'Hui {n}',
+  yunPart: 'Yun {n}',
+  shiPart: 'Shi {n}',
+  yuanExtNote: 'Yuan {n} lies beyond the first Yuan (67017 BCE – CE 62583); it is computed by extending the 129,600-year cycle, a mathematical extension of the modern reconstruction.',
+  yuanNote1: 'The first year of the first Yuan is 67017 BCE (Jia-Zi), derived from historical anchors in the original book — see the FAQ.',
+  secHex: 'Hexagrams',
+  cardHui: 'Hui Hexagram',
+  cardYun: 'Yun Hexagram',
+  cardShi: 'Shi Hexagram · Jiazi Hexagram',
+  cardAnnual: 'Annual Hexagram',
+  huiSpan: 'Hui of {b}',
+  yunSpan: 'Yun {n}',
+  shiSpan: 'Jiazi hexagram · 60 years',
+  upperTri: 'Upper trigram',
+  lowerTri: 'Lower trigram',
+  annualSpan: 'Year {y}',
+  xiangLabel: 'Image: ',
+  guaciNote: 'Hexagram image text shown in classical Chinese.',
+  layerYuan: 'Yuan hexagram',
+  layerSeason: 'Season principal',
+  layerTerm: 'Term hexagram',
+  layerOnDuty: '2,160-year duty hexagram',
+  secShiYears: 'The Thirty Years of the Shi',
+  shiYearsNote: 'The stem-branch of each of the thirty years of this Shi; gold marks the year you asked about.',
+  secChronicle: 'Chronicle of the Shi',
+  chronicleLoading: 'Loading the chronicle text…',
+  chronicleFail: 'The chronicle text could not be loaded. Please refresh and try again.',
+  chronicleNoneYear: 'The book records nothing for this year.',
+  chronicleNoneShi: 'The book records nothing for this Shi.',
+  chronicleOut: 'The chronicle in the book (Yun Jing Shi) ends with the sixth year of Xiande of Later Zhou (CE 959), and its tables run to Shi 2268 (about CE 1054). This year lies beyond the book’s chronology, so it has a computed position and hexagrams only, and no chronicle entry.',
+  chronicleDetails: 'Show the full chronicle text of this Shi',
+  tiyaoQuote: '其书以元经会，以会经运，以运经世，起于帝尧甲辰，至后周显德六年己未，而兴亡治乱之迹皆以卦象推之。',
+  tiyaoCite: '— Summary (Tiyao) of the Huangji Jingshi Shu',
+  dataLoading: 'Loading the hexagram image texts…',
+  dataFail: 'The hexagram image texts could not be loaded; only the calculation is shown. Please refresh and try again.',
+  dataReady: 'Hexagram image texts loaded.',
+  ceYear: 'CE {n}',
+  bceYear: 'BCE {n}',
+  rangeCE: 'CE {a}–{b}',
+  rangeBCE: 'BCE {a}–{b}',
+  rangeMixed: 'BCE {a} – CE {b}',
+  yearShortCE: '{n}',
+  yearShortBCE: '{n} BCE',
+  faqTitle: 'Huangji Jingshi: Free Chart & FAQ',
+  faqQ1: 'How are Yuan, Hui, Yun and Shi calculated?',
+  faqA1: 'Thirty years make one Shi, twelve Shi make one Yun (360 years), thirty Yun make one Hui (10,800 years), and twelve Hui make one Yuan (129,600 years). Enter a year and this page works out which Yuan, Hui, Yun and Shi it falls in, which year of the Shi it is, and its stem-branch.',
+  faqQ2: 'Why does the epoch start in 67017 BCE?',
+  faqA2: 'The first year of the first Yuan is taken as 67017 BCE (Jia-Zi). That Gregorian year is not printed in the original book; it is derived from the book’s own historical anchors: the Jia-Chen year of Emperor Yao (2357 BCE) is the 11th year of Shi 2156; the 54th year of Emperor Wu of Han (87 BCE) is the first year (Jia-Wu) of Shi 2232; the 43rd year of Emperor Wu of Liang (CE 544) is the first year (Jia-Zi) of Shi 2253; and the sixth year of Xiande of Later Zhou (CE 959, Ji-Wei) is the 26th year of Shi 2266. All anchors give the same epoch.',
+  faqQ3: 'How are the Hui, Yun, Shi and annual hexagrams assigned?',
+  faqA3: 'The Hui hexagram uses the twelve “message hexagrams” (Hui of Zi = Fu, Hui of Wu = Gou, Hui of Wei = Dun, and so on). The Yun, Shi (Jiazi) and annual hexagrams follow the rules of Ma Zhenguo and Zeng Huacai’s 2020 “129,600-year hexagram table for Shao Yong’s Huangji Jingshi”: the Primordial circular diagram drops the four cardinal hexagrams Qian, Kun, Kan and Li, leaving sixty duty hexagrams; one duty hexagram covers 2,160 years, changing a line gives the Yun hexagram, changing a line again gives the Jiazi hexagram, and the annual hexagram advances one step per year clockwise from the Jiazi hexagram. This is a named modern reconstruction, not the only algorithm the original text itself gives — the book contains no ready-made year-to-hexagram table.',
+  faqQ4: 'Why is there no chronicle entry for 2026?',
+  faqA4: 'The book’s chronicle (Yi Yun Jing Shi) runs from the Jia-Chen year of Emperor Yao to the sixth year of Xiande of Later Zhou (CE 959), and its tables run to Shi 2268 (about CE 1054). Later years have only a computed position and hexagrams; this page says so plainly instead of inventing an entry.',
+  faqQ5: 'Is the Huangji Jingshi chart free? Where does the data come from?',
+  faqA5: 'Yes, free. The calculation runs locally in your browser — no charge, and the year you enter is never saved. The chronicle text comes from the Huangji Jingshi Shu in fourteen volumes (Shao Yong, Song dynasty); the hexagram image texts come from the Bushu Quanshu’s sixty-four hexagram images; the allocation rules follow Ma Zhenguo and Zeng Huacai’s 2020 table. Classical text is kept in Chinese.',
+  disclaimer: 'Huangji Jingshi is a traditional divination art, for reference only; it is not a basis for decisions.',
+  attrLine: 'Chronicle: Huangji Jingshi Shu, 14 vols. (Shao Yong, Song); hexagram images: Bushu Quanshu · Sixty-four hexagram images; allocation: Ma Zhenguo & Zeng Huacai 2020 table (modern reconstruction).',
+  offlineNote: 'Calculation runs fully offline; no data is sent to any server. Chronicle and hexagram image texts are loaded on demand from this site’s data files.',
+  langLabel: 'Language'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '皇極経世 · ローカル排盤',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '一生之図 · 元会運世',
+  slogan: '元は会を経、会は運を経、<br>運は世を経、世は三十年。',
+  subtitle: '皇極経世 無料オンライン排盤',
+  labelEra: '紀元',
+  eraCE: '西暦',
+  eraBCE: '紀元前',
+  labelYear: '年',
+  phYear: '例 2026',
+  labelDate: '日付（任意）',
+  btnToday: '今年',
+  dateHint: '日付の年のみを使います。元会運世は年で推算します。紀元前の年は「紀元」で「紀元前」を選んでください。',
+  btnSubmit: '元会運世を推す',
+  errNoYear: 'まず年を入力してください。',
+  errBadYear: '年は正の整数で入力してください。',
+  errRangeBCE: '紀元前は紀元前 67017 年（第一元の第一年）までです。',
+  errRangeCE: '西暦は最大 99999 年までです。',
+  resultTitle: '推算結果',
+  ai_interpret: 'AI 解釈',
+  secPosition: '元会運世',
+  colLevel: '層',
+  colNo: '番号',
+  colName: '名',
+  colYearIn: 'その層の第何年',
+  colRange: '期間',
+  lvlYuan: '元',
+  lvlHui: '会',
+  lvlYun: '運',
+  lvlShi: '世',
+  yearInYuan: '元内第 {n} 年',
+  yearInHui: '会内第 {n} 年',
+  yearInYun: '運内第 {n} 年',
+  yearInShi: '世内第 {n} 年',
+  yunInHui: '本会第 {n} 運',
+  shiInYun: '本運第 {n} 世',
+  yuanPart: '第 {n} 元',
+  huiPart: '第 {n} 会',
+  yunPart: '第 {n} 運',
+  shiPart: '第 {n} 世',
+  yuanExtNote: '第 {n} 元は第一元（紀元前 67017 年 – 西暦 62583 年）の範囲外で、129600 年周期の延拓による推算です（現代再構成の数学的延長）。',
+  yuanNote1: '第一元の第一年は紀元前 67017 年（甲子）で、原書の歴史的錨点から反推したものです。詳しくはよくある質問をご覧ください。',
+  secHex: '配卦',
+  cardHui: '会卦',
+  cardYun: '運卦',
+  cardShi: '世卦 · 甲子卦',
+  cardAnnual: '年卦',
+  huiSpan: '{b}会',
+  yunSpan: '第 {n} 運',
+  shiSpan: '甲子卦 · 60 年',
+  upperTri: '上卦',
+  lowerTri: '下卦',
+  annualSpan: '{y} 年',
+  xiangLabel: '卦象：',
+  guaciNote: '卦象の文は中国語原文のまま表示しています。',
+  layerYuan: '元卦',
+  layerSeason: '四季正卦',
+  layerTerm: '節卦',
+  layerOnDuty: '2160 年値卦',
+  secShiYears: '世内の三十年',
+  shiYearsNote: 'この世の三十年の干支。金色が調べた年です。',
+  secChronicle: '本世の紀事',
+  chronicleLoading: '紀事原文を読み込み中……',
+  chronicleFail: '紀事原文を読み込めませんでした。更新して再試行してください。',
+  chronicleNoneYear: 'この年について原書に紀事はありません。',
+  chronicleNoneShi: 'この世について原書に紀事はありません。',
+  chronicleOut: '原書『以運経世』の編年は後周顕徳六年（西暦 959 年）で終わり、表は第 2268 世（約西暦 1054 年）までです。この年は原書の編年範囲外のため、周期による推算の位置と配卦のみで、原書の紀事はありません。',
+  chronicleDetails: '本世の紀事原文を開く',
+  tiyaoQuote: '其書以元經會，以會經運，以運經世，起於帝堯甲辰，至後周顯德六年己未，而興亡治亂之跡皆以卦象推之。',
+  tiyaoCite: '——『皇極經世書 · 提要』',
+  dataLoading: '卦象辞を読み込み中……',
+  dataFail: '卦象辞を読み込めませんでした。推算のみ表示します。更新して再試行してください。',
+  dataReady: '卦象辞を読み込みました。',
+  ceYear: '西暦 {n} 年',
+  bceYear: '紀元前 {n} 年',
+  rangeCE: '西暦 {a}–{b} 年',
+  rangeBCE: '紀元前 {a}–{b} 年',
+  rangeMixed: '紀元前 {a} 年 – 西暦 {b} 年',
+  yearShortCE: '{n}',
+  yearShortBCE: '前 {n}',
+  faqTitle: '皇極経世：無料排盤とよくある質問',
+  faqQ1: '皇極経世の元会運世はどう計算しますか？',
+  faqA1: '三十年を一世とし、十二世で一運（360 年）、三十運で一会（10800 年）、十二会で一元（129600 年）です。年を入力すると、その年が属する元・会・運・世と世内第何年か、年干支を算出します。',
+  faqQ2: '紀元の起点が紀元前 67017 年なのはなぜですか？',
+  faqA2: '第一元の第一年を紀元前 67017 年（甲子）としています。これは原書に直接書かれた西暦の年ではなく、原書の歴史的錨点からの反推です。帝堯甲辰（紀元前 2357 年）は第 2156 世第 11 年、漢孝武皇帝五十四年（紀元前 87 年）は第 2232 世の初年甲午、梁武帝四十三年（西暦 544 年）は第 2253 世の初年甲子、後周顕徳六年己未（西暦 959 年）は第 2266 世第 26 年で、いずれの錨点からも同じ紀元が得られます。',
+  faqQ3: '会卦・運卦・世卦・年卦はどう配されますか？',
+  faqA3: '会卦は十二消息卦（子会は復、午会は姤、未会は遁……）を使います。運卦・世卦（甲子卦）・年卦は馬振国・曾華才 2020 年『邵雍皇極経世 129,600 年配卦表』の規則によります。先天円図から乾坤坎離の四正卦を除いた六十値卦で、2160 年に一値卦、爻を変えて運卦、さらに爻を変えて甲子卦、年卦は甲子卦から時計回りに毎年一歩進みます。これは具名の現代再構成であり、邵雍原文が直接与えた唯一の算法ではありません。原書自体に出来上がりの年—卦対照表はありません。',
+  faqQ4: '2026 年の原書紀事がないのはなぜですか？',
+  faqA4: '原書『以運経世』の編年は帝堯甲辰から後周顕徳六年（西暦 959 年）までで、表は第 2268 世（約西暦 1054 年）までです。それ以後の年は周期による推算の位置と配卦のみで、原書の紀事はありません。本頁は「原書に紀事なし」と正直に表示し、条文を捏造しません。',
+  faqQ5: '皇極経世の排盤は無料ですか？データはどこから来ますか？',
+  faqA5: '無料です。推算はローカルで行われ、料金もかからず、入力した年も保存されません。紀事原文は『皇極經世書』十四巻全文（宋・邵雍）、卦象辞は卜筮全書の六十四卦卦象、配卦の算法は馬振国・曾華才 2020 年配卦表によります。古典原文は中国語のままです。',
+  disclaimer: '皇極経世は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  attrLine: '紀事：『皇極經世書』十四巻全文（宋・邵雍）；卦象辞：卜筮全書 · 六十四卦卦象；配卦：馬振国・曾華才 2020 年配卦表（現代再構成）。',
+  offlineNote: 'このページの推算は完全オフラインで動作し、データは外部サーバーに送信されません。紀事と卦象辞は必要に応じて本サイトのデータファイルから読み込みます。',
+  langLabel: '言語'
+}
+};
+
+// 六十四卦英文名（Wilhelm 式），按序号 1-64；zh-TW / ja 仍用中文卦名
+var HEX_EN = [null,
+'The Creative','The Receptive','Difficulty at the Beginning','Youthful Folly','Waiting','Conflict','The Army','Holding Together','The Taming Power of the Small','Treading',
+'Peace','Standstill','Fellowship','Possession in Great Measure','Modesty','Enthusiasm','Following','Work on What Has Been Spoiled','Approach','Contemplation',
+'Biting Through','Grace','Splitting Apart','Return','Innocence','The Taming Power of the Great','The Corners of the Mouth','Preponderance of the Great','The Abysmal','The Clinging',
+'Influence','Duration','Retreat','The Power of the Great','Progress','Darkening of the Light','The Family','Opposition','Obstruction','Deliverance',
+'Decrease','Increase','Breakthrough','Coming to Meet','Gathering Together','Pushing Upward','Oppression','The Well','Revolution','The Cauldron',
+'The Arousing','Keeping Still','Development','The Marrying Maiden','Abundance','The Wanderer','The Gentle','The Joyous','Dissolution','Limitation',
+'Inner Truth','Preponderance of the Small','After Completion','Before Completion'];
+var TRIGRAM_EN = {'乾':'Heaven','兑':'Lake','离':'Fire','震':'Thunder','巽':'Wind','坎':'Water','艮':'Mountain','坤':'Earth'};
+var ELEMENT_EN = {'金':'Metal','木':'Wood','水':'Water','火':'Fire','土':'Earth'};
+var BRANCH_EN = {'子':'Zi','丑':'Chou','寅':'Yin','卯':'Mao','辰':'Chen','巳':'Si','午':'Wu','未':'Wei','申':'Shen','酉':'You','戌':'Xu','亥':'Hai'};
+var STEM_EN = {'甲':'Jia','乙':'Yi','丙':'Bing','丁':'Ding','戊':'Wu','己':'Ji','庚':'Geng','辛':'Xin','壬':'Ren','癸':'Gui'};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function fmt(s) {
+  var out = s;
+  for (var i = 1; i < arguments.length; i += 2) out = out.split(arguments[i]).join(String(arguments[i + 1]));
+  return out;
+}
+function hexName(hex) { return LANG === 'en' ? HEX_EN[hex.kw] : hex.name; }
+function trigramName(n) { var nm = TRIGRAMS[n].name; return LANG === 'en' ? TRIGRAM_EN[nm] : nm; }
+function elementName(el) { return LANG === 'en' ? ELEMENT_EN[el] : el; }
+function branchName(b) { return LANG === 'en' ? BRANCH_EN[b] : b; }
+function stemName(s) { return LANG === 'en' ? STEM_EN[s] : s; }
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var ye = document.getElementById('year-error'); if (ye) ye.textContent = '';
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// 纪元：第一元第一年 = 公元前 67017 年（甲子）。
+// 由原书历史锚点反推（见 FAQ）：尧甲辰 2357 BCE = 世 2156 第 11 年；
+// 汉孝武帝五十四年 87 BCE = 世 2232 首年甲午；梁武帝四十三年 544 CE = 世 2253 首年甲子；
+// 后周显德六年己未 959 CE = 世 2266 第 26 年。几个锚点得到同一纪元。
+// 配卦：马振国、曾华才 2020 年《邵雍皇极经世 129,600 年配卦表》规则（具名现代重建）。
+var EPOCH_ASTRO = 1 - 67017; // -67016
+var STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+// 八卦：编号、名称、五行、爻（下→上）
+var TRIGRAMS = {
+  1: { name: '乾', element: '金', lines: [1,1,1] },
+  2: { name: '兑', element: '金', lines: [1,1,0] },
+  3: { name: '离', element: '火', lines: [1,0,1] },
+  4: { name: '震', element: '木', lines: [1,0,0] },
+  5: { name: '巽', element: '木', lines: [0,1,1] },
+  6: { name: '坎', element: '水', lines: [0,1,0] },
+  7: { name: '艮', element: '土', lines: [0,0,1] },
+  8: { name: '坤', element: '土', lines: [0,0,0] }
+};
+// 三爻值（最高位为下爻，即初爻）→ 八卦编号
+var TRIGRAM_NUM_BY_BITS = { 7:1, 6:2, 5:3, 4:4, 3:5, 2:6, 1:7, 0:8 };
+// 八卦取象字：乾天 兑泽 离火 震雷 巽风 坎水 艮山 坤地
+var TRIGRAM_IMG = { 1:'天', 2:'泽', 3:'火', 4:'雷', 5:'风', 6:'水', 7:'山', 8:'地' };
+// 伏羲卦数（0-63，最高位为初爻）→ [文王序， 卦名]
+var HEX_DEF = [
+  [2,'坤'],[23,'剥'],[8,'比'],[20,'观'],[16,'豫'],[35,'晋'],[45,'萃'],[12,'否'],
+  [15,'谦'],[52,'艮'],[39,'蹇'],[53,'渐'],[62,'小过'],[56,'旅'],[31,'咸'],[33,'遁'],
+  [7,'师'],[4,'蒙'],[29,'坎'],[59,'涣'],[40,'解'],[64,'未济'],[47,'困'],[6,'讼'],
+  [46,'升'],[18,'蛊'],[48,'井'],[57,'巽'],[32,'恒'],[50,'鼎'],[28,'大过'],[44,'姤'],
+  [24,'复'],[27,'颐'],[3,'屯'],[42,'益'],[51,'震'],[21,'噬嗑'],[17,'随'],[25,'无妄'],
+  [36,'明夷'],[22,'贲'],[63,'既济'],[37,'家人'],[55,'丰'],[30,'离'],[49,'革'],[13,'同人'],
+  [19,'临'],[41,'损'],[60,'节'],[61,'中孚'],[54,'归妹'],[38,'睽'],[58,'兑'],[10,'履'],
+  [11,'泰'],[26,'大畜'],[5,'需'],[9,'小畜'],[34,'大壮'],[14,'大有'],[43,'夬'],[1,'乾']
+];
+var PRINCIPAL = { 0:1, 18:1, 45:1, 63:1 }; // 四正卦：坤 坎 离 乾
+var CIRCLE = []; // 先天圆图顺时针：姤 31 递减至坤 0，再复 32 递增至乾 63
+(function () { var i; for (i = 31; i >= 0; i--) CIRCLE.push(i); for (i = 32; i <= 63; i++) CIRCLE.push(i); })();
+var ON_DUTY = CIRCLE.filter(function (c) { return !PRINCIPAL[c]; }); // 六十值卦（去四正）
+var ON_DUTY_ROT = (function () { var i = ON_DUTY.indexOf(32); return ON_DUTY.slice(i).concat(ON_DUTY.slice(0, i)); })(); // 以复起
+var HUI_CODES = [32, 48, 56, 60, 62, 63, 31, 15, 7, 3, 1, 0]; // 十二消息卦：子复 … 午姤 … 亥坤
+var SEASON_CODES = [45, 63, 18, 0]; // 离 乾 坎 坤
+
+function mod(n, d) { return ((n % d) + d) % d; }
+function flip(code, line) { return code ^ (1 << (6 - line)); } // 第 line 爻反转（1 初爻 … 6 上爻）
+function nextOnDuty(code) {
+  var s = CIRCLE.indexOf(code);
+  for (var step = 1; step <= 64; step++) {
+    var c = CIRCLE[mod(s + step, 64)];
+    if (!PRINCIPAL[c]) return c;
+  }
+  return code;
+}
+function advanceOnDuty(code, steps) {
+  var s = ON_DUTY.indexOf(code);
+  return ON_DUTY[mod(s + steps, 60)];
+}
+function hexInfo(code) {
+  var def = HEX_DEF[code];
+  var kw = def[0], name = def[1];
+  // 爻：自下而上（初→上）= 伏羲卦数最高位→最低位
+  var lines = [];
+  for (var i = 0; i < 6; i++) lines.push((code >> (5 - i)) & 1);
+  // 下卦 = 初二三爻，上卦 = 四五上爻；三爻值最高位为下爻（初爻/四爻）
+  var lowerBits = (lines[0] << 2) | (lines[1] << 1) | lines[2];
+  var upperBits = (lines[3] << 2) | (lines[4] << 1) | lines[5];
+  var lower = TRIGRAM_NUM_BY_BITS[lowerBits];
+  var upper = TRIGRAM_NUM_BY_BITS[upperBits];
+  var fullName = (upper === lower)
+    ? TRIGRAMS[upper].name + '为' + TRIGRAM_IMG[upper]
+    : TRIGRAM_IMG[upper] + TRIGRAM_IMG[lower] + name;
+  return { code: code, kw: kw, name: name, fullName: fullName, upper: upper, lower: lower, lines: lines,
+    unicode: String.fromCodePoint(0x4dc0 + kw - 1) };
+}
+
+// 公历年份 → 天文纪年（无公元 0 年：公元前 1 年 = 0）
+function astroYear(era, year) { return era === 'CE' ? year : 1 - year; }
+
+function compute(era, year) {
+  var astro = astroYear(era, year);
+  var offset = astro - EPOCH_ASTRO;
+  var yuanIndex = Math.floor(offset / 129600);
+  var year0 = offset - yuanIndex * 129600; // 元内零基年 0..129599
+  var gz = mod(offset, 60);
+  var yuanNo = yuanIndex + 1;
+  var huiNo = Math.floor(year0 / 10800) + 1;
+  var yunNo = Math.floor(year0 / 360) + 1;
+  var shiNo = Math.floor(year0 / 30) + 1;
+  var yuanStart = EPOCH_ASTRO + yuanIndex * 129600;
+  var huiStart = yuanStart + (huiNo - 1) * 10800;
+  var yunStart = yuanStart + (yunNo - 1) * 360;
+  var shiStart = yuanStart + (shiNo - 1) * 30;
+  var yunInHui = ((yunNo - 1) % 30) + 1;
+  var shiInYun = ((shiNo - 1) % 12) + 1;
+  // ---- ma-zeng-2020 配卦 ----
+  var season = Math.floor(year0 / 32400);
+  var seasonPrincipal = SEASON_CODES[season];
+  var termLine = Math.floor((year0 % 32400) / 5400) + 1;
+  var termCode = flip(seasonPrincipal, termLine);
+  var huiCode = HUI_CODES[huiNo - 1];
+  var onDutyBlock = Math.floor(year0 / 2160);
+  var onDutyCode = ON_DUTY_ROT[onDutyBlock];
+  var yunSeg = Math.floor((year0 % 2160) / 360);
+  var yunCode = flip(onDutyCode, yunSeg + 1);
+  var yunYear = (year0 % 2160) % 360;
+  var jiaziSeg = Math.floor(yunYear / 60);
+  var rawJiazi = flip(yunCode, jiaziSeg + 1);
+  var jiaziCode = PRINCIPAL[rawJiazi] ? nextOnDuty(rawJiazi) : rawJiazi;
+  var yearInJiazi = yunYear % 60;
+  var annualCode = advanceOnDuty(jiaziCode, yearInJiazi);
+  var jiaziStart = yunStart + jiaziSeg * 60;
+  // 世内三十年干支（世首干支序号）
+  var shiStartGz = mod((shiNo - 1) * 30, 60);
+  var shiYears = [];
+  for (var i = 0; i < 30; i++) {
+    var g = shiStartGz + i;
+    shiYears.push({ gz: STEMS[g % 10] + BRANCHES[g % 12], astro: shiStart + i });
+  }
+  return {
+    era: era, year: year, astro: astro,
+    ganzhi: STEMS[gz % 10] + BRANCHES[gz % 12],
+    yuanNo: yuanNo, yearInYuan: year0 + 1, yuanStem: STEMS[mod(yuanNo - 1, 10)],
+    yuanStart: yuanStart, yuanEnd: yuanStart + 129599,
+    huiNo: huiNo, huiBranch: BRANCHES[huiNo - 1], yearInHui: (year0 % 10800) + 1,
+    huiStart: huiStart, huiEnd: huiStart + 10799,
+    yunNo: yunNo, yunStem: STEMS[(yunNo - 1) % 10], yunInHui: yunInHui, yearInYun: (year0 % 360) + 1,
+    yunStart: yunStart, yunEnd: yunStart + 359,
+    shiNo: shiNo, shiBranch: BRANCHES[(shiNo - 1) % 12], shiInYun: shiInYun, yearInShi: (year0 % 30) + 1,
+    shiStart: shiStart, shiEnd: shiStart + 29,
+    hex: {
+      yuan: hexInfo(32), season: hexInfo(seasonPrincipal), term: hexInfo(termCode),
+      hui: hexInfo(huiCode), onDuty: hexInfo(onDutyCode), yun: hexInfo(yunCode),
+      jiazi: hexInfo(jiaziCode), annual: hexInfo(annualCode)
+    },
+    jiaziStart: jiaziStart, jiaziEnd: jiaziStart + 59,
+    shiYears: shiYears,
+    inChronicle: (shiNo >= 2149 && shiNo <= 2268)
+  };
+}
+
+// ---- 年份标签 ----
+function fmtYear(a) {
+  if (a >= 1) return fmt(t('ceYear'), '{n}', a);
+  return fmt(t('bceYear'), '{n}', 1 - a);
+}
+function fmtRange(a, b) {
+  if (a >= 1 && b >= 1) return fmt(t('rangeCE'), '{a}', a, '{b}', b);
+  if (a <= 0 && b <= 0) return fmt(t('rangeBCE'), '{a}', 1 - a, '{b}', 1 - b);
+  return fmt(t('rangeMixed'), '{a}', 1 - a, '{b}', b);
+}
+function fmtYearShort(a) {
+  if (a >= 1) return fmt(t('yearShortCE'), '{n}', a);
+  return fmt(t('yearShortBCE'), '{n}', 1 - a);
+}
+
+// ---- 中文数字解析（容忍原书省略零的写法，如“二千二百九”）----
+var CN_DIGIT = { '一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9 };
+function parseCnNum(s) {
+  var total = 0, pending = 0, i, ch;
+  for (i = 0; i < s.length; i++) {
+    ch = s.charAt(i);
+    if (CN_DIGIT[ch]) { pending = CN_DIGIT[ch]; }
+    else if (ch === '千') { total += (pending || 1) * 1000; pending = 0; }
+    else if (ch === '百') { total += (pending || 1) * 100; pending = 0; }
+    else if (ch === '十') { total += (pending || 1) * 10; pending = 0; }
+    // 零：跳过
+  }
+  return total + pending;
+}
+
+// ---- 数据加载（本站数据文件，按需加载）----
+var GUAXIANG = null; // 卦名 → {xiang, duan}
+var GUAXIANG_STATE = 'idle'; // idle | loading | ready | fail
+var CHRONICLE = null; // huangji 全书 JSON
+var CHRONICLE_STATE = 'idle';
+
+function loadGuaxiang(onDone) {
+  if (GUAXIANG_STATE === 'ready' || GUAXIANG_STATE === 'loading') { if (onDone) onDone(); return; }
+  GUAXIANG_STATE = 'loading';
+  setStatus(t('dataLoading'), false);
+  fetch('/data/liuyao_guaxiang.json').then(function (res) {
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  }).then(function (data) {
+    GUAXIANG = {};
+    var list = data.guaxiang || [];
+    for (var i = 0; i < list.length; i++) GUAXIANG[list[i].name] = list[i];
+    GUAXIANG_STATE = 'ready';
+    setStatus(t('dataReady'), false);
+    if (onDone) onDone();
+    if (LAST_RESULT) showResult(LAST_RESULT, true);
+  }).catch(function () {
+    GUAXIANG_STATE = 'fail';
+    setStatus(t('dataFail'), true);
+    if (onDone) onDone();
+  });
+}
+
+function setStatus(msg, isErr) {
+  var el = document.getElementById('data-status');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.className = 'data-status' + (isErr ? ' err' : '');
+}
+
+function loadChronicle(result) {
+  var body = document.getElementById('chronicle-body');
+  var ref = document.getElementById('chronicle-ref');
+  ref.classList.add('hidden');
+  if (!result.inChronicle) {
+    body.innerHTML = '<div class="chronicle-quote">' + t('tiyaoQuote') + '</div>' +
+      '<div class="chronicle-cite">' + t('tiyaoCite') + '</div>' +
+      '<p style="margin-top:.8rem">' + t('chronicleOut') + '</p>';
+    return;
+  }
+  body.innerHTML = '<p>' + t('chronicleLoading') + '</p>';
+  function done() {
+    if (CHRONICLE_STATE !== 'ready' || !CHRONICLE) {
+      body.innerHTML = '<p>' + t('chronicleFail') + '</p>';
+      return;
+    }
+    var found = findShiBlock(CHRONICLE, result);
+    if (!found) {
+      body.innerHTML = '<p>' + t('chronicleNoneShi') + '</p>';
+      return;
+    }
+    var ann = extractYearNote(found.block, result);
+    body.innerHTML = '<p><b>' + esc(result.ganzhi) + '</b>　' + (ann ? esc(ann) : t('chronicleNoneYear')) + '</p>';
+    var full = document.getElementById('chronicle-full');
+    full.textContent = cleanText(found.block);
+    ref.classList.remove('hidden');
+  }
+  if (CHRONICLE_STATE === 'ready') { done(); return; }
+  if (CHRONICLE_STATE === 'loading') {
+    var timer = setInterval(function () {
+      if (CHRONICLE_STATE !== 'loading') { clearInterval(timer); done(); }
+    }, 300);
+    return;
+  }
+  CHRONICLE_STATE = 'loading';
+  fetch('/data/huangji_jingshi_shu.json').then(function (res) {
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  }).then(function (data) {
+    CHRONICLE = data;
+    CHRONICLE_STATE = 'ready';
+    done();
+  }).catch(function () {
+    CHRONICLE_STATE = 'fail';
+    done();
+  });
+}
+
+function cleanText(s) {
+  var out = String(s).replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+  if (out.length > 2600) out = out.slice(0, 2600) + ' ……';
+  return out;
+}
+
+// 在全书中找该世的纪事块：按“经世之<字><中文数>”定位，取到下一个“经世之”为止
+function findShiBlock(data, result) {
+  var sections = data.sections || [];
+  var re = /经世之(.)([一二三四五六七八九十百千零]+)/g;
+  for (var s = 0; s < sections.length; s++) {
+    var text = sections[s].text || '';
+    var m;
+    re.lastIndex = 0;
+    while ((m = re.exec(text)) !== null) {
+      if (parseCnNum(m[2]) === result.shiNo) {
+        var start = m.index;
+        var next = text.indexOf('经世之', start + 1);
+        var block = next === -1 ? text.slice(start) : text.slice(start, next);
+        return { section: sections[s].title, block: block };
+      }
+    }
+  }
+  return null;
+}
+
+// 从世块中取该年的纪事：世块按世首干支起连续列出三十年干支，取第 yearInShi 个干支后的文字
+var GZ60 = (function () {
+  var a = [];
+  for (var i = 0; i < 60; i++) a.push(STEMS[i % 10] + BRANCHES[i % 12]);
+  return a;
+})();
+function extractYearNote(block, result) {
+  var gzRe = /[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]/g;
+  var tokens = [], m;
+  while ((m = gzRe.exec(block)) !== null) tokens.push({ gz: m[0], start: m.index, end: m.index + 2 });
+  if (!tokens.length) return '';
+  var idx = result.yearInShi - 1;
+  // 校验：首个干支须为世首干支，且前 yearInShi 个按六十甲子连续
+  var ok = tokens[0].gz === result.shiYears[0].gz;
+  if (ok) {
+    for (var i = 1; i <= idx && i < tokens.length; i++) {
+      var prevN = GZ60.indexOf(tokens[i - 1].gz);
+      var curN = GZ60.indexOf(tokens[i].gz);
+      if (prevN < 0 || curN < 0 || (curN - prevN + 60) % 60 !== 1) { ok = false; break; }
+    }
+  }
+  var target = null;
+  if (ok && idx < tokens.length && tokens[idx].gz === result.ganzhi) {
+    target = tokens[idx];
+  } else {
+    // 回退：在块中找该年干支唯一带纪事的出现
+    var cands = [];
+    for (var j = 0; j < tokens.length; j++) {
+      if (tokens[j].gz !== result.ganzhi) continue;
+      var end = (j + 1 < tokens.length) ? tokens[j + 1].start : block.length;
+      var note = cleanText(block.slice(tokens[j].end, end));
+      if (note) cands.push(note);
+    }
+    if (cands.length === 1) return cands[0];
+    return '';
+  }
+  var endPos = (idx + 1 < tokens.length) ? tokens[idx + 1].start : block.length;
+  return cleanText(block.slice(target.end, endPos));
+}
+// ==LOGIC-END==
+
+// ---- UI ----
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function hexDiagram(linesBottomUp) {
+  var html = '<div class="hex-diagram">';
+  for (var i = 5; i >= 0; i--) {
+    var v = linesBottomUp[i];
+    var cls = 'hex-row ' + (v === 1 ? 'yang' : 'yin');
+    var segs = v === 1
+      ? '<div class="bar"><span class="seg"></span></div>'
+      : '<div class="bar"><span class="seg"></span><span class="seg"></span></div>';
+    html += '<div class="' + cls + '"><span class="lbl">' + (i + 1) + '</span>' + segs + '<span class="mark"></span></div>';
+  }
+  return html + '</div>';
+}
+
+function hexCard(title, hex, spanText) {
+  var up = TRIGRAMS[hex.upper], low = TRIGRAMS[hex.lower];
+  var numLabel = LANG === 'en' ? 'Hexagram ' + hex.kw : '第 ' + hex.kw + ' 卦';
+  var displayName = LANG === 'en' ? hexName(hex) : hex.fullName;
+  var cnSub = (LANG === 'en') ? '<span class="gua-name-cn">' + esc(hex.fullName) + ' ' + hex.unicode + '</span>' : '';
+  var note = t('guaciNote');
+  var gx = GUAXIANG ? GUAXIANG[hex.fullName] : null;
+  var guaci = gx ? (esc(gx.xiang) + '，' + esc(gx.duan)) : '';
+  return '<div class="hex-card"><h3>' + title + '</h3>' +
+    '<div class="gua-name">' + numLabel + ' · ' + displayName + '</div>' + cnSub +
+    '<div class="tri-info">' + t('upperTri') + ' <b>' + trigramName(hex.upper) + ' · ' + elementName(up.element) + '</b>　' + t('lowerTri') + ' <b>' + trigramName(hex.lower) + ' · ' + elementName(low.element) + '</b></div>' +
+    hexDiagram(hex.lines) +
+    (guaci ? '<div class="guaci">' + t('xiangLabel') + guaci + (note ? '<div class="guaci-note">' + note + '</div>' : '') + '</div>' : '') +
+    '<div class="span-line">' + spanText + '</div></div>';
+}
+
+function showResult(r, noScroll) {
+  LAST_RESULT = r;
+  var yearLabel = fmtYear(r.astro);
+  var head = '<b>' + esc(yearLabel) + '</b>（' + esc(r.ganzhi) + '）<br>' +
+    fmt(t('yuanPart'), '{n}', r.yuanNo) + ' · ' + stemName(r.yuanStem) + '　' +
+    fmt(t('huiPart'), '{n}', r.huiNo) + ' · ' + branchName(r.huiBranch) + '　' +
+    fmt(t('yunPart'), '{n}', r.yunNo) + ' · ' + stemName(r.yunStem) + '　' +
+    fmt(t('shiPart'), '{n}', r.shiNo) + ' · ' + branchName(r.shiBranch) + '<br>' +
+    fmt(t('yearInYuan'), '{n}', r.yearInYuan) + ' · ' +
+    fmt(t('yearInHui'), '{n}', r.yearInHui) + ' · ' +
+    fmt(t('yearInYun'), '{n}', r.yearInYun) + ' · ' +
+    fmt(t('yearInShi'), '{n}', r.yearInShi);
+  document.getElementById('result-head').innerHTML = head;
+
+  var yn = document.getElementById('yuan-note');
+  yn.innerHTML = (r.yuanNo !== 1)
+    ? fmt(t('yuanExtNote'), '{n}', r.yuanNo)
+    : '<span class="level">' + t('yuanNote1') + '</span>';
+
+  var rows = [
+    [t('lvlYuan'), fmt(t('yuanPart'), '{n}', r.yuanNo), stemName(r.yuanStem), fmt(t('yearInYuan'), '{n}', r.yearInYuan), fmtRange(r.yuanStart, r.yuanEnd)],
+    [t('lvlHui'), fmt(t('huiPart'), '{n}', r.huiNo), branchName(r.huiBranch), fmt(t('yearInHui'), '{n}', r.yearInHui), fmtRange(r.huiStart, r.huiEnd)],
+    [t('lvlYun'), fmt(t('yunPart'), '{n}', r.yunNo) + ' · ' + fmt(t('yunInHui'), '{n}', r.yunInHui), stemName(r.yunStem), fmt(t('yearInYun'), '{n}', r.yearInYun), fmtRange(r.yunStart, r.yunEnd)],
+    [t('lvlShi'), fmt(t('shiPart'), '{n}', r.shiNo) + ' · ' + fmt(t('shiInYun'), '{n}', r.shiInYun), branchName(r.shiBranch), fmt(t('yearInShi'), '{n}', r.yearInShi), fmtRange(r.shiStart, r.shiEnd)]
+  ];
+  var th = '<tr><th>' + t('colLevel') + '</th><th>' + t('colNo') + '</th><th>' + t('colName') + '</th><th>' + t('colYearIn') + '</th><th>' + t('colRange') + '</th></tr>';
+  var tb = '';
+  for (var i = 0; i < rows.length; i++) {
+    tb += '<tr><td><b>' + rows[i][0] + '</b></td><td><span class="gold">' + rows[i][1] + '</span></td><td>' + rows[i][2] + '</td><td>' + rows[i][3] + '</td><td>' + rows[i][4] + '</td></tr>';
+  }
+  document.getElementById('pos-table').innerHTML = th + tb;
+
+  var grid = document.getElementById('hex-grid');
+  grid.innerHTML =
+    hexCard(t('cardHui'), r.hex.hui, '<b>' + fmt(t('huiSpan'), '{b}', branchName(r.huiBranch)) + '</b> · ' + fmtRange(r.huiStart, r.huiEnd)) +
+    hexCard(t('cardYun'), r.hex.yun, '<b>' + fmt(t('yunSpan'), '{n}', r.yunNo) + '</b> · ' + fmtRange(r.yunStart, r.yunEnd)) +
+    hexCard(t('cardShi'), r.hex.jiazi, '<b>' + t('shiSpan') + '</b> · ' + fmtRange(r.jiaziStart, r.jiaziEnd)) +
+    hexCard(t('cardAnnual'), r.hex.annual, '<b>' + fmt(t('annualSpan'), '{y}', yearLabel) + '</b> · ' + esc(r.ganzhi));
+
+  document.getElementById('layers-line').innerHTML =
+    t('layerYuan') + ' <b>' + hexName(r.hex.yuan) + '</b> · ' +
+    t('layerSeason') + ' <b>' + hexName(r.hex.season) + '</b> · ' +
+    t('layerTerm') + ' <b>' + hexName(r.hex.term) + '</b> · ' +
+    t('layerOnDuty') + ' <b>' + hexName(r.hex.onDuty) + '</b>';
+
+  var chips = '';
+  for (var k = 0; k < r.shiYears.length; k++) {
+    var sy = r.shiYears[k];
+    var isNow = (sy.astro === r.astro);
+    chips += '<span class="chip' + (isNow ? ' now' : '') + '">' + sy.gz + ' · ' + fmtYearShort(sy.astro) + '</span>';
+  }
+  document.getElementById('shi-chips').innerHTML = chips;
+
+  loadChronicle(r);
+  document.getElementById('result-card').classList.remove('hidden');
+  if (!noScroll) document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function doCompute() {
+  var err = document.getElementById('year-error');
+  var era = document.getElementById('era').value;
+  var raw = document.getElementById('year').value;
+  var y = parseInt(raw, 10);
+  if (raw === '' || raw === null) { err.textContent = t('errNoYear'); return; }
+  if (isNaN(y) || y < 1 || String(y) !== String(parseInt(raw, 10))) { err.textContent = t('errBadYear'); return; }
+  if (era === 'BCE' && y > 67017) { err.textContent = t('errRangeBCE'); return; }
+  if (era === 'CE' && y > 99999) { err.textContent = t('errRangeCE'); return; }
+  err.textContent = '';
+  loadGuaxiang();
+  showResult(compute(era, y));
+}
+
+function useDateYear() {
+  var v = document.getElementById('date').value;
+  if (!v) return;
+  var y = parseInt(v.slice(0, 4), 10);
+  if (!isNaN(y) && y >= 1) {
+    document.getElementById('era').value = 'CE';
+    document.getElementById('year').value = y;
+  }
+}
+
+function useThisYear() {
+  var now = new Date();
+  document.getElementById('era').value = 'CE';
+  document.getElementById('year').value = now.getFullYear();
+  document.getElementById('date').value = '';
+}
+
+// 默认填入今年并直接推算
+document.getElementById('year').value = new Date().getFullYear();
+// 初始化界面语言（localStorage 优先，否则按浏览器语言自动检测）
+applyI18n();
+loadGuaxiang();
+showResult(compute('CE', new Date().getFullYear()), true);
+
+// ==AI-INTERPRET==
+// Shared AI 解读 button (/js/ai-jiegua.js). Summary comes from this page's
+// own result state; null/'' means "no result yet" and the button only shows
+// a hint instead of calling the backend.
+function aiTrunc(s, n) { s = String(s == null ? '' : s); return s.length > n ? s.slice(0, n) + '…' : s; }
+window.getJieguaSummary = function() {
+if (!LAST_RESULT) return null;
+var r = LAST_RESULT;
+var parts = [];
+parts.push('皇极经世·' + fmtYear(r.astro) + '（' + r.ganzhi + '）');
+parts.push('元：' + r.yuanNo + ' · ' + stemName(r.yuanStem) + '　会：' + r.huiNo + ' · ' + branchName(r.huiBranch) + '　运：' + r.yunNo + ' · ' + stemName(r.yunStem) + '　世：' + r.shiNo + ' · ' + branchName(r.shiBranch));
+parts.push('元卦：' + hexName(r.hex.yuan) + ' · 季卦：' + hexName(r.hex.season) + ' · 月卦：' + hexName(r.hex.term) + ' · 会卦：' + hexName(r.hex.hui) + ' · 运卦：' + hexName(r.hex.yun) + ' · 世卦：' + hexName(r.hex.jiazi) + ' · 年卦：' + hexName(r.hex.annual));
+var gx = (typeof GUAXIANG !== 'undefined' && GUAXIANG) ? GUAXIANG[r.hex.annual.fullName] : null;
+if (gx) parts.push('年卦象断：' + aiTrunc(gx.xiang + '，' + gx.duan, 200));
+return parts.join('\n');
+};
+
+if (window.AIInterpret) { window.AIInterpret.attach(); }
+else { document.addEventListener('DOMContentLoaded', function () { if (window.AIInterpret) window.AIInterpret.attach(); }); }
+</script>
+<script src="/js/ai-jiegua.js"></script>
+</body>
+</html>

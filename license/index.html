@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 数据与出处</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏（与梅花页一致） ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { display: block; font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select {
+    width: auto; flex: 1; min-width: 0; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: .9rem; padding: .3rem .1rem; outline: none; border-radius: 0; font-family: inherit; cursor: pointer;
+  }
+  .lang-switch select:focus { border-bottom-color: #c9a962; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+
+  /* ---- 分组卡片 ---- */
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+  .group-card {
+    display: block; text-decoration: none; color: inherit;
+    background: transparent; border: 1px solid rgba(201,169,98,.3); border-radius: 6px;
+    padding: 1.3rem 1.4rem; min-height: 132px;
+  }
+  a.group-card:hover { border-color: #c9a962; background: rgba(201,169,98,.05); }
+  .group-card.soon { opacity: .55; cursor: default; }
+  .group-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: .8rem; }
+  .group-card-title { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.25rem; color: #f0ead8; line-height: 1.5; }
+  .group-card-arrow { color: #c9a962; font-size: 1.2rem; flex-shrink: 0; line-height: 1.5; }
+  .group-card-desc { font-size: .85rem; color: #9a9aab; line-height: 1.8; margin-top: .7rem; }
+  .group-card-badge { display: inline-block; margin-top: .8rem; font-size: .7rem; color: #c9a962; border: 1px solid rgba(201,169,98,.6); border-radius: 999px; padding: .1rem .6rem; letter-spacing: .1em; }
+  .group-card-badge.soon { color: #6f6f80; border-color: rgba(154,154,171,.35); }
+
+  /* ---- 一事一问 ---- */
+  .pill {
+    display: inline-block; font-size: .75rem; color: #c9a962; letter-spacing: .25em;
+    border: 1px solid rgba(201,169,98,.6); border-radius: 999px; padding: .35rem 1rem; margin-bottom: 1.2rem;
+  }
+  .inquiry-title { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.5rem; color: #f0ead8; font-weight: 400; letter-spacing: .06em; margin-bottom: 1.4rem; }
+  .inquiry-list { list-style: none; }
+  .inquiry-list li { padding: .55rem 0; font-size: .98rem; line-height: 1.7; }
+  .inquiry-list li::before { content: '•'; color: #c9a962; margin-right: .7rem; }
+  .inquiry-list a { color: #f0ead8; text-decoration: none; }
+  .inquiry-list a:hover { color: #c9a962; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  /* ---- 移动端底部导航 ---- */
+  .bottom-nav { display: none; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 5.5rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .bottom-nav {
+      display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+      background: rgba(11,11,20,.96); border-top: 1px solid rgba(201,169,98,.25);
+      padding: .45rem 0 calc(.45rem + env(safe-area-inset-bottom, 0px));
+    }
+    .bottom-nav a, .bottom-nav span.bn-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: .15rem;
+      color: #f0ead8; text-decoration: none; font-size: .72rem; letter-spacing: .05em;
+    }
+    .bottom-nav .bn-icon { color: #c9a962; font-size: 1.05rem; line-height: 1.2; }
+    .bottom-nav span.bn-item { color: #6f6f80; cursor: default; }
+    .bottom-nav span.bn-item .bn-icon { color: #6f6f80; }
+  }
+</style>
+<style>
+  .page-title { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2rem; color: #f0ead8; text-align: center; margin: .6rem 0; }
+  .page-sub { color: #9a9aab; text-align: center; max-width: 640px; margin: 0 auto; line-height: 1.9; }
+  .section h2 { font-family: "Noto Serif SC","Songti SC","SimSun",serif; color: #c9a962; font-size: 1.15rem; margin-bottom: .7rem; }
+  .section p { color: #d8d8e0; line-height: 2; margin-bottom: .8rem; }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">免费占卜 · 本地排盘</div>
+    </div>
+  </a>
+      <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_jingfang">京房易</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_yindu">印度占星</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_liunian">流年流月</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+      <span class="nav-item"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span> <span class="nav-tag" data-i18n="navSoon">即将上线</span></span>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+    <section class="section">
+      <p class="eyebrow" data-i18n="licEyebrow">附录 · 数据与出处</p>
+      <h1 class="page-title" data-i18n="licTitle">数据与出处</h1>
+      <p class="page-sub" data-i18n="licIntro">盗天机是免费的在线占卜站。本页列出本站使用的数据来源与许可证。所有排盘计算均在你的浏览器本地完成。</p>
+    </section>
+
+    <section class="section">
+      <h2 data-i18n="licS1T">术数数据</h2>
+      <p data-i18n="licS1A">本站的解梦、六爻、八字、紫微斗数等术数数据，来自开源项目 comprehensive-shushu-engine（wang-er-1-2003），该项目将 35 个体系的古籍原文逐句数字化为 JSON 数据。本站按 GNU 通用公共许可证第三版（GPL-3.0）使用这些数据。</p>
+      <p><a style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)" href="https://github.com/wang-er-1-2003/comprehensive-shushu-engine" data-i18n="licS1Link">GitHub 仓库：wang-er-1-2003/comprehensive-shushu-engine</a></p>
+      <p><a style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)" href="/license/LICENSE.txt" data-i18n="licS1Lic">许可证全文（GPL-3.0）：LICENSE.txt</a></p>
+    </section>
+
+    <section class="section">
+      <h2 data-i18n="licS2T">农历换算</h2>
+      <p data-i18n="licS2A">公历与农历换算使用 lunar-javascript（6tail，MIT 许可证）。</p>
+    </section>
+
+    <section class="section">
+      <h2 data-i18n="licS3T">梅花解卦参考</h2>
+      <p data-i18n="licS3A">梅花易数的 64 卦、384 爻辞等解卦参考资料，来自开源项目 muyen/meihua-yishu。</p>
+    </section>
+
+    <section class="section">
+      <h2 data-i18n="licS4T">本站说明</h2>
+      <p data-i18n="licS4A">本站所有工具均为静态页面，不收集、不上传你的输入。传统术数仅供参考，不构成决策依据。</p>
+    </section>
+
+    <footer>
+      <span data-i18n="disclaimer">传统术数仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a>
+    </footer>
+</div>
+</main>
+
+<nav class="bottom-nav">
+  <a href="/meihua/"><span class="bn-icon">✦</span><span data-i18n="bn1">一事一问</span></a>
+  <a href="/shengminglingshu/"><span class="bn-icon">◎</span><span data-i18n="bn2">一生之图</span></a>
+  <a href="/xiyang-hepan/"><span class="bn-icon">❖</span><span data-i18n="bn3">两人之间</span></a>
+  <a href="/maya/"><span class="bn-icon">◷</span><span data-i18n="bn4">时机之轮</span></a>
+</nav>
+
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。localStorage 键为站点级 'daotianji-lang'，与各工具页共用。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'licEyebrow': '附录 · 数据与出处',
+  'licTitle': '数据与出处',
+  'licIntro': '盗天机是免费的在线占卜站。本页列出本站使用的数据来源与许可证。所有排盘计算均在你的浏览器本地完成。',
+  'licS1T': '术数数据',
+  'licS1A': '本站的解梦、六爻、八字、紫微斗数等术数数据，来自开源项目 comprehensive-shushu-engine（wang-er-1-2003），该项目将 35 个体系的古籍原文逐句数字化为 JSON 数据。本站按 GNU 通用公共许可证第三版（GPL-3.0）使用这些数据。',
+  'licS1Link': 'GitHub 仓库：wang-er-1-2003/comprehensive-shushu-engine',
+  'licS1Lic': '许可证全文（GPL-3.0）：LICENSE.txt',
+  'licS2T': '农历换算',
+  'licS2A': '公历与农历换算使用 lunar-javascript（6tail，MIT 许可证）。',
+  'licS3T': '梅花解卦参考',
+  'licS3A': '梅花易数的 64 卦、384 爻辞等解卦参考资料，来自开源项目 muyen/meihua-yishu。',
+  'licS4T': '本站说明',
+  'licS4A': '本站所有工具均为静态页面，不收集、不上传你的输入。传统术数仅供参考，不构成决策依据。',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '免费占卜 · 本地排盘',
+  navGroup: '占卜',
+  nav_1: '解梦', nav_2: '六爻占卜', nav_3: '梅花易数', nav_4: '小六壬', nav_5: '塔罗牌',
+  nav_6: '雷诺曼', nav_7: '北欧卢恩符文', nav_8: '奇门遁甲', nav_9: '印度占星卜卦', nav_10: '西方卜卦占星',
+  nav_11: '大六壬', nav_12: '金口诀', nav_13: '太乙神数', nav_14: '占星骰子',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  langLabel: '语言',
+  eyebrow: 'PROLOGUE · 序幕',
+  slogan: '把问题带来，<br>把天机带走。',
+  subtitle: '盗天机 · 免费在线占卜排盘',
+  card1Title: '一事一问 · 当下的抉择',
+  card1Desc: '解梦、六爻占卜、梅花易数、小六壬、塔罗牌、雷诺曼、北欧卢恩符文、奇门遁甲、大六壬、金口诀、太乙神数、占星骰子、诸葛神数、灵棋经、测字、周易占卜',
+  card1Badge: '已有 7 个工具',
+  card2Title: '一生之图 · 命盘全览',
+  card2Desc: '四柱八字、紫微斗数、铁板神数、焦氏易林、京房易、太玄经、皇极经世、生命灵数、称骨算命、西洋占星、印度占星、七政四余',
+  card2Badge: '已有 2 个工具',
+  card3Title: '两人之间 · 关系合盘',
+  card3Desc: '西方占星合盘、八字合盘、紫微合盘、印度合盘',
+  card4Title: '时机之轮 · 阶段 / 流年 / 流月',
+  card4Desc: '流年运势、流月运势、阶段推运',
+  cardSoon: '即将上线',
+  inquiryPill: 'INQUIRY · 一事一问',
+  inquiryTitle: '一事一问 · 当下的抉择',
+  inqQ1: '这份工作我要继续做下去吗？',
+  inqQ2: '现在那个 offer 值不值得接？',
+  inqQ3: '下周那个面试会顺利吗？',
+  inqQ4: '正在谈的这件事最后能不能成？',
+  inqQ5: '这次关系冷战，还会有转机吗？',
+  faqTitle: '常见问题',
+  faqQ1: '盗天机是什么？',
+  faqA1: '盗天机是免费的在线占卜站，把传统术数做成排盘工具：起卦排盘在本地完成，不联网、不收费。',
+  faqQ2: '占卜结果免费吗？',
+  faqA2: '免费。所有工具的排盘与基础解读都不收费，也没有次数限制。',
+  faqQ3: '占卜需要注册或登录吗？',
+  faqA3: '不需要。打开就能用，不用注册、不用登录，也不会保存你输入的问题。',
+  disclaimer: '传统术数仅供参考，不构成决策依据。',
+  bn1: '一事一问', bn2: '一生之图', bn3: '两人之间', bn4: '时机之轮'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'licEyebrow': '附錄 · 數據與出處',
+  'licTitle': '數據與出處',
+  'licIntro': '盜天機是免費的在線占卜站。本頁列出本站使用的數據來源與許可證。所有排盤計算均在你的瀏覽器本地完成。',
+  'licS1T': '術數數據',
+  'licS1A': '本站的解夢、六爻、八字、紫微斗數等術數數據，來自開源項目 comprehensive-shushu-engine（wang-er-1-2003），該項目將 35 個體系的古籍原文逐句數字化為 JSON 數據。本站按 GNU 通用公共許可證第三版（GPL-3.0）使用這些數據。',
+  'licS1Link': 'GitHub 倉庫：wang-er-1-2003/comprehensive-shushu-engine',
+  'licS1Lic': '許可證全文（GPL-3.0）：LICENSE.txt',
+  'licS2T': '農曆換算',
+  'licS2A': '公曆與農曆換算使用 lunar-javascript（6tail，MIT 許可證）。',
+  'licS3T': '梅花解卦參考',
+  'licS3A': '梅花易數的 64 卦、384 爻辭等解卦參考資料，來自開源項目 muyen/meihua-yishu。',
+  'licS4T': '本站說明',
+  'licS4A': '本站所有工具均為靜態頁面，不收集、不上傳你的輸入。傳統術數僅供參考，不構成決策依據。',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '免費占卜 · 本地排盤',
+  navGroup: '占卜',
+  nav_1: '解夢', nav_2: '六爻占卜', nav_3: '梅花易數', nav_4: '小六壬', nav_5: '塔羅牌',
+  nav_6: '雷諾曼', nav_7: '北歐盧恩符文', nav_8: '奇門遁甲', nav_9: '印度占星卜卦', nav_10: '西方卜卦占星',
+  nav_11: '大六壬', nav_12: '金口訣', nav_13: '太乙神數', nav_14: '占星骰子',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  langLabel: '語言',
+  eyebrow: 'PROLOGUE · 序幕',
+  slogan: '把問題帶來，<br>把天機帶走。',
+  subtitle: '盜天機 · 免費線上占卜排盤',
+  card1Title: '一事一問 · 當下的抉擇',
+  card1Desc: '解夢、六爻占卜、梅花易數、小六壬、塔羅牌、雷諾曼、北歐盧恩符文、奇門遁甲、大六壬、金口訣、太乙神數、占星骰子、諸葛神數、靈棋經、測字、周易占卜',
+  card1Badge: '已有 7 個工具',
+  card2Title: '一生之圖 · 命盤全覽',
+  card2Desc: '四柱八字、紫微斗數、鐵板神數、焦氏易林、京房易、太玄經、皇極經世、生命靈數、稱骨算命、西洋占星、印度占星、七政四餘',
+  card2Badge: '已有 2 個工具',
+  card3Title: '兩人之間 · 關係合盤',
+  card3Desc: '西方占星合盤、八字合盤、紫微合盤、印度合盤',
+  card4Title: '時機之輪 · 階段 / 流年 / 流月',
+  card4Desc: '流年運勢、流月運勢、階段推運',
+  cardSoon: '即將上線',
+  inquiryPill: 'INQUIRY · 一事一問',
+  inquiryTitle: '一事一問 · 當下的抉擇',
+  inqQ1: '這份工作我要繼續做下去嗎？',
+  inqQ2: '現在那個 offer 值不值得接？',
+  inqQ3: '下週那個面試會順利嗎？',
+  inqQ4: '正在談的這件事最後能不能成？',
+  inqQ5: '這次關係冷戰，還會有轉機嗎？',
+  faqTitle: '常見問題',
+  faqQ1: '盜天機是什麼？',
+  faqA1: '盜天機是免費的線上占卜站，把傳統術數做成排盤工具：起卦排盤在本地完成，不聯網、不收費。',
+  faqQ2: '占卜結果免費嗎？',
+  faqA2: '免費。所有工具的排盤與基礎解讀都不收費，也沒有次數限制。',
+  faqQ3: '占卜需要註冊或登錄嗎？',
+  faqA3: '不需要。打開就能用，不用註冊、不用登錄，也不會保存你輸入的問題。',
+  disclaimer: '傳統術數僅供參考，不構成決策依據。',
+  bn1: '一事一問', bn2: '一生之圖', bn3: '兩人之間', bn4: '時機之輪'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'licEyebrow': 'Appendix · Data & Sources',
+  'licTitle': 'Data & Sources',
+  'licIntro': 'Daotianji is a free online divination site. This page lists the data sources and licenses used. All chart calculations run locally in your browser.',
+  'licS1T': 'Divination Data',
+  'licS1A': 'The dream, six-lines, BaZi, Ziwei and other divination data on this site comes from the open-source project comprehensive-shushu-engine (wang-er-1-2003), which digitizes classical texts for 35 systems into JSON. This site uses that data under the GNU General Public License v3.0 (GPL-3.0).',
+  'licS1Link': 'GitHub: wang-er-1-2003/comprehensive-shushu-engine',
+  'licS1Lic': 'Full license (GPL-3.0): LICENSE.txt',
+  'licS2T': 'Lunar Calendar',
+  'licS2A': 'Gregorian–lunar conversion uses lunar-javascript (6tail, MIT License).',
+  'licS3T': 'Meihua Reference',
+  'licS3A': 'The 64 hexagrams, 384 line texts and other Meihua interpretation references come from the open-source project muyen/meihua-yishu.',
+  'licS4T': 'About This Site',
+  'licS4A': 'Every tool on this site is a static page. Nothing you enter is collected or uploaded. Traditional divination arts are for reference only; they are not a basis for decisions.',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Free Divination · Local Charts',
+  navGroup: 'Divination',
+  nav_1: 'Dream Interpretation', nav_2: 'Six Lines (Liu Yao)', nav_3: 'Meihua Yishu', nav_4: 'Xiao Liuren', nav_5: 'Tarot',
+  nav_6: 'Lenormand', nav_7: 'Norse Runes', nav_8: 'Qimen Dunjia', nav_9: 'Vedic Astrology', nav_10: 'Western Horary Astrology',
+  nav_11: 'Da Liuren', nav_12: 'Jinkou Jue', nav_13: 'Taiyi Shenshu', nav_14: 'Astrology Dice',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  langLabel: 'Language',
+  eyebrow: 'PROLOGUE',
+  slogan: 'Bring your question.<br>Take the secret with you.',
+  subtitle: 'Daotianji · Free online divination charts',
+  card1Title: 'One Question · The Choice at Hand',
+  card1Desc: 'Dream Interpretation, Six Lines, Meihua Yishu, Xiao Liuren, Tarot, Lenormand, Norse Runes, Qimen Dunjia, Da Liuren, Jinkou Jue, Taiyi Shenshu, Astrology Dice, Zhuge Oracles, Lingqi Jing, Character Divination, Zhouyi Divination',
+  card1Badge: '7 tools available',
+  card2Title: 'Life Chart · The Full Destiny Map',
+  card2Desc: 'Four Pillars (BaZi), Ziwei Dou Shu, Tieban Shenshu, Jiaoshi Yilin, Jingfang Yi, Taixuan Jing, Huangji Jingshi, Life Path Numbers, Bone Weighing, Western Astrology, Vedic Astrology, Qizheng Siyu',
+  card2Badge: '2 tools available',
+  card3Title: 'Between Two · Relationship Synastry',
+  card3Desc: 'Western synastry, BaZi compatibility, Ziwei compatibility, Vedic compatibility',
+  card4Title: 'Wheel of Timing · Phases / Years / Months',
+  card4Desc: 'Annual fortune, monthly fortune, phase forecasts',
+  cardSoon: 'Coming soon',
+  inquiryPill: 'INQUIRY · One Question',
+  inquiryTitle: 'One Question · The Choice at Hand',
+  inqQ1: 'Should I keep doing this job?',
+  inqQ2: 'Is that offer worth taking?',
+  inqQ3: 'Will next week\u2019s interview go well?',
+  inqQ4: 'Will the deal I\u2019m negotiating work out in the end?',
+  inqQ5: 'After this cold war in the relationship, is there still a turning point?',
+  faqTitle: 'FAQ',
+  faqQ1: 'What is Daotianji?',
+  faqA1: 'Daotianji is a free online divination site that turns traditional Chinese divination arts into charting tools. Charts are computed locally in your browser — no internet, no charge.',
+  faqQ2: 'Are the readings free?',
+  faqA2: 'Yes, free. Charting and basic readings for all tools are free, with no limit on how often you use them.',
+  faqQ3: 'Do I need to register or log in?',
+  faqA3: 'No. Just open and use it — no registration, no login, and your questions are never saved.',
+  disclaimer: 'Traditional divination arts are for reference only; they are not a basis for decisions.',
+  bn1: 'One Question', bn2: 'Life Chart', bn3: 'Between Two', bn4: 'Wheel of Timing'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'licEyebrow': '付録 · データと出典',
+  'licTitle': 'データと出典',
+  'licIntro': '盗天機は無料のオンライン占いサイトです。本頁では使用しているデータとライセンスを示します。すべての排盤計算はブラウザ内で行われます。',
+  'licS1T': '術数データ',
+  'licS1A': '本サイトの解夢・六爻・八字・紫微斗数などの術数データは、オープンソースプロジェクト comprehensive-shushu-engine（wang-er-1-2003）によるもので、35体系の古典をJSON化したものです。本サイトは GNU 一般公衆利用許諾書第3版（GPL-3.0）に基づき利用しています。',
+  'licS1Link': 'GitHub：wang-er-1-2003/comprehensive-shushu-engine',
+  'licS1Lic': 'ライセンス全文（GPL-3.0）：LICENSE.txt',
+  'licS2T': '農暦換算',
+  'licS2A': '西暦・農暦の換算には lunar-javascript（6tail、MIT ライセンス）を使用しています。',
+  'licS3T': '梅花解卦参考',
+  'licS3A': '梅花易数の64卦・384爻辞などの解卦参考資料は、オープンソースプロジェクト muyen/meihua-yishu によるものです。',
+  'licS4T': '本サイトについて',
+  'licS4A': '本サイトのツールはすべて静的ページです。入力内容が収集・送信されることはありません。伝統的な占術は参考までとし、判断の根拠にはなりません。',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '無料占い · ローカル排盤',
+  navGroup: '占い',
+  nav_1: '夢占い', nav_2: '六爻占い', nav_3: '梅花易数', nav_4: '小六壬', nav_5: 'タロット',
+  nav_6: 'ルノルマン', nav_7: '北欧ルーン', nav_8: '奇門遁甲', nav_9: 'インド占星術', nav_10: '西洋ホラリー占星術',
+  nav_11: '大六壬', nav_12: '金口訣', nav_13: '太乙神数', nav_14: '占星ダイス',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  langLabel: '言語',
+  eyebrow: 'プロローグ · 序幕',
+  slogan: '問いを持ち込み、<br>天機を持ち帰る。',
+  subtitle: '盗天機 · 無料オンライン占い排盤',
+  card1Title: '一事一問 · 今の選択',
+  card1Desc: '夢占い、六爻占い、梅花易数、小六壬、タロット、ルノルマン、北欧ルーン、奇門遁甲、大六壬、金口訣、太乙神数、占星ダイス、諸葛神数、霊棋経、測字、周易占い',
+  card1Badge: '7つのツール利用可',
+  card2Title: '一生の図 · 命盤全覧',
+  card2Desc: '四柱八字、紫微斗数、鉄板神数、焦氏易林、京房易、太玄経、皇極経世、生命霊数、称骨占い、西洋占星術、インド占星術、七政四余',
+  card2Badge: '2つのツール利用可',
+  card3Title: '二人の間 · 相性合盤',
+  card3Desc: '西洋占星合盤、八字合盤、紫微合盤、インド合盤',
+  card4Title: '時機の輪 · 段階 / 流年 / 流月',
+  card4Desc: '流年運勢、流月運勢、段階推運',
+  cardSoon: '近日公開',
+  inquiryPill: 'INQUIRY · 一事一問',
+  inquiryTitle: '一事一問 · 今の選択',
+  inqQ1: 'この仕事を続けるべき？',
+  inqQ2: '今のオファーを受ける価値はある？',
+  inqQ3: '来週の面接はうまくいく？',
+  inqQ4: '今交渉中のこの件は最後にまとまる？',
+  inqQ5: '今回の関係の冷戦、まだ転機はある？',
+  faqTitle: 'よくある質問',
+  faqQ1: '盗天機とは？',
+  faqA1: '盗天機は無料のオンライン占いサイトで、伝統的な占術を排盤ツールにしたものです。排盤はローカルで計算され、ネット接続も料金も不要です。',
+  faqQ2: '占い結果は無料ですか？',
+  faqA2: '無料です。すべてのツールの排盤と基本的な解釈は無料で、回数制限もありません。',
+  faqQ3: '占いに登録やログインは必要ですか？',
+  faqA3: '不要です。開くだけで使えます。登録もログインも不要で、入力した質問も保存されません。',
+  disclaimer: '伝統的な占術は参考までとし、判断の根拠にはなりません。',
+  bn1: '一事一問', bn2: '一生の図', bn3: '二人の間', bn4: '時機の輪'
+}
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('subtitle');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+}
+
+applyI18n();
+</script>
+</body>
+</html>

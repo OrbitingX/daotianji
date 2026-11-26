@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 四柱八字</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .method-row { display: flex; gap: 2rem; }
+  .method-row > .field { flex: 1; min-width: 0; }
+  .check-row { display: flex; align-items: center; gap: .6rem; margin-bottom: 1.4rem; font-size: .9rem; color: #c8c2ae; }
+  .check-row input { accent-color: #c9a962; width: 1rem; height: 1rem; }
+  .lunar-preview { font-size: .88rem; color: #9a9aab; line-height: 1.9; margin-top: .5rem; }
+  .lunar-preview b { color: #c9a962; font-weight: 600; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+  .hint { color: #9a9aab; font-size: .85rem; line-height: 1.8; margin-bottom: 1rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .verdict { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .level { color: #c9a962; font-weight: 700; }
+  .pillar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.2rem; }
+  .pillar-card { border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1rem .7rem; text-align: center; }
+  .pillar-card.day-master { border-color: #c9a962; background: rgba(201,169,98,.06); }
+  .pillar-card h3 { font-size: .8rem; color: #b08d3e; font-weight: 400; letter-spacing: .25em; margin-bottom: .5rem; }
+  .pillar-card .gz { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.9rem; color: #f0ead8; letter-spacing: .08em; }
+  .pillar-card .gz .roman { display: block; font-size: .72rem; color: #6f6f80; letter-spacing: .12em; margin-top: .15rem; font-family: inherit; }
+  .pillar-card .tg { font-size: .92rem; color: #c9a962; margin-top: .5rem; }
+  .pillar-card .meta { font-size: .82rem; color: #9a9aab; line-height: 1.9; margin-top: .4rem; }
+  .pillar-card .hidden-stems { font-size: .82rem; color: #c8c2ae; line-height: 1.9; border-top: 1px dashed rgba(201,169,98,.35); margin-top: .6rem; padding-top: .5rem; }
+  .pillar-card .hidden-stems b { color: #f0ead8; font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin-top: 1.2rem; }
+  table.chart { width: 100%; border-collapse: collapse; font-size: .88rem; min-width: 560px; }
+  table.chart th { color: #b08d3e; font-weight: 400; letter-spacing: .18em; text-align: left; padding: .5rem .6rem; border-bottom: 1px solid rgba(201,169,98,.45); white-space: nowrap; }
+  table.chart td { padding: .55rem .6rem; border-bottom: 1px solid rgba(201,169,98,.12); color: #c8c2ae; white-space: nowrap; line-height: 1.6; }
+  table.chart tr.current td { color: #f0ead8; background: rgba(201,169,98,.06); }
+  table.chart td .flag { color: #e8c97a; font-weight: 700; }
+  .chip { display: inline-block; border: 1px solid rgba(201,169,98,.5); border-radius: 999px; padding: .15rem .7rem; margin: 0 .35rem .5rem 0; font-size: .85rem; color: #c8c2ae; }
+  .chip b { color: #c9a962; font-weight: 600; }
+  .chip.missing { border-color: rgba(217,123,108,.6); color: #d97b6c; }
+  .chip.missing b { color: #d97b6c; }
+  .duan-block { margin-top: 1.6rem; }
+  .duan-block h3 { font-size: .85rem; color: #c9a962; letter-spacing: .25em; font-weight: 400; margin-bottom: .7rem; }
+  .duan-item { padding: .7rem 0; border-bottom: 1px solid rgba(201,169,98,.12); font-size: .92rem; line-height: 1.9; color: #c8c2ae; }
+  .duan-item:last-child { border-bottom: none; }
+  .duan-item .cond { color: #c9a962; font-weight: 600; }
+  .duan-item .src { color: #6f6f80; font-size: .8rem; }
+  .duan-note { font-size: .82rem; color: #6f6f80; line-height: 1.8; margin-top: .6rem; }
+  .data-status { font-size: .82rem; color: #6f6f80; margin-top: 1rem; line-height: 1.8; }
+  .data-status.err { color: #d97b6c; }
+  details.refbox { margin-top: 1.6rem; border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1rem 1.2rem; }
+  details.refbox summary { cursor: pointer; color: #c9a962; font-size: .9rem; letter-spacing: .12em; list-style: none; }
+  details.refbox summary::-webkit-details-marker { display: none; }
+  details.refbox summary::after { content: ' +'; }
+  details.refbox[open] summary::after { content: ' −'; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .method-row { flex-direction: column; gap: 0; }
+    .pillar-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">四柱八字 · 本地排盘</div>
+    </div>
+  </a>
+            <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></span>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">一生之图 · 命盘信息</div>
+  <h1 class="slogan" data-i18n-html="slogan">四柱既立，<br>一生之图自分。</h1>
+  <p class="subtitle" data-i18n="subtitle">四柱八字免费在线排盘</p>
+
+  <section class="section">
+    <div class="method-row">
+      <div class="field">
+        <label for="birth" data-i18n="labelBirth">出生日期与时间（公历）</label>
+        <input type="datetime-local" id="birth" onchange="updateLunarPreview()">
+        <div class="lunar-preview" id="lunar-preview"></div>
+        <div class="error" id="birth-error"></div>
+      </div>
+      <div class="field">
+        <label for="gender" data-i18n="labelGender">性别</label>
+        <select id="gender">
+          <option value="1" selected data-i18n="optMale">男</option>
+          <option value="0" data-i18n="optFemale">女</option>
+        </select>
+      </div>
+    </div>
+    <label class="check-row"><input type="checkbox" id="unknown-hour" onchange="toggleUnknownHour()"> <span data-i18n="labelUnknownHour">时辰不明（只排年月日三柱）</span></label>
+    <p class="hint" data-i18n="formHint">年柱以立春为界，月柱以节气为界，日柱按六十甲子日夜交替，时柱按日干推算。输入的时间按当地太阳时理解，本页不做经度真太阳时换算。</p>
+    <button class="submit-btn" onclick="doChart()" data-i18n="btnSubmit">起盘 · 排八字</button>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">排盘结果</div>
+    <div class="result-head" id="result-head"></div>
+    <div class="pillar-grid" id="pillar-grid"></div>
+    <div id="wuxing-block"></div>
+    <div class="duan-block" id="dayun-block"></div>
+    <div class="duan-block" id="liunian-block"></div>
+    <div id="shensha-block"></div>
+    <div id="guji-block"></div>
+    <div class="data-status" id="data-status"></div>
+    <details class="refbox" id="xiaoyun-ref">
+      <summary data-i18n="xiaoyunBtn">展开小运</summary>
+      <div id="xiaoyun-list"></div>
+    </details>
+    <details class="refbox" id="nayin-ref">
+      <summary data-i18n="nayinBtn">展开纳音详解</summary>
+      <div id="nayin-list"></div>
+    </details>
+      <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="bazi" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+</section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">四柱八字：免费排盘与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">年柱为什么以立春为界，不以春节为界？</summary>
+      <p data-i18n="faqA1">八字以节气定年：立春之前出生，年柱仍属上一年；立春之后出生，年柱才是新的一年。春节是农历正月初一，与立春常差几天，1 月、2 月出生的人尤其要注意。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">月柱是怎么定的？</summary>
+      <p data-i18n="faqA2">月柱以节气（立春、惊蛰、清明、立夏、芒种、小暑、立秋、白露、寒露、立冬、大雪、小寒）为界，每月从节开始，到下一个节之前结束；不是按公历 1 号换月，也不是按农历初一换月。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">时辰不明怎么办？</summary>
+      <p data-i18n="faqA3">时辰不明时，本页只排年月日三柱，大运与流年照常排；时柱、小运与日时断语需要时辰，暂不显示。子时是 23:00 至次日 1:00，夜子时（23:00–24:00）仍属当日的日柱、早子时（0:00–1:00）属次日。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">大运顺排还是逆排？起运怎么算？</summary>
+      <p data-i18n="faqA4">阳年出生的男性与阴年出生的女性顺排，阴年出生的男性与阳年出生的女性逆排（阳年指年干为甲丙戊庚壬）。起运按传统“三天折一年”法：顺排数到下一个节，逆排数回上一个节，三天折一岁。不同排盘软件因节气时刻表与折算口径不同，起运月龄可差一两个月，大运干支与交运年份一致为准。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">为什么本页不取用神、不定格局？</summary>
+      <p data-i18n="faqA5">取用神与定格局是八字中最活的一层：子平真诠专寻月令、滴天髓主中和、穷通宝鉴重调候，各书取法互相矛盾，取错则全盘皆错，须先选流派再人工判断。本页只给出可机算的排盘与可查验的断语原文，不代断用神格局。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ6">四柱八字排盘免费吗？数据从哪里来？</summary>
+      <p data-i18n="faqA6">免费。本页排盘在本地完成，不联网、不收费，也不会保存你的出生信息。断语数据来自 comprehensive-shushu-engine（GPL-3.0）所收的三命通会、渊海子平、滴天髓阐微、子平真诠等古典命理文献，五行缺失类断语来自 liki 整理层（MIT）。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">四柱八字属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="attrLine">断语数据：comprehensive-shushu-engine（GPL-3.0），三命通会 · 渊海子平 · 滴天髓阐微 · 子平真诠；五行断语：liki（MIT）。</span><br>
+    <span data-i18n="offlineNote">本页排盘完全离线运行，农历与节气换算使用本地 lunar.js，不向任何服务器发送数据；断语文本按需从本站数据文件加载。</span>
+  </footer>
+</div>
+</main>
+<script src="lunar.js"></script>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。古典断语原文一律保留中文，见 classicNote。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '四柱八字 · 本地排盘',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '一生之图 · 命盘信息',
+  slogan: '四柱既立，<br>一生之图自分。',
+  subtitle: '四柱八字免费在线排盘',
+  labelBirth: '出生日期与时间（公历）',
+  labelGender: '性别',
+  optMale: '男',
+  optFemale: '女',
+  labelUnknownHour: '时辰不明（只排年月日三柱）',
+  formHint: '年柱以立春为界，月柱以节气为界，日柱按六十甲子日夜交替，时柱按日干推算。输入的时间按当地太阳时理解，本页不做经度真太阳时换算。',
+  btnSubmit: '起盘 · 排八字',
+  errNoBirth: '请先选择出生日期与时间。',
+  errBadBirth: '出生时间格式不正确。',
+  errYearRange: '本页支持 1890–2100 年出生排盘。',
+  resultTitle: '排盘结果',
+  ai_interpret: 'AI 解读',
+  lunarLabel: '农历',
+  zodiacLabel: '生肖',
+  dayMasterIs: '日主',
+  pillarYear: '年柱',
+  pillarMonth: '月柱',
+  pillarDay: '日柱',
+  pillarHour: '时柱',
+  hourUnknown: '时辰不明',
+  colStemGod: '天干十神',
+  colHidden: '地支藏干',
+  colElement: '五行',
+  colNayin: '纳音',
+  colChangsheng: '长生',
+  secWuxing: '五行统计',
+  wuxingCount: '四柱干支五行计数',
+  wuxingMissing: '缺',
+  wuxingNoneMissing: '五行俱全，无所缺。',
+  wuxingUnknownHour: '时辰不明，五行统计仅按年月日三柱计算，缺失未必为真缺。',
+  likiNote: '以下断语来自 liki 整理层，仅就“五行缺失”这一可直接查验的条件命中：',
+  classicNote: '',
+  secDayun: '大运',
+  dayunStart: '起运',
+  dayunForward: '顺排',
+  dayunBackward: '逆排',
+  dayunCurrent: '当前大运',
+  dayunBefore: '起运前',
+  colDayun: '大运',
+  colYears: '年份',
+  colAge: '年龄（周岁）',
+  colDayunGod: '天干十神',
+  secLiunian: '流年',
+  liunianCurrent: '今年流年',
+  liunianBeyond: '今年已超出本页所列大运范围（大运列至约 106 岁）。',
+  liunianInDayun: '本步大运流年',
+  colLiunian: '流年',
+  colLiunianAge: '年龄（周岁）',
+  xiaoyunBtn: '展开小运',
+  xiaoyunNote: '小运以时柱起运，一年一步；时辰不明时不排小运。',
+  nayinBtn: '展开纳音详解',
+  secShensha: '神煞',
+  shenshaNone: '四柱中未查到本页所列神煞。',
+  shenshaNote: '本页只列其中可按规则直接查验的神煞；神煞只作参考，不定吉凶。',
+  shenshaHit: '见于',
+  secGuji: '古籍断语',
+  gujiYueling: '月令金不换',
+  gujiShishi: '日时断',
+  gujiYiji: '十干宜忌（滴天髓）',
+  gujiTiaohou: '调候宜忌（穷通宝鉴）',
+  gujiTiyao: '八字提要',
+  gujiMingli: '古籍命例',
+  gujiDtd: '滴天髓阐微命例',
+  gujiDayun: '原书大运',
+  gujiNoMatch: '古籍库中未收录与此四柱完全相同的命例。',
+  gujiSource: '出处',
+  dataLoading: '断语数据加载中……',
+  dataFail: '断语数据未能加载，仅显示排盘；可刷新后重试。',
+  dataReady: '断语数据已加载。',
+  faqTitle: '四柱八字：免费排盘与使用常见问题',
+  faqQ1: '年柱为什么以立春为界，不以春节为界？',
+  faqA1: '八字以节气定年：立春之前出生，年柱仍属上一年；立春之后出生，年柱才是新的一年。春节是农历正月初一，与立春常差几天，1 月、2 月出生的人尤其要注意。',
+  faqQ2: '月柱是怎么定的？',
+  faqA2: '月柱以节气（立春、惊蛰、清明、立夏、芒种、小暑、立秋、白露、寒露、立冬、大雪、小寒）为界，每月从节开始，到下一个节之前结束；不是按公历 1 号换月，也不是按农历初一换月。',
+  faqQ3: '时辰不明怎么办？',
+  faqA3: '时辰不明时，本页只排年月日三柱，大运与流年照常排；时柱、小运与日时断语需要时辰，暂不显示。子时是 23:00 至次日 1:00，夜子时（23:00–24:00）仍属当日的日柱、早子时（0:00–1:00）属次日。',
+  faqQ4: '大运顺排还是逆排？起运怎么算？',
+  faqA4: '阳年出生的男性与阴年出生的女性顺排，阴年出生的男性与阳年出生的女性逆排（阳年指年干为甲丙戊庚壬）。起运按传统“三天折一年”法：顺排数到下一个节，逆排数回上一个节，三天折一岁。不同排盘软件因节气时刻表与折算口径不同，起运月龄可差一两个月，大运干支与交运年份一致为准。',
+  faqQ5: '为什么本页不取用神、不定格局？',
+  faqA5: '取用神与定格局是八字中最活的一层：子平真诠专寻月令、滴天髓主中和、穷通宝鉴重调候，各书取法互相矛盾，取错则全盘皆错，须先选流派再人工判断。本页只给出可机算的排盘与可查验的断语原文，不代断用神格局。',
+  faqQ6: '四柱八字排盘免费吗？数据从哪里来？',
+  faqA6: '免费。本页排盘在本地完成，不联网、不收费，也不会保存你的出生信息。断语数据来自 comprehensive-shushu-engine（GPL-3.0）所收的三命通会、渊海子平、滴天髓阐微、子平真诠等古典命理文献，五行缺失类断语来自 liki 整理层（MIT）。',
+  disclaimer: '四柱八字属传统术数，仅供参考，不构成决策依据。',
+  attrLine: '断语数据：comprehensive-shushu-engine（GPL-3.0），三命通会 · 渊海子平 · 滴天髓阐微 · 子平真诠；五行断语：liki（MIT）。',
+  offlineNote: '本页排盘完全离线运行，农历与节气换算使用本地 lunar.js，不向任何服务器发送数据；断语文本按需从本站数据文件加载。',
+  langLabel: '语言',
+  seasonSpring: '春', seasonSummer: '夏', seasonAutumn: '秋', seasonWinter: '冬',
+  yearsOld: '岁', monthsOld: '个月', daysOld: '天'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '四柱八字 · 本地排盤',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '一生之圖 · 命盤資訊',
+  slogan: '四柱既立，<br>一生之圖自分。',
+  subtitle: '四柱八字免費線上排盤',
+  labelBirth: '出生日期與時間（公曆）',
+  labelGender: '性別',
+  optMale: '男',
+  optFemale: '女',
+  labelUnknownHour: '時辰不明（只排年月日三柱）',
+  formHint: '年柱以立春為界，月柱以節氣為界，日柱按六十甲子日夜交替，時柱按日干推算。輸入的時間按當地太陽時理解，本頁不做經度真太陽時換算。',
+  btnSubmit: '起盤 · 排八字',
+  errNoBirth: '請先選擇出生日期與時間。',
+  errBadBirth: '出生時間格式不正確。',
+  errYearRange: '本頁支援 1890–2100 年出生排盤。',
+  resultTitle: '排盤結果',
+  ai_interpret: 'AI 解讀',
+  lunarLabel: '農曆',
+  zodiacLabel: '生肖',
+  dayMasterIs: '日主',
+  pillarYear: '年柱',
+  pillarMonth: '月柱',
+  pillarDay: '日柱',
+  pillarHour: '時柱',
+  hourUnknown: '時辰不明',
+  colStemGod: '天干十神',
+  colHidden: '地支藏干',
+  colElement: '五行',
+  colNayin: '納音',
+  colChangsheng: '長生',
+  secWuxing: '五行統計',
+  wuxingCount: '四柱干支五行計數',
+  wuxingMissing: '缺',
+  wuxingNoneMissing: '五行俱全，無所缺。',
+  wuxingUnknownHour: '時辰不明，五行統計僅按年月日三柱計算，缺失未必為真缺。',
+  likiNote: '以下斷語來自 liki 整理層，僅就「五行缺失」這一可直接查驗的條件命中：',
+  classicNote: '',
+  secDayun: '大運',
+  dayunStart: '起運',
+  dayunForward: '順排',
+  dayunBackward: '逆排',
+  dayunCurrent: '當前大運',
+  dayunBefore: '起運前',
+  colDayun: '大運',
+  colYears: '年份',
+  colAge: '年齡（週歲）',
+  colDayunGod: '天干十神',
+  secLiunian: '流年',
+  liunianCurrent: '今年流年',
+  liunianBeyond: '今年已超出本頁所列大運範圍（大運列至約 106 歲）。',
+  liunianInDayun: '本步大運流年',
+  colLiunian: '流年',
+  colLiunianAge: '年齡（週歲）',
+  xiaoyunBtn: '展開小運',
+  xiaoyunNote: '小運以時柱起運，一年一步；時辰不明時不排小運。',
+  nayinBtn: '展開納音詳解',
+  secShensha: '神煞',
+  shenshaNone: '四柱中未查到本頁所列神煞。',
+  shenshaNote: '本頁只列其中可按規則直接查驗的神煞；神煞只作參考，不定吉凶。',
+  shenshaHit: '見於',
+  secGuji: '古籍斷語',
+  gujiYueling: '月令金不換',
+  gujiShishi: '日時斷',
+  gujiYiji: '十干宜忌（滴天髓）',
+  gujiTiaohou: '調候宜忌（窮通寶鑑）',
+  gujiTiyao: '八字提要',
+  gujiMingli: '古籍命例',
+  gujiDtd: '滴天髓闡微命例',
+  gujiDayun: '原書大運',
+  gujiNoMatch: '古籍庫中未收錄與此四柱完全相同的命例。',
+  gujiSource: '出處',
+  dataLoading: '斷語數據加載中……',
+  dataFail: '斷語數據未能加載，僅顯示排盤；可刷新後重試。',
+  dataReady: '斷語數據已加載。',
+  faqTitle: '四柱八字：免費排盤與使用常見問題',
+  faqQ1: '年柱為什麼以立春為界，不以春節為界？',
+  faqA1: '八字以節氣定年：立春之前出生，年柱仍屬上一年；立春之後出生，年柱才是新的一年。春節是農曆正月初一，與立春常差幾天，1 月、2 月出生的人尤其要注意。',
+  faqQ2: '月柱是怎麼定的？',
+  faqA2: '月柱以節氣（立春、驚蟄、清明、立夏、芒種、小暑、立秋、白露、寒露、立冬、大雪、小寒）為界，每月從節開始，到下一個節之前結束；不是按公曆 1 號換月，也不是按農曆初一換月。',
+  faqQ3: '時辰不明怎麼辦？',
+  faqA3: '時辰不明時，本頁只排年月日三柱，大運與流年照常排；時柱、小運與日時斷語需要時辰，暫不顯示。子時是 23:00 至次日 1:00，夜子時（23:00–24:00）仍屬當日的日柱、早子時（0:00–1:00）屬次日。',
+  faqQ4: '大運順排還是逆排？起運怎麼算？',
+  faqA4: '陽年出生的男性與陰年出生的女性順排，陰年出生的男性與陽年出生的女性逆排（陽年指年干為甲丙戊庚壬）。起運按傳統「三天折一年」法：順排數到下一個節，逆排數回上一個節，三天折一歲。不同排盤軟體因節氣時刻表與折算口徑不同，起運月齡可差一兩個月，大運干支與交運年份一致為準。',
+  faqQ5: '為什麼本頁不取用神、不定格局？',
+  faqA5: '取用神與定格局是八字中最活的一層：子平真詮專尋月令、滴天髓主中和、窮通寶鑑重調候，各書取法互相矛盾，取錯則全盤皆錯，須先選流派再人工判斷。本頁只給出可機算的排盤與可查驗的斷語原文，不代斷用神格局。',
+  faqQ6: '四柱八字排盤免費嗎？數據從哪裡來？',
+  faqA6: '免費。本頁排盤在本地完成，不聯網、不收費，也不會保存你的出生資訊。斷語數據來自 comprehensive-shushu-engine（GPL-3.0）所收的三命通會、淵海子平、滴天髓闡微、子平真詮等古典命理文獻，五行缺失類斷語來自 liki 整理層（MIT）。',
+  disclaimer: '四柱八字屬傳統術數，僅供參考，不構成決策依據。',
+  attrLine: '斷語數據：comprehensive-shushu-engine（GPL-3.0），三命通會 · 淵海子平 · 滴天髓闡微 · 子平真詮；五行斷語：liki（MIT）。',
+  offlineNote: '本頁排盤完全離線運行，農曆與節氣換算使用本地 lunar.js，不向任何伺服器發送數據；斷語文本按需從本站數據文件加載。',
+  langLabel: '語言',
+  seasonSpring: '春', seasonSummer: '夏', seasonAutumn: '秋', seasonWinter: '冬',
+  yearsOld: '歲', monthsOld: '個月', daysOld: '天'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Four Pillars · Local Chart',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'Life Chart · Birth Information',
+  slogan: 'Once the four pillars stand,<br>the chart of a life draws itself.',
+  subtitle: 'Free online Four Pillars (Bazi) chart',
+  labelBirth: 'Date and time of birth (Gregorian)',
+  labelGender: 'Gender',
+  optMale: 'Male',
+  optFemale: 'Female',
+  labelUnknownHour: 'Birth hour unknown (chart only year, month and day)',
+  formHint: 'The year pillar changes at Lichun (Start of Spring), the month pillar at each solar term, the day pillar follows the 60-day cycle, and the hour pillar is derived from the day stem. The time you enter is taken as local solar time; no longitude-based true-solar-time correction is applied.',
+  btnSubmit: 'Cast the chart',
+  errNoBirth: 'Please choose a date and time of birth first.',
+  errBadBirth: 'The birth time format is invalid.',
+  errYearRange: 'This page charts births from 1890 to 2100.',
+  resultTitle: 'The Chart',
+  ai_interpret: 'AI Reading',
+  lunarLabel: 'Lunar date',
+  zodiacLabel: 'Zodiac',
+  dayMasterIs: 'Day Master',
+  pillarYear: 'Year Pillar',
+  pillarMonth: 'Month Pillar',
+  pillarDay: 'Day Pillar',
+  pillarHour: 'Hour Pillar',
+  hourUnknown: 'Hour unknown',
+  colStemGod: 'Stem: Ten God',
+  colHidden: 'Hidden stems',
+  colElement: 'Element',
+  colNayin: 'Nayin',
+  colChangsheng: 'Stage',
+  secWuxing: 'Five Elements',
+  wuxingCount: 'Element counts across the eight stem-branch characters',
+  wuxingMissing: 'Missing',
+  wuxingNoneMissing: 'All five elements are present.',
+  wuxingUnknownHour: 'The birth hour is unknown, so the counts use only the year, month and day pillars; a “missing” element may not truly be missing.',
+  likiNote: 'The readings below come from the liki layer and match only the directly checkable condition of a missing element:',
+  classicNote: 'Classical texts are shown in Chinese.',
+  secDayun: 'Luck Cycles (Dayun)',
+  dayunStart: 'Luck begins',
+  dayunForward: 'Forward',
+  dayunBackward: 'Backward',
+  dayunCurrent: 'Current cycle',
+  dayunBefore: 'Before luck begins',
+  colDayun: 'Luck cycle',
+  colYears: 'Years',
+  colAge: 'Age',
+  colDayunGod: 'Stem: Ten God',
+  secLiunian: 'Annual Luck (Liunian)',
+  liunianCurrent: 'This year',
+  liunianBeyond: 'This year falls beyond the luck cycles listed here (shown to about age 106).',
+  liunianInDayun: 'Years within this luck cycle',
+  colLiunian: 'Year',
+  colLiunianAge: 'Age',
+  xiaoyunBtn: 'Show minor luck cycles (Xiaoyun)',
+  xiaoyunNote: 'Minor luck starts from the hour pillar, one step per year; it is not shown when the birth hour is unknown.',
+  nayinBtn: 'Show Nayin details',
+  secShensha: 'Symbolic Stars (Shensha)',
+  shenshaNone: 'None of the stars listed on this page appear in these four pillars.',
+  shenshaNote: 'Only stars whose rules can be checked directly are listed here; stars are for reference only and do not decide fortune.',
+  shenshaHit: 'Found in',
+  secGuji: 'Classical Readings',
+  gujiYueling: 'Monthly command (Jin Bu Huan)',
+  gujiShishi: 'Day-hour reading',
+  gujiYiji: 'Ten stems: likes and dislikes (Di Tian Sui)',
+  gujiTiaohou: 'Seasonal balance (Qiong Tong Bao Jian)',
+  gujiTiyao: 'Bazi outline',
+  gujiMingli: 'Classical case with the same pillars',
+  gujiDtd: 'Di Tian Sui case with the same pillars',
+  gujiDayun: 'Luck cycles in the book',
+  gujiNoMatch: 'No case with exactly these four pillars was found in the classical library.',
+  gujiSource: 'Source',
+  dataLoading: 'Loading the readings data…',
+  dataFail: 'The readings data could not be loaded; only the chart is shown. Please refresh and try again.',
+  dataReady: 'Readings data loaded.',
+  faqTitle: 'Four Pillars (Bazi): Free Chart & FAQ',
+  faqQ1: 'Why does the year pillar change at Lichun rather than Chinese New Year?',
+  faqA1: 'Bazi counts the year by solar terms: before Lichun the year pillar still belongs to the previous year, and only after Lichun does it become the new year. Chinese New Year is the first day of the lunar year and often falls days away from Lichun, which matters most for people born in January or February.',
+  faqQ2: 'How is the month pillar set?',
+  faqA2: 'The month pillar changes at the solar terms (Lichun, Jingzhe, Qingming, Lixia, Mangzhong, Xiaoshu, Liqiu, Bailu, Hanlu, Lidong, Daxue, Xiaohan). Each month runs from one term to the next — not from the 1st of the Gregorian month, and not from the 1st of the lunar month.',
+  faqQ3: 'What if I do not know my birth hour?',
+  faqA3: 'When the hour is unknown, this page charts only the year, month and day pillars; luck cycles and annual luck still work. The hour pillar, minor luck cycles and day-hour readings need the hour, so they are left out. The Zi hour runs 23:00–01:00; the late Zi hour (23:00–24:00) still belongs to the current day pillar, while the early Zi hour (00:00–01:00) belongs to the next day.',
+  faqQ4: 'Do luck cycles run forward or backward? How is the starting age found?',
+  faqA4: 'Men born in a yang year and women born in a yin year run forward; men born in a yin year and women born in a yang year run backward (a yang year is one whose year stem is Jia, Bing, Wu, Geng or Ren). The starting age uses the traditional “three days count as one year” rule: forward counts to the next solar term, backward counts back to the previous one. Different calculators use different solar-term tables and rounding, so the starting age in months can differ by a month or two; the cycle stems and the changeover years are what to go by.',
+  faqQ5: 'Why does this page not pick a Useful God (Yongshen) or a chart pattern?',
+  faqA5: 'Choosing a Useful God and a pattern is the most judgment-based layer of Bazi: Zi Ping Zhen Quan looks to the month command, Di Tian Sui aims at balance, and Qiong Tong Bao Jian stresses seasonal adjustment, and the schools contradict each other — a wrong pick spoils the whole reading, so it needs a chosen school and a human reading. This page gives only what can be computed and the classical texts that can be checked, and does not decide Yongshen or pattern for you.',
+  faqQ6: 'Is the Bazi chart free? Where does the data come from?',
+  faqA6: 'Yes, free. The chart is computed locally in your browser — no internet, no charge, and your birth information is never saved. The readings come from the comprehensive-shushu-engine collection (GPL-3.0) of classical texts — San Ming Tong Hui, Yuan Hai Zi Ping, Di Tian Sui Chan Wei, Zi Ping Zhen Quan and others — and the missing-element readings come from the liki layer (MIT).',
+  disclaimer: 'Four Pillars (Bazi) is a traditional divination art, for reference only; it is not a basis for decisions.',
+  attrLine: 'Readings data: comprehensive-shushu-engine (GPL-3.0) — San Ming Tong Hui · Yuan Hai Zi Ping · Di Tian Sui Chan Wei · Zi Ping Zhen Quan; element readings: liki (MIT).',
+  offlineNote: 'Charting runs fully offline. Lunar and solar-term conversion uses the local lunar.js and no data is sent to any server; reading texts are loaded on demand from this site’s data files.',
+  langLabel: 'Language',
+  seasonSpring: 'Spring', seasonSummer: 'Summer', seasonAutumn: 'Autumn', seasonWinter: 'Winter',
+  yearsOld: 'y', monthsOld: 'm', daysOld: 'd'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '四柱八字 · ローカル排盤',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '一生之図 · 命盤情報',
+  slogan: '四柱既に立てば、<br>一生の図自ずと分つ。',
+  subtitle: '四柱八字 無料オンライン排盤',
+  labelBirth: '生年月日と時刻（西暦）',
+  labelGender: '性別',
+  optMale: '男',
+  optFemale: '女',
+  labelUnknownHour: '出生時刻不明（年月日の三柱のみ）',
+  formHint: '年柱は立春を境に、月柱は節気を境に、日柱は六十甲子の日替わりで、時柱は日干から推します。入力した時刻は現地の太陽時として扱い、経度による真太陽時の補正は行いません。',
+  btnSubmit: '起盤する',
+  errNoBirth: 'まず生年月日と時刻を選択してください。',
+  errBadBirth: '出生時刻の形式が正しくありません。',
+  errYearRange: 'このページは1890～2100年生まれの排盤に対応しています。',
+  resultTitle: '排盤結果',
+  ai_interpret: 'AI 解釈',
+  lunarLabel: '旧暦',
+  zodiacLabel: '干支',
+  dayMasterIs: '日主',
+  pillarYear: '年柱',
+  pillarMonth: '月柱',
+  pillarDay: '日柱',
+  pillarHour: '時柱',
+  hourUnknown: '時刻不明',
+  colStemGod: '天干十神',
+  colHidden: '地支蔵干',
+  colElement: '五行',
+  colNayin: '納音',
+  colChangsheng: '長生',
+  secWuxing: '五行統計',
+  wuxingCount: '四柱干支の五行カウント',
+  wuxingMissing: '欠',
+  wuxingNoneMissing: '五行はすべて揃っています。',
+  wuxingUnknownHour: '出生時刻が不明のため、五行統計は年月日の三柱のみで計算しています。「欠」は真の欠如とは限りません。',
+  likiNote: '以下の断語はliki整理層のもので、「五行の欠如」という直接確認できる条件でのみ命中したものです：',
+  classicNote: '古典の文章は中国語原文のまま表示しています。',
+  secDayun: '大運',
+  dayunStart: '起運',
+  dayunForward: '順行',
+  dayunBackward: '逆行',
+  dayunCurrent: '現在の大運',
+  dayunBefore: '起運前',
+  colDayun: '大運',
+  colYears: '年份',
+  colAge: '年齢（満年齢）',
+  colDayunGod: '天干十神',
+  secLiunian: '流年',
+  liunianCurrent: '今年の流年',
+  liunianBeyond: '今年は本ページ掲載の大運の範囲を超えています（約106歳まで掲載）。',
+  liunianInDayun: 'この大運の流年',
+  colLiunian: '流年',
+  colLiunianAge: '年齢（満年齢）',
+  xiaoyunBtn: '小運を展開',
+  xiaoyunNote: '小運は時柱から起運し、一年一步です。出生時刻が不明の場合は表示しません。',
+  nayinBtn: '納音の詳解を展開',
+  secShensha: '神煞',
+  shenshaNone: 'この四柱に本ページ掲載の神煞は見当たりません。',
+  shenshaNote: '規則で直接確認できる神煞のみ掲載しています。神煞は参考までとし、吉凶を決めるものではありません。',
+  shenshaHit: '見られる柱',
+  secGuji: '古籍断語',
+  gujiYueling: '月令金不換',
+  gujiShishi: '日時断',
+  gujiYiji: '十干宜忌（滴天髄）',
+  gujiTiaohou: '調候宜忌（窮通宝鑑）',
+  gujiTiyao: '八字提要',
+  gujiMingli: '同じ四柱の古籍命例',
+  gujiDtd: '同じ四柱の滴天髄闡微命例',
+  gujiDayun: '原書の大運',
+  gujiNoMatch: '古籍ライブラリにこの四柱と完全に一致する命例はありませんでした。',
+  gujiSource: '出典',
+  dataLoading: '断語データを読み込んでいます…',
+  dataFail: '断語データを読み込めませんでした。排盤のみ表示します。更新して再試行してください。',
+  dataReady: '断語データを読み込みました。',
+  faqTitle: '四柱八字：無料排盤とよくある質問',
+  faqQ1: '年柱はなぜ春節ではなく立春で変わるのですか？',
+  faqA1: '八字は節気で年を数えます。立春より前に生まれたら年柱は前年のままで、立春を過ぎて初めて新しい年になります。春節は旧暦正月一日で、立春とは数日ずれることがあり、1月・2月生まれの人は特に注意が必要です。',
+  faqQ2: '月柱はどう決まりますか？',
+  faqA2: '月柱は節気（立春・驚蟄・清明・立夏・芒種・小暑・立秋・白露・寒露・立冬・大雪・小寒）で変わります。各月は節から次の節の前までで、西暦の1日でも旧暦の1日でも変わりません。',
+  faqQ3: '出生時刻が分からない場合は？',
+  faqA3: '時刻が不明の場合、本ページは年月日の三柱のみを排盤し、大運と流年は通常通り表示します。時柱・小運・日時断には時刻が必要なため表示しません。子時は23:00～翌1:00で、夜子時（23:00～24:00）は当日の日柱、早子時（0:00～1:00）は翌日の日柱です。',
+  faqQ4: '大運は順行と逆行のどちらですか？起運はどう計算しますか？',
+  faqA4: '陽年生まれの男性と陰年生まれの女性は順行、陰年生まれの男性と陽年生まれの女性は逆行です（陽年とは年干が甲・丙・戊・庚・壬の年）。起運は伝統の「三日を一年とする」方法で、順行は次の節まで、逆行は前の節まで数えます。節気の時刻表や換算方法がソフトによって異なるため、起運の月数は1～2か月ずれることがあります。大運の干支と交運の年を基準にしてください。',
+  faqQ5: 'なぜこのページは用神を取らず、格局を定めないのですか？',
+  faqA5: '用神を取ることと格局を定めることは八字で最も判断に委ねられる部分です。子平真詮は月令を尋ね、滴天髄は中和を主とし、窮通宝鑑は調候を重んじ、各書の取り方は互いに矛盾し、間違えれば全体が誤ります。流派を選んで人が判断する必要があるため、本ページは計算できる排盤と確認できる断語の原文のみを示し、用神・格局の断定はしません。',
+  faqQ6: '四柱八字の排盤は無料ですか？データはどこから来ていますか？',
+  faqA6: '無料です。このページの排盤はローカルで計算され、ネット接続も料金も不要で、出生情報は保存されません。断語データは comprehensive-shushu-engine（GPL-3.0）所収の三命通会・淵海子平・滴天髄闡微・子平真詮などの古典命理文献で、五行欠如の断語はliki整理層（MIT）によるものです。',
+  disclaimer: '四柱八字は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  attrLine: '断語データ：comprehensive-shushu-engine（GPL-3.0）、三命通会 · 淵海子平 · 滴天髄闡微 · 子平真詮；五行断語：liki（MIT）。',
+  offlineNote: 'このページの排盤は完全オフラインで動作します。旧暦と節気の換算はローカルの lunar.js を使い、データは外部サーバーに送信されません。断語テキストは必要に応じて本サイトのデータファイルから読み込みます。',
+  langLabel: '言語',
+  seasonSpring: '春', seasonSummer: '夏', seasonAutumn: '秋', seasonWinter: '冬',
+  yearsOld: '歳', monthsOld: 'か月', daysOld: '日'
+}
+};
+
+// 十神译名
+var TG_I18N = {
+  'zh-CN': {'比肩':'比肩','劫财':'劫财','食神':'食神','伤官':'伤官','偏财':'偏财','正财':'正财','七杀':'七杀','正官':'正官','偏印':'偏印','正印':'正印'},
+  'zh-TW': {'比肩':'比肩','劫财':'劫財','食神':'食神','伤官':'傷官','偏财':'偏財','正财':'正財','七杀':'七殺','正官':'正官','偏印':'偏印','正印':'正印'},
+  'en': {'比肩':'Friend','劫财':'Robber Wealth','食神':'Eating God','伤官':'Hurting Officer','偏财':'Indirect Wealth','正财':'Direct Wealth','七杀':'Seven Killings','正官':'Direct Officer','偏印':'Indirect Resource','正印':'Direct Resource'},
+  'ja': {'比肩':'比肩','劫财':'劫財','食神':'食神','伤官':'傷官','偏财':'偏財','正财':'正財','七杀':'七殺','正官':'正官','偏印':'偏印','正印':'正印'}
+};
+var ELEMENT_I18N = {
+  'zh-CN': {'木':'木','火':'火','土':'土','金':'金','水':'水'},
+  'zh-TW': {'木':'木','火':'火','土':'土','金':'金','水':'水'},
+  'en': {'木':'Wood','火':'Fire','土':'Earth','金':'Metal','水':'Water'},
+  'ja': {'木':'木','火':'火','土':'土','金':'金','水':'水'}
+};
+var STEM_EN = ['Jia','Yi','Bing','Ding','Wu','Ji','Geng','Xin','Ren','Gui'];
+var BRANCH_EN = ['Zi','Chou','Yin','Mao','Chen','Si','Wu','Wei','Shen','You','Xu','Hai'];
+var ZODIAC_EN = ['Rat','Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat','Monkey','Rooster','Dog','Pig'];
+var ZODIAC_JA = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function tgName(cn) {
+  if (!cn) return '';
+  if (LANG === 'zh-TW') return (TG_I18N['zh-TW'][cn] || cn);
+  var m = TG_I18N[LANG] || TG_I18N['zh-CN'];
+  return m[cn] || cn;
+}
+function elementName(el) { var m = ELEMENT_I18N[LANG] || ELEMENT_I18N['zh-CN']; return m[el] || el; }
+function stemName(s) {
+  if (LANG === 'en') return STEM_EN[['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'].indexOf(s)];
+  return s;
+}
+function branchName(b) {
+  if (LANG === 'en') return BRANCH_EN[['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'].indexOf(b)];
+  return b;
+}
+function gzName(gz) {
+  if (!gz) return '';
+  if (LANG === 'en') return stemName(gz.charAt(0)) + branchName(gz.charAt(1));
+  return gz;
+}
+function zodiacName(idx) {
+  if (LANG === 'en') return ZODIAC_EN[idx];
+  return ZODIAC_JA[idx];
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var be = document.getElementById('birth-error'); if (be) be.textContent = '';
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+var GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var GAN_ELEM = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+var ZHI_ELEM = {'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+var GAN_YANG = {'甲':1,'乙':0,'丙':1,'丁':0,'戊':1,'己':0,'庚':1,'辛':0,'壬':1,'癸':0};
+var ELEM_GEN = {'木':'火','火':'土','土':'金','金':'水','水':'木'};
+var ELEM_CTRL = {'木':'土','土':'水','水':'火','火':'金','金':'木'};
+var ELEM_LIST = ['木','火','土','金','水'];
+var ZODIAC_ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+
+// 纳音六十甲子（每两柱同名），按甲子序排列
+var NAYIN = ['海中金','炉中火','大林木','路旁土','剑锋金','山头火','涧下水','城头土','白蜡金','杨柳木','泉中水','屋上土','霹雳火','松柏木','长流水','沙中金','山下火','平地木','壁上土','金箔金','覆灯火','天河水','大驿土','钗钏金','桑柘木','大溪水','沙中土','天上火','石榴木','大海水'];
+var NAYIN_ELEM = ['金','火','木','土','金','火','水','土','金','木','水','土','火','木','水','金','火','木','土','金','火','水','土','金','木','水','土','火','木','水'];
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// 十神：以日干为我，看目标天干与我的生克与阴阳
+function tenGod(dayGan, g) {
+  if (!g || !dayGan) return '';
+  var de = GAN_ELEM[dayGan], ge = GAN_ELEM[g];
+  if (ge === de) return GAN_YANG[g] === GAN_YANG[dayGan] ? '比肩' : '劫财';
+  if (ELEM_GEN[ge] === de) return GAN_YANG[g] === GAN_YANG[dayGan] ? '偏印' : '正印';
+  if (ELEM_GEN[de] === ge) return GAN_YANG[g] === GAN_YANG[dayGan] ? '食神' : '伤官';
+  if (ELEM_CTRL[ge] === de) return GAN_YANG[g] === GAN_YANG[dayGan] ? '七杀' : '正官';
+  if (ELEM_CTRL[de] === ge) return GAN_YANG[g] === GAN_YANG[dayGan] ? '偏财' : '正财';
+  return '';
+}
+function jiaziIndex(gz) {
+  if (!gz || gz.length < 2) return -1;
+  var gi = GAN.indexOf(gz.charAt(0)), zi = ZHI.indexOf(gz.charAt(1));
+  if (gi < 0 || zi < 0) return -1;
+  for (var i = 0; i < 60; i++) { if (i % 10 === gi && i % 12 === zi) return i; }
+  return -1;
+}
+function nayinOf(gz) {
+  var i = jiaziIndex(gz);
+  if (i < 0) return { name: '', elem: '' };
+  var n = Math.floor(i / 2);
+  return { name: NAYIN[n], elem: NAYIN_ELEM[n] };
+}
+function seasonOf(monthZhi) {
+  if (monthZhi === '寅' || monthZhi === '卯' || monthZhi === '辰') return 'spring';
+  if (monthZhi === '巳' || monthZhi === '午' || monthZhi === '未') return 'summer';
+  if (monthZhi === '申' || monthZhi === '酉' || monthZhi === '戌') return 'autumn';
+  return 'winter';
+}
+function seasonName(s) {
+  return s === 'spring' ? t('seasonSpring') : s === 'summer' ? t('seasonSummer') : s === 'autumn' ? t('seasonAutumn') : t('seasonWinter');
+}
+
+// ---- 数据（懒加载，首绘后才取；排盘本身不依赖数据） ----
+var DATA = null;
+var dataPromise = null;
+function fetchJson(path) {
+  return fetch(path).then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
+}
+function setStatus(kind) {
+  var el = document.getElementById('data-status');
+  if (!el) return;
+  el.classList.toggle('err', kind === 'fail');
+  el.textContent = kind === 'loading' ? t('dataLoading') : kind === 'fail' ? t('dataFail') : kind === 'ready' ? t('dataReady') : '';
+}
+function ensureData() {
+  if (dataPromise) return dataPromise;
+  setStatus('loading');
+  dataPromise = Promise.all([
+    fetchJson('/data/bazi.json'),
+    fetchJson('/data/mingli_all.json'),
+    fetchJson('/data/liki_bazi_rules.json')
+  ]).then(function(arr) {
+    DATA = { bazi: arr[0], mingli: arr[1], liki: arr[2] };
+    if (!arr[0] && !arr[1] && !arr[2]) setStatus('fail'); else setStatus('ready');
+    return DATA;
+  });
+  return dataPromise;
+}
+
+// ---- 表单 ----
+function toggleUnknownHour() {
+  var u = document.getElementById('unknown-hour').checked;
+  var b = document.getElementById('birth');
+  if (u && b.value) {
+    var parts = b.value.split('T');
+    b.value = parts[0] + 'T12:00';
+  }
+  updateLunarPreview();
+}
+function updateLunarPreview() {
+  var el = document.getElementById('lunar-preview');
+  if (!el) return;
+  var v = document.getElementById('birth').value;
+  el.innerHTML = '';
+  if (!v) return;
+  try {
+    var d = new Date(v);
+    if (isNaN(d.getTime())) return;
+    var solar = Solar.fromYmdHms(d.getFullYear(), d.getMonth() + 1, d.getDate(), d.getHours(), d.getMinutes(), 0);
+    var lunar = solar.getLunar();
+    var zx = ZODIAC_ZHI.indexOf(lunar.getYearShengXiaoExact());
+    el.innerHTML = esc(t('lunarLabel')) + ' <b>' + esc(lunar.toString()) + '</b> · ' + esc(t('zodiacLabel')) + ' <b>' + esc(lunar.getYearShengXiaoExact()) + (LANG === 'en' && zx >= 0 ? ' (' + ZODIAC_EN[zx] + ')' : '') + '</b>';
+  } catch (e) { el.innerHTML = ''; }
+}
+
+function doChart() {
+  var err = document.getElementById('birth-error');
+  var v = document.getElementById('birth').value;
+  if (!v) { err.textContent = t('errNoBirth'); return; }
+  var d = new Date(v);
+  if (isNaN(d.getTime())) { err.textContent = t('errBadBirth'); return; }
+  if (d.getFullYear() < 1890 || d.getFullYear() > 2100) { err.textContent = t('errYearRange'); return; }
+  err.textContent = '';
+  var unknownHour = document.getElementById('unknown-hour').checked;
+  var gender = parseInt(document.getElementById('gender').value, 10);
+  var solar, lunar, ec, yun;
+  try {
+    solar = Solar.fromYmdHms(d.getFullYear(), d.getMonth() + 1, d.getDate(), d.getHours(), d.getMinutes(), 0);
+    lunar = solar.getLunar();
+    ec = lunar.getEightChar();
+    yun = ec.getYun(gender, 1);
+  } catch (e) {
+    err.textContent = t('errBadBirth');
+    return;
+  }
+  var pillars = [
+    { key: 'year', label: t('pillarYear'), gz: ec.getYear() },
+    { key: 'month', label: t('pillarMonth'), gz: ec.getMonth() },
+    { key: 'day', label: t('pillarDay'), gz: ec.getDay() },
+    { key: 'hour', label: t('pillarHour'), gz: unknownHour ? '' : ec.getTime() }
+  ];
+  LAST_RESULT = {
+    birth: d, unknownHour: unknownHour, gender: gender,
+    solar: solar, lunar: lunar, ec: ec, yun: yun,
+    pillars: pillars,
+    dayGan: ec.getDay().charAt(0),
+    dayZhi: ec.getDay().charAt(1),
+    monthZhi: ec.getMonth().charAt(1),
+    yearZhi: ec.getYear().charAt(1)
+  };
+  showResult(LAST_RESULT, false);
+  ensureData().then(function() { if (LAST_RESULT) showResult(LAST_RESULT, true); });
+}
+
+// ---- 渲染：核心（不依赖数据文件） ----
+function pillarLabel(key) {
+  return key === 'year' ? t('pillarYear') : key === 'month' ? t('pillarMonth') : key === 'day' ? t('pillarDay') : t('pillarHour');
+}
+function pillarCard(p, isDayMaster, hiddenHtml, changsheng) {
+  var gan = p.gz ? p.gz.charAt(0) : '';
+  var zhi = p.gz ? p.gz.charAt(1) : '';
+  var tg = (p.key === 'day') ? t('dayMasterIs') : tgName(tenGod(LAST_RESULT.dayGan, gan));
+  var roman = (LANG === 'en' && p.gz) ? '<span class="roman">' + esc(gzName(p.gz)) + '</span>' : '';
+  var gzHtml = p.gz ? esc(p.gz) + roman : '<span style="color:#6f6f80">' + esc(t('hourUnknown')) + '</span>';
+  var ny = p.gz ? nayinOf(p.gz) : { name: '', elem: '' };
+  var meta = '';
+  if (p.gz) {
+    meta = esc(elementName(GAN_ELEM[gan])) + ' · ' + esc(elementName(ZHI_ELEM[zhi])) + '<br>' +
+      esc(t('colNayin')) + ' ' + esc(ny.name) + (LANG === 'en' && ny.elem ? ' (' + esc(elementName(ny.elem)) + ')' : '') + '<br>' +
+      esc(t('colChangsheng')) + ' ' + esc(changsheng || '—');
+  }
+  return '<div class="pillar-card' + (isDayMaster ? ' day-master' : '') + '"><h3>' + esc(pillarLabel(p.key)) + '</h3>' +
+    '<div class="gz">' + gzHtml + '</div>' +
+    '<div class="tg">' + esc(tg) + '</div>' +
+    '<div class="meta">' + meta + '</div>' +
+    (hiddenHtml ? '<div class="hidden-stems">' + hiddenHtml + '</div>' : '') + '</div>';
+}
+function changshengOf(gan, zhi) {
+  if (!DATA || !DATA.bazi || !DATA.bazi.changsheng || !DATA.bazi.changsheng.items) return '';
+  var arr = DATA.bazi.changsheng.items[gan];
+  var names = DATA.bazi.changsheng.names;
+  if (!arr || !names) return '';
+  var idx = arr.indexOf(zhi);
+  return idx >= 0 ? names[idx] : '';
+}
+function hiddenStemsHtml(p) {
+  if (!p.gz) return '';
+  if (!DATA || !DATA.bazi || !DATA.bazi.zanggan) return '';
+  var list = DATA.bazi.zanggan[p.gz.charAt(1)];
+  if (!list) return '';
+  var parts = [];
+  for (var i = 0; i < list.length; i++) {
+    parts.push('<b>' + esc(list[i]) + '</b> ' + esc(tgName(tenGod(LAST_RESULT.dayGan, list[i]))));
+  }
+  return esc(t('colHidden')) + '：' + parts.join(' · ');
+}
+
+function renderPillars(r) {
+  var grid = document.getElementById('pillar-grid');
+  var html = '';
+  for (var i = 0; i < r.pillars.length; i++) {
+    var p = r.pillars[i];
+    var cs = p.gz ? changshengOf(p.gz.charAt(0), p.gz.charAt(1)) : '';
+    html += pillarCard(p, p.key === 'day', hiddenStemsHtml(p), cs);
+  }
+  grid.innerHTML = html;
+}
+
+function renderHead(r) {
+  var head = document.getElementById('result-head');
+  var lunarStr = r.lunar.toString();
+  var zx = ZODIAC_ZHI.indexOf(r.lunar.getYearShengXiaoExact());
+  var g = r.gender === 1 ? t('optMale') : t('optFemale');
+  head.innerHTML = esc(t('lunarLabel')) + ' <b>' + esc(lunarStr) + '</b> · ' + esc(t('zodiacLabel')) + ' <b>' + esc(r.lunar.getYearShengXiaoExact()) + (LANG === 'en' && zx >= 0 ? ' (' + ZODIAC_EN[zx] + ')' : '') + '</b><br>' +
+    esc(t('dayMasterIs')) + ' <b>' + esc(r.dayGan) + esc(GAN_ELEM[r.dayGan]) + (LANG === 'en' ? ' (' + esc(stemName(r.dayGan)) + ' ' + esc(elementName(GAN_ELEM[r.dayGan])) + ')' : '') + '</b> · ' + esc(g);
+}
+
+function renderWuxing(r) {
+  var block = document.getElementById('wuxing-block');
+  var counts = { '木': 0, '火': 0, '土': 0, '金': 0, '水': 0 };
+  for (var i = 0; i < r.pillars.length; i++) {
+    var gz = r.pillars[i].gz;
+    if (!gz) continue;
+    counts[GAN_ELEM[gz.charAt(0)]]++;
+    counts[ZHI_ELEM[gz.charAt(1)]]++;
+  }
+  var html = '<div class="duan-block"><h3>' + esc(t('secWuxing')) + '</h3><div>' + esc(t('wuxingCount')) + '：</div><div style="margin-top:.7rem">';
+  var missing = [];
+  for (var j = 0; j < ELEM_LIST.length; j++) {
+    var el = ELEM_LIST[j];
+    if (counts[el] === 0) {
+      missing.push(el);
+      html += '<span class="chip missing"><b>' + esc(elementName(el)) + '</b> ' + esc(t('wuxingMissing')) + '</span>';
+    } else {
+      html += '<span class="chip"><b>' + esc(elementName(el)) + '</b> × ' + counts[el] + '</span>';
+    }
+  }
+  html += '</div>';
+  if (missing.length === 0) {
+    html += '<div class="duan-note">' + esc(t('wuxingNoneMissing')) + '</div>';
+  }
+  html += '<div id="liki-block"></div></div>';
+  if (r.unknownHour) {
+    html += '<div class="duan-note">' + esc(t('wuxingUnknownHour')) + '</div>';
+  }
+  block.innerHTML = html;
+  renderLiki(r, r.unknownHour ? [] : missing);
+}
+
+// liki 五行缺失断语：仅命中条件组全部由“缺X”构成、且 X 确实缺失的断语
+function renderLiki(r, missing) {
+  var el = document.getElementById('liki-block');
+  if (!el) return;
+  if (!DATA || !DATA.liki) { el.innerHTML = ''; return; }
+  var liki = DATA.liki;
+  if (!liki.assertions || !liki.conditions) { el.innerHTML = ''; return; }
+  var condById = {};
+  for (var i = 0; i < liki.conditions.length; i++) {
+    var c = liki.conditions[i];
+    if (!condById[c.assertion_id]) condById[c.assertion_id] = {};
+    if (!condById[c.assertion_id][c.condition_group_id]) condById[c.assertion_id][c.condition_group_id] = [];
+    condById[c.assertion_id][c.condition_group_id].push(c);
+  }
+  var hits = [];
+  for (var j = 0; j < liki.assertions.length; j++) {
+    var a = liki.assertions[j];
+    var groups = condById[a.assertion_id];
+    if (!groups) continue;
+    var ok = false;
+    for (var gid in groups) {
+      if (!groups.hasOwnProperty(gid)) continue;
+      var facs = groups[gid];
+      var allOk = facs.length > 0;
+      for (var k = 0; k < facs.length; k++) {
+        var f = facs[k];
+        var m = /^缺(.?)$/.exec(f.factor || '');
+        if (!m || f.expected !== '1' || missing.indexOf(m[1]) < 0) { allOk = false; break; }
+      }
+      if (allOk) { ok = true; break; }
+    }
+    if (ok) hits.push(a);
+  }
+  if (!hits.length) { el.innerHTML = ''; return; }
+  var html = '<div class="duan-note">' + esc(t('likiNote')) + (t('classicNote') ? ' ' + esc(t('classicNote')) : '') + '</div>';
+  for (var n = 0; n < hits.length; n++) {
+    html += '<div class="duan-item"><span class="cond">' + esc(hits[n]['结论'] || hits[n]['事件'] || '') + '</span><br>' + esc(hits[n]['依据'] || '') + '</div>';
+  }
+  el.innerHTML = html;
+}
+
+// ---- 渲染：大运 / 流年 ----
+function renderDayun(r) {
+  var block = document.getElementById('dayun-block');
+  var yun = r.yun;
+  var curYear = new Date().getFullYear();
+  var dys = yun.getDaYun(11);
+  var startTxt = yun.getStartYear() + t('yearsOld') + ' ' + yun.getStartMonth() + t('monthsOld') + ' ' + yun.getStartDay() + t('daysOld');
+  var dir = yun.isForward() ? t('dayunForward') : t('dayunBackward');
+  var html = '<h3>' + esc(t('secDayun')) + '</h3>' +
+    '<div class="verdict">' + esc(t('dayunStart')) + ' <span class="level">' + esc(startTxt) + '</span> · ' + esc(dir) + '</div>' +
+    '<div class="table-wrap"><table class="chart"><thead><tr><th>' + esc(t('colDayun')) + '</th><th>' + esc(t('colDayunGod')) + '</th><th>' + esc(t('colYears')) + '</th><th>' + esc(t('colAge')) + '</th></tr></thead><tbody>';
+  var curIdx = -1;
+  for (var i = 0; i < dys.length; i++) {
+    var dy = dys[i];
+    var isCur = curYear >= dy.getStartYear() && curYear <= dy.getEndYear();
+    if (isCur) curIdx = i;
+    var gz = dy.getGanZhi();
+    var labelHtml = gz ? esc(LANG === 'en' ? gzName(gz) : gz) : esc(t('dayunBefore'));
+    var god = gz ? tgName(tenGod(r.dayGan, gz.charAt(0))) : '';
+    var ageTxt = (dy.getStartAge() - 1) + '–' + (dy.getEndAge() - 1);
+    html += '<tr' + (isCur ? ' class="current"' : '') + '><td><b>' + labelHtml + '</b>' + (isCur ? ' <span class="flag">● ' + esc(t('dayunCurrent')) + '</span>' : '') + '</td><td>' + esc(god) + '</td><td>' + dy.getStartYear() + '–' + dy.getEndYear() + '</td><td>' + ageTxt + '</td></tr>';
+  }
+  html += '</tbody></table></div>';
+  block.innerHTML = html;
+  r.curDayunIdx = curIdx;
+  r.curDayun = curIdx >= 0 ? dys[curIdx] : null;
+}
+
+function renderLiunian(r) {
+  var block = document.getElementById('liunian-block');
+  var curYear = new Date().getFullYear();
+  var html = '<h3>' + esc(t('secLiunian')) + '</h3>';
+  var curLn = null;
+  if (r.curDayun) {
+    var lns = r.curDayun.getLiuNian(10);
+    for (var i = 0; i < lns.length; i++) {
+      if (lns[i].getYear() === curYear) curLn = lns[i];
+    }
+    if (curLn) {
+      var gz = curLn.getGanZhi();
+      html += '<div class="verdict">' + esc(t('liunianCurrent')) + ' <span class="level">' + curYear + ' · ' + esc(LANG === 'en' ? gzName(gz) : gz) + '</span> · ' + esc(tgName(tenGod(r.dayGan, gz.charAt(0)))) + ' · ' + esc(t('dayunCurrent')) + ' <b>' + esc(LANG === 'en' ? gzName(r.curDayun.getGanZhi()) : r.curDayun.getGanZhi()) + '</b></div>';
+    }
+    html += '<div class="table-wrap"><table class="chart"><thead><tr><th>' + esc(t('colLiunian')) + '</th><th>' + esc(t('colDayunGod')) + '</th><th>' + esc(t('colLiunianAge')) + '</th></tr></thead><tbody>';
+    for (var j = 0; j < lns.length; j++) {
+      var ln = lns[j];
+      var lgz = ln.getGanZhi();
+      var isCur = ln.getYear() === curYear;
+      html += '<tr' + (isCur ? ' class="current"' : '') + '><td><b>' + ln.getYear() + ' · ' + esc(LANG === 'en' ? gzName(lgz) : lgz) + '</b>' + (isCur ? ' <span class="flag">●</span>' : '') + '</td><td>' + esc(tgName(tenGod(r.dayGan, lgz.charAt(0)))) + '</td><td>' + (ln.getAge() - 1) + '</td></tr>';
+    }
+    html += '</tbody></table></div>';
+  } else if (r.curDayun) {
+    html += '<div class="duan-note">' + esc(t('liunianBeyond')) + '</div>';
+  } else {
+    html += '<div class="duan-note">' + esc(t('dayunBefore')) + '</div>';
+  }
+  block.innerHTML = html;
+  renderXiaoyun(r);
+}
+
+function renderXiaoyun(r) {
+  var el = document.getElementById('xiaoyun-list');
+  if (!el) return;
+  if (r.unknownHour) { el.innerHTML = '<div class="duan-note">' + esc(t('xiaoyunNote')) + '</div>'; return; }
+  if (!r.curDayun) { el.innerHTML = '<div class="duan-note">' + esc(t('liunianBeyond')) + '</div>'; return; }
+  var xys = r.curDayun.getXiaoYun(10);
+  var html = '<div class="duan-note">' + esc(t('xiaoyunNote')) + '</div><div class="table-wrap"><table class="chart"><thead><tr><th>' + esc(t('colLiunian')) + '</th><th>' + esc(t('colDayunGod')) + '</th><th>' + esc(t('colLiunianAge')) + '</th></tr></thead><tbody>';
+  var curYear = new Date().getFullYear();
+  for (var i = 0; i < xys.length; i++) {
+    var xy = xys[i];
+    var gz = xy.getGanZhi();
+    var isCur = xy.getYear() === curYear;
+    html += '<tr' + (isCur ? ' class="current"' : '') + '><td><b>' + xy.getYear() + ' · ' + esc(LANG === 'en' ? gzName(gz) : gz) + '</b>' + (isCur ? ' <span class="flag">●</span>' : '') + '</td><td>' + esc(tgName(tenGod(r.dayGan, gz.charAt(0)))) + '</td><td>' + (xy.getAge() - 1) + '</td></tr>';
+  }
+  html += '</tbody></table></div>';
+  el.innerHTML = html;
+}
+// ---- 神煞：只查验规则可直接求值的项目；规则原文与断语来自数据文件 ----
+// 三合局分组：申子辰 / 寅午戌 / 巳酉丑 / 亥卯未
+var SANHE = { '申子辰': ['申','子','辰'], '寅午戌': ['寅','午','戌'], '巳酉丑': ['巳','酉','丑'], '亥卯未': ['亥','卯','未'] };
+function sanheGroup(zhi) {
+  for (var g in SANHE) { if (SANHE[g].indexOf(zhi) >= 0) return g; }
+  return '';
+}
+function shenshaChecks(r) {
+  var branches = [], stems = [];
+  var labels = [t('pillarYear'), t('pillarMonth'), t('pillarDay'), t('pillarHour')];
+  for (var i = 0; i < r.pillars.length; i++) {
+    var gz = r.pillars[i].gz;
+    branches.push(gz ? gz.charAt(1) : '');
+    stems.push(gz ? gz.charAt(0) : '');
+  }
+  function whereBranches(list) {
+    var out = [];
+    for (var i = 0; i < 4; i++) { if (branches[i] && list.indexOf(branches[i]) >= 0) out.push(labels[i]); }
+    return out;
+  }
+  function whereStems(list) {
+    var out = [];
+    for (var i = 0; i < 4; i++) { if (stems[i] && list.indexOf(stems[i]) >= 0) out.push(labels[i]); }
+    return out;
+  }
+  var hits = [];
+  function add(name, places) { if (places && places.length) hits.push({ name: name, places: places }); }
+  // 天乙贵人（以日干查四支；庚兼两组）
+  var tianyi = { '甲': ['丑','未'], '戊': ['丑','未'], '庚': ['丑','未','午','寅'], '乙': ['子','申'], '己': ['子','申'], '丙': ['亥','酉'], '丁': ['亥','酉'], '辛': ['午','寅'], '壬': ['巳','卯'], '癸': ['巳','卯'] };
+  add('天乙贵人', whereBranches(tianyi[r.dayGan] || []));
+  // 年支 / 日支三合查
+  var sanheMap = {
+    '驿马': { '申子辰': '寅', '寅午戌': '申', '巳酉丑': '亥', '亥卯未': '巳' },
+    '桃花（咸池）': { '申子辰': '酉', '寅午戌': '卯', '巳酉丑': '午', '亥卯未': '子' },
+    '华盖': { '申子辰': '辰', '寅午戌': '戌', '巳酉丑': '丑', '亥卯未': '未' },
+    '将星': { '申子辰': '子', '寅午戌': '午', '巳酉丑': '酉', '亥卯未': '卯' },
+    '劫煞': { '申子辰': '巳', '寅午戌': '亥', '巳酉丑': '寅', '亥卯未': '申' },
+    '亡神': { '申子辰': '亥', '寅午戌': '巳', '巳酉丑': '申', '亥卯未': '寅' },
+    '灾煞': { '申子辰': '午', '寅午戌': '子', '巳酉丑': '卯', '亥卯未': '酉' },
+    '六厄': { '申子辰': '卯', '寅午戌': '酉', '亥卯未': '午', '巳酉丑': '子' }
+  };
+  var baseZhis = [];
+  if (r.yearZhi) baseZhis.push(r.yearZhi);
+  if (r.dayZhi) baseZhis.push(r.dayZhi);
+  for (var nm in sanheMap) {
+    if (!sanheMap.hasOwnProperty(nm)) continue;
+    var targets = [];
+    for (var b = 0; b < baseZhis.length; b++) {
+      var g = sanheGroup(baseZhis[b]);
+      if (g && sanheMap[nm][g]) targets.push(sanheMap[nm][g]);
+    }
+    add(nm, whereBranches(targets));
+  }
+  // 羊刃 / 禄神 / 金舆（以日干查四支）
+  add('羊刃', whereBranches([{'甲':'卯','丙':'午','戊':'午','庚':'酉','壬':'子'}[r.dayGan]].filter(function(x) { return !!x; })));
+  var lu = { '甲': '寅', '乙': '卯', '丙': '巳', '丁': '午', '戊': '巳', '己': '午', '庚': '申', '辛': '酉', '壬': '亥', '癸': '子' };
+  add('禄神', whereBranches([lu[r.dayGan]].filter(function(x) { return !!x; })));
+  var jinyu = { '甲': '辰', '乙': '巳', '丙': '未', '戊': '未', '丁': '申', '己': '申', '庚': '戌', '辛': '亥', '壬': '丑', '癸': '寅' };
+  add('金舆', whereBranches([jinyu[r.dayGan]].filter(function(x) { return !!x; })));
+  // 天德 / 月德（以月支查四干）
+  var tiande = { '寅': '丁', '卯': '申', '辰': '壬', '巳': '辛', '午': '亥', '未': '甲', '申': '癸', '酉': '寅', '戌': '丙', '亥': '乙', '子': '巳', '丑': '庚' };
+  add('天德', whereStems([tiande[r.monthZhi]].filter(function(x) { return !!x; })));
+  var yuede = { '寅午戌': '丙', '申子辰': '壬', '亥卯未': '甲', '巳酉丑': '庚' };
+  var yg = sanheGroup(r.monthZhi);
+  add('月德', whereStems(yg && yuede[yg] ? [yuede[yg]] : []));
+  // 日柱定式
+  var dayGz = r.pillars[2].gz;
+  if (['庚辰','壬辰','戊戌','庚戌'].indexOf(dayGz) >= 0) hits.push({ name: '魁罡', places: [t('pillarDay')] });
+  if (['甲辰','乙巳','丙申','丁亥','戊戌','己丑','庚辰','辛巳','壬申','癸亥'].indexOf(dayGz) >= 0) hits.push({ name: '十恶大败', places: [t('pillarDay')] });
+  if (['丙子','丁丑','戊寅','辛卯','壬辰','癸巳','丙午','丁未','戊申','辛酉','壬戌','癸亥'].indexOf(dayGz) >= 0) hits.push({ name: '阴阳差错', places: [t('pillarDay')] });
+  // 天罗地网（以年支或日支查；只列实际命中的柱）
+  var luoPlaces = [], wangPlaces = [];
+  if (r.yearZhi === '戌' || r.yearZhi === '亥') luoPlaces.push(t('pillarYear'));
+  if (r.dayZhi === '戌' || r.dayZhi === '亥') luoPlaces.push(t('pillarDay'));
+  if (r.yearZhi === '辰' || r.yearZhi === '巳') wangPlaces.push(t('pillarYear'));
+  if (r.dayZhi === '辰' || r.dayZhi === '巳') wangPlaces.push(t('pillarDay'));
+  if (luoPlaces.length) hits.push({ name: '天罗', places: luoPlaces });
+  if (wangPlaces.length) hits.push({ name: '地网', places: wangPlaces });
+  // 孤辰寡宿（以年支查四支）
+  var guchen = { '亥子丑': ['寅','戌'], '寅卯辰': ['巳','丑'], '巳午未': ['申','辰'], '申酉戌': ['亥','未'] };
+  var yGroup = '';
+  if (['亥','子','丑'].indexOf(r.yearZhi) >= 0) yGroup = '亥子丑';
+  if (['寅','卯','辰'].indexOf(r.yearZhi) >= 0) yGroup = '寅卯辰';
+  if (['巳','午','未'].indexOf(r.yearZhi) >= 0) yGroup = '巳午未';
+  if (['申','酉','戌'].indexOf(r.yearZhi) >= 0) yGroup = '申酉戌';
+  if (yGroup) {
+    add('孤辰', whereBranches([guchen[yGroup][0]]));
+    add('寡宿', whereBranches([guchen[yGroup][1]]));
+  }
+  // 三奇（年月日时干顺连）
+  var sq = stems.join('');
+  if (sq.indexOf('乙丙丁') >= 0 || sq.indexOf('甲戊庚') >= 0 || sq.indexOf('辛壬癸') >= 0) hits.push({ name: '三奇', places: [t('pillarYear'), t('pillarMonth'), t('pillarDay'), t('pillarHour')] });
+  // 三刑 / 六害（四支两两成对）
+  function pairHit(a, b) { return branches.indexOf(a) >= 0 && branches.indexOf(b) >= 0; }
+  var xingPairs = [];
+  if (pairHit('寅','巳') || pairHit('巳','申') || pairHit('申','寅')) xingPairs.push('寅巳申');
+  if (pairHit('丑','戌') || pairHit('戌','未') || pairHit('未','丑')) xingPairs.push('丑戌未');
+  if (pairHit('子','卯')) xingPairs.push('子卯');
+  var selfXing = [];
+  for (var s = 0; s < ['辰','午','酉','亥'].length; s++) {
+    var br = ['辰','午','酉','亥'][s];
+    var cnt = 0;
+    for (var c = 0; c < 4; c++) { if (branches[c] === br) cnt++; }
+    if (cnt >= 2) selfXing.push(br + br);
+  }
+  if (xingPairs.length || selfXing.length) hits.push({ name: '三刑', places: xingPairs.concat(selfXing) });
+  var haiPairs = [];
+  var haiDefs = [['子','未'],['丑','午'],['寅','巳'],['卯','辰'],['申','亥'],['酉','戌']];
+  for (var h = 0; h < haiDefs.length; h++) {
+    if (pairHit(haiDefs[h][0], haiDefs[h][1])) haiPairs.push(haiDefs[h][0] + haiDefs[h][1]);
+  }
+  if (haiPairs.length) hits.push({ name: '六害', places: haiPairs });
+  return hits;
+}
+
+function renderShensha(r) {
+  var block = document.getElementById('shensha-block');
+  var html = '<div class="duan-block"><h3>' + esc(t('secShensha')) + '</h3>';
+  if (!DATA || !DATA.bazi) {
+    html += '<div class="duan-note">' + esc(t('dataLoading')) + '</div></div>';
+    block.innerHTML = html;
+    return;
+  }
+  var hits = shenshaChecks(r);
+  var byName = {};
+  if (DATA.bazi.shensha) {
+    for (var i = 0; i < DATA.bazi.shensha.length; i++) byName[DATA.bazi.shensha[i].name] = DATA.bazi.shensha[i];
+  }
+  if (!hits.length) {
+    html += '<div class="duan-note">' + esc(t('shenshaNone')) + '</div>';
+  }
+  for (var j = 0; j < hits.length; j++) {
+    var h = hits[j];
+    var d = byName[h.name];
+    html += '<div class="duan-item"><span class="cond">' + esc(h.name) + '</span> · ' + esc(t('shenshaHit')) + ' ' + esc(h.places.join('、')) + '<br>';
+    if (d) html += esc(d.rule) + '<br>' + esc(d.duan || '');
+    html += '</div>';
+  }
+  html += '<div class="duan-note">' + esc(t('shenshaNote')) + (t('classicNote') ? ' ' + esc(t('classicNote')) : '') + '</div></div>';
+  block.innerHTML = html;
+}
+
+// ---- 古籍断语（数据文件） ----
+function renderGuji(r) {
+  var block = document.getElementById('guji-block');
+  var html = '<div class="duan-block"><h3>' + esc(t('secGuji')) + '</h3>';
+  if (!DATA || !DATA.bazi) {
+    html += '<div class="duan-note">' + esc(t('dataLoading')) + '</div></div>';
+    block.innerHTML = html;
+    return;
+  }
+  var bz = DATA.bazi;
+  // 月令金不换
+  var yl = bz.yue_ling && bz.yue_ling[r.dayGan] ? bz.yue_ling[r.dayGan][r.monthZhi] : '';
+  if (yl) html += '<div class="duan-item"><span class="cond">' + esc(t('gujiYueling')) + ' · ' + esc(r.dayGan) + esc(t('pillarDay')) + ' / ' + esc(r.monthZhi) + esc(t('pillarMonth')) + '</span><br>' + esc(yl) + '</div>';
+  // 日时断
+  if (!r.unknownHour && bz.shishizhen && bz.shishizhen[r.dayGan]) {
+    var ss = bz.shishizhen[r.dayGan][r.pillars[3].gz];
+    if (ss) html += '<div class="duan-item"><span class="cond">' + esc(t('gujiShishi')) + ' · ' + esc(ss.title || '') + '</span><br>' + esc(ss.text || '').replace(/\n/g, '<br>') + '</div>';
+  }
+  // 十干宜忌
+  var yj = bz.gan_yiji ? bz.gan_yiji[r.dayGan] : '';
+  if (yj) html += '<div class="duan-item"><span class="cond">' + esc(t('gujiYiji')) + ' · ' + esc(r.dayGan) + '</span><br>' + esc(yj).replace(/\n/g, '<br>') + '</div>';
+  // 调候：原数据季键顺延一位（春键下是总题，夏键下是春月文，秋键下是夏月文，冬键下是秋月文，冬月文缺失），按条文所述季节对照
+  var season = seasonOf(r.monthZhi);
+  var thKey = season === 'spring' ? '夏' : season === 'summer' ? '秋' : season === 'autumn' ? '冬' : '';
+  var thElem = bz.tiaohou ? bz.tiaohou[GAN_ELEM[r.dayGan]] : null;
+  if (thElem && thKey && thElem[thKey]) {
+    html += '<div class="duan-item"><span class="cond">' + esc(t('gujiTiaohou')) + ' · ' + esc(GAN_ELEM[r.dayGan]) + esc(seasonName(season)) + '</span><br>' + esc(thElem[thKey]) + '</div>';
+    html += '<div class="duan-note">调候注：原数据季键顺延一位（“夏”键下为春月文，余类推），冬月条文缺失；本页按条文所述季节对照显示。</div>';
+  } else if (thElem && season === 'winter') {
+    html += '<div class="duan-note">' + esc(t('gujiTiaohou')) + ' · ' + esc(GAN_ELEM[r.dayGan]) + esc(seasonName(season)) + '：原数据中冬月调候条文缺失（季键顺延一位所致），故不显示。</div>';
+  }
+  // 八字提要（月支 + 日干 + 时柱）
+  if (!r.unknownHour && bz.bazitiyao) {
+    for (var i = 0; i < bz.bazitiyao.length; i++) {
+      var by = bz.bazitiyao[i];
+      if (by.m === r.monthZhi && by.d === r.dayGan && by.t === r.pillars[3].gz) {
+        html += '<div class="duan-item"><span class="cond">' + esc(t('gujiTiyao')) + ' · ' + esc(by.m) + esc(by.d) + esc(by.t) + '</span><br>' + esc(by.text || '') + '</div>';
+        break;
+      }
+    }
+  }
+  // 古籍命例：四柱完全相同
+  var bzKey = [r.pillars[0].gz, r.pillars[1].gz, r.pillars[2].gz, r.pillars[3].gz];
+  var found = false;
+  if (!r.unknownHour && DATA.mingli) {
+    for (var m = 0; m < DATA.mingli.length; m++) {
+      var item = DATA.mingli[m];
+      if (item.bz && item.bz.length === 4 && item.bz[0] === bzKey[0] && item.bz[1] === bzKey[1] && item.bz[2] === bzKey[2] && item.bz[3] === bzKey[3]) {
+        html += '<div class="duan-item"><span class="cond">' + esc(t('gujiMingli')) + '</span> <span class="src">' + esc(t('gujiSource')) + '：' + esc(item.src || '') + ' #' + esc(String(item.line || '')) + '</span><br>' + esc(item.text || '') + '</div>';
+        found = true;
+        break;
+      }
+    }
+  }
+  if (!r.unknownHour && bz.dtd_mingli) {
+    var joined = bzKey.join(' ');
+    for (var k = 0; k < bz.dtd_mingli.length; k++) {
+      var dm = bz.dtd_mingli[k];
+      if (dm.b === joined) {
+        html += '<div class="duan-item"><span class="cond">' + esc(t('gujiDtd')) + '</span><br>' + esc(dm.txt || '') + (dm.y ? '<br>' + esc(t('gujiDayun')) + '：' + esc(dm.y) : '') + '</div>';
+        found = true;
+        break;
+      }
+    }
+  }
+  if (!found && !r.unknownHour) html += '<div class="duan-note">' + esc(t('gujiNoMatch')) + '</div>';
+  html += '<div class="duan-note">' + esc(t('classicNote')) + '</div></div>';
+  block.innerHTML = html;
+  renderNayin(r);
+}
+
+function renderNayin(r) {
+  var el = document.getElementById('nayin-list');
+  if (!el) return;
+  var html = '';
+  if (!DATA || !DATA.bazi || !DATA.bazi.nayin_xiang) { el.innerHTML = ''; return; }
+  var list = DATA.bazi.nayin_xiang;
+  for (var i = 0; i < r.pillars.length; i++) {
+    var gz = r.pillars[i].gz;
+    if (!gz) continue;
+    for (var j = 0; j < list.length; j++) {
+      if (list[j].k === gz) {
+        html += '<div class="duan-item"><span class="cond">' + esc(pillarLabel(r.pillars[i].key)) + ' ' + esc(gz) + ' · ' + esc(nayinOf(gz).name) + '</span><br>' + esc(list[j].txt || '') + '</div>';
+        break;
+      }
+    }
+  }
+  el.innerHTML = html;
+}
+
+// ---- 总渲染 ----
+function showResult(r, isRelang) {
+  document.getElementById('result-card').classList.remove('hidden');
+  renderHead(r);
+  renderPillars(r);
+  renderWuxing(r);
+  renderDayun(r);
+  renderLiunian(r);
+  renderShensha(r);
+  renderGuji(r);
+  if (!isRelang) {
+    var card = document.getElementById('result-card');
+    if (card && card.scrollIntoView) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+applyI18n();
+
+// ==AI-INTERPRET==
+// Shared AI 解读 button (/js/ai-jiegua.js). Summary comes from this page's
+// own result state; null/'' means "no result yet" and the button only shows
+// a hint instead of calling the backend.
+function aiTrunc(s, n) { s = String(s == null ? '' : s); return s.length > n ? s.slice(0, n) + '…' : s; }
+window.getJieguaSummary = function() {
+if (!LAST_RESULT) return null;
+var r = LAST_RESULT;
+var parts = [];
+parts.push('八字命盘（' + r.lunar.toString() + '）');
+parts.push('四柱：' + r.pillars.map(function (p) { return p.gz || '时辰未知'; }).join(' '));
+parts.push('日主：' + r.dayGan);
+r.pillars.forEach(function (p) {
+if (!p.gz) return;
+var ny = nayinOf(p.gz);
+parts.push(p.label + p.gz + '（' + tgName(tenGod(r.dayGan, p.gz.charAt(0))) + ' · ' + (ny && ny.name ? ny.name : '') + '）');
+});
+if (r.yun && r.yun.getStartYear) parts.push('大运：' + r.yun.getStartYear() + '岁起运（' + (r.yun.isForward() ? '顺行' : '逆行') + '）');
+return parts.join('\n');
+};
+
+if (window.AIInterpret) { window.AIInterpret.attach(); }
+else { document.addEventListener('DOMContentLoaded', function () { if (window.AIInterpret) window.AIInterpret.attach(); }); }
+</script>
+<script src="/js/ai-jiegua.js"></script>
+</body>
+</html>

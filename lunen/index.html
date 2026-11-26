@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 北欧卢恩符文</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; }
+  a.nav-item { text-decoration: none; cursor: pointer; }
+  a.nav-item:hover { color: #f0ead8; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .rune-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-top: 1.4rem; }
+  .rune-card { background: transparent; border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1.1rem 1.2rem; text-align: center; }
+  .rune-pos { font-size: .8rem; color: #b08d3e; font-weight: 400; letter-spacing: .25em; margin-bottom: .6rem; }
+  .rune-char { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 3.4rem; line-height: 1.2; color: #c9a962; }
+  .rune-char.reversed { display: inline-block; transform: rotate(180deg); }
+  .rune-name { font-size: 1.05rem; font-weight: 700; color: #f0ead8; margin-top: .4rem; }
+  .rune-translit { font-size: .8rem; color: #9a9aab; margin-top: .2rem; }
+  .orient-badge { display: inline-block; margin-top: .6rem; font-size: .75rem; color: #c9a962; border: 1px solid rgba(201,169,98,.5); border-radius: 999px; padding: .15rem .7rem; }
+  .orient-badge.rev { color: #d97b6c; border-color: rgba(217,123,108,.6); }
+  .rune-kw { font-size: .88rem; color: #c8c2ae; line-height: 1.7; margin-top: .7rem; text-align: left; }
+  .rune-kw b, .rune-meaning b { color: #f0ead8; font-weight: 600; }
+  .rune-meaning { font-size: .88rem; color: #c8c2ae; line-height: 1.7; margin-top: .5rem; text-align: left; border-top: 1px dashed rgba(201,169,98,.35); padding-top: .7rem; }
+  .no-rev-note { font-size: .78rem; color: #6f6f80; margin-top: .5rem; line-height: 1.6; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">北欧卢恩符文 · 本地占卜</div>
+    </div>
+  </a>
+          <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></span>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">第一幕 · 问事信息</div>
+  <h1 class="slogan" data-i18n-html="slogan">二十四符文，<br>一字一世界。</h1>
+  <p class="subtitle" data-i18n="subtitle">北欧卢恩符文免费在线占卜</p>
+
+  <section class="section">
+    <div class="field">
+      <label for="question" data-i18n="labelQuestion">所问之事（可选）</label>
+      <input type="text" id="question" placeholder="例如：这个机会要不要接？" data-i18n-ph="phQuestion">
+    </div>
+    <div class="field">
+      <label for="layout" data-i18n="labelLayout">占卜布局</label>
+      <select id="layout">
+        <option value="single" selected data-i18n="optSingle">单符文 · 一字断事</option>
+        <option value="three" data-i18n="optThree">三符文 · 过去 · 现在 · 未来</option>
+      </select>
+    </div>
+    <button class="submit-btn" onclick="castRunes()" data-i18n="btnCast">掷符文 · 起占</button>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">符文</div>
+    <div class="result-head" id="result-head"></div>
+    <div class="rune-grid" id="rune-grid"></div>
+    <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="lunen" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+  </section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">北欧卢恩符文：免费占卜与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">北欧卢恩符文是什么？</summary>
+      <p data-i18n="faqA1">卢恩是古日耳曼与北欧民族使用的字母，古弗萨克（Elder Futhark）共二十四个符文，每个符文既是字母，也承载一个意象与寓意；占卜时随机抽出符文，以其寓意对照所问之事。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">为什么有些符文没有逆位？</summary>
+      <p data-i18n="faqA2">在多数传统中，盖博、哈加拉兹、瑙蒂兹、伊萨、耶拉、艾瓦兹、索维洛、英瓦兹、达加兹这九个符文没有逆位含义——它们的形状上下对称或寓意本身已包含两面，抽到时永远按正位解读；其余十五个符文抽出时正位与逆位各占一半。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">单符文和三符文布局怎么读？</summary>
+      <p data-i18n="faqA3">单符文适合问一件事的核心答案；三符文按过去、现在、未来排列——过去看成因与背景，现在看当下的力量与阻碍，未来看事情可能的发展方向，三者要连起来读。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">卢恩占卜的结果准吗？</summary>
+      <p data-i18n="faqA4">没有科学证据表明符文能预测未来。符文的价值在于提供一个反思的镜子：它的意象帮你把模糊的处境说清楚，再由你自己判断。不同流派对同一符文的解释也有出入，本页采用常见的传统寓意。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">卢恩占卜免费吗？我的问题会被保存吗？</summary>
+      <p data-i18n="faqA5">免费。占卜在本地完成，不联网、不收费，也不会保存你输入的问题；只有在你主动点“AI 解读”时，结果摘要才会被发给服务器做一次解读。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">北欧卢恩符文属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="offlineNote">本页占卜在本地完成，不联网、不保存问题；点“AI 解读”时才会把结果摘要发给服务器解读。</span>
+  </footer>
+</div>
+</main>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。符文名保留原文 + 中文。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '北欧卢恩符文 · 本地占卜',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '第一幕 · 问事信息',
+  slogan: '二十四符文，<br>一字一世界。',
+  subtitle: '北欧卢恩符文免费在线占卜',
+  labelQuestion: '所问之事（可选）',
+  phQuestion: '例如：这个机会要不要接？',
+  labelLayout: '占卜布局',
+  optSingle: '单符文 · 一字断事',
+  optThree: '三符文 · 过去 · 现在 · 未来',
+  btnCast: '掷符文 · 起占',
+  resultTitle: '符文',
+  asked: '所问',
+  layoutSingle: '单符文',
+  layoutThree: '三符文（过去 · 现在 · 未来）',
+  posPast: '过去',
+  posPresent: '现在',
+  posFuture: '未来',
+  upright: '正位',
+  reversed: '逆位',
+  noReversed: '无逆位',
+  keywordsLabel: '关键词',
+  meaningLabel: '寓意',
+  faqTitle: '北欧卢恩符文：免费占卜与使用常见问题',
+  faqQ1: '北欧卢恩符文是什么？',
+  faqA1: '卢恩是古日耳曼与北欧民族使用的字母，古弗萨克（Elder Futhark）共二十四个符文，每个符文既是字母，也承载一个意象与寓意；占卜时随机抽出符文，以其寓意对照所问之事。',
+  faqQ2: '为什么有些符文没有逆位？',
+  faqA2: '在多数传统中，盖博、哈加拉兹、瑙蒂兹、伊萨、耶拉、艾瓦兹、索维洛、英瓦兹、达加兹这九个符文没有逆位含义——它们的形状上下对称或寓意本身已包含两面，抽到时永远按正位解读；其余十五个符文抽出时正位与逆位各占一半。',
+  faqQ3: '单符文和三符文布局怎么读？',
+  faqA3: '单符文适合问一件事的核心答案；三符文按过去、现在、未来排列——过去看成因与背景，现在看当下的力量与阻碍，未来看事情可能的发展方向，三者要连起来读。',
+  faqQ4: '卢恩占卜的结果准吗？',
+  faqA4: '没有科学证据表明符文能预测未来。符文的价值在于提供一个反思的镜子：它的意象帮你把模糊的处境说清楚，再由你自己判断。不同流派对同一符文的解释也有出入，本页采用常见的传统寓意。',
+  faqQ5: '卢恩占卜免费吗？我的问题会被保存吗？',
+  faqA5: '免费。占卜在本地完成，不联网、不收费，也不会保存你输入的问题；只有在你主动点“AI 解读”时，结果摘要才会被发给服务器做一次解读。',
+  disclaimer: '北欧卢恩符文属传统术数，仅供参考，不构成决策依据。',
+  offlineNote: '本页占卜在本地完成，不联网、不保存问题；点“AI 解读”时才会把结果摘要发给服务器解读。',
+  langLabel: '语言',
+  ai_interpret: 'AI 解读'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '北歐盧恩符文 · 本地占卜',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '第一幕 · 問事資訊',
+  slogan: '二十四符文，<br>一字一世界。',
+  subtitle: '北歐盧恩符文免費線上占卜',
+  labelQuestion: '所問之事（可選）',
+  phQuestion: '例如：這個機會要不要接？',
+  labelLayout: '占卜佈局',
+  optSingle: '單符文 · 一字斷事',
+  optThree: '三符文 · 過去 · 現在 · 未來',
+  btnCast: '擲符文 · 起占',
+  resultTitle: '符文',
+  asked: '所問',
+  layoutSingle: '單符文',
+  layoutThree: '三符文（過去 · 現在 · 未來）',
+  posPast: '過去',
+  posPresent: '現在',
+  posFuture: '未來',
+  upright: '正位',
+  reversed: '逆位',
+  noReversed: '無逆位',
+  keywordsLabel: '關鍵詞',
+  meaningLabel: '寓意',
+  faqTitle: '北歐盧恩符文：免費占卜與使用常見問題',
+  faqQ1: '北歐盧恩符文是什麼？',
+  faqA1: '盧恩是古日耳曼與北歐民族使用的字母，古弗薩克（Elder Futhark）共二十四個符文，每個符文既是字母，也承載一個意象與寓意；占卜時隨機抽出符文，以其寓意對照所問之事。',
+  faqQ2: '為什麼有些符文沒有逆位？',
+  faqA2: '在多數傳統中，蓋博、哈加拉茲、瑙蒂茲、伊薩、耶拉、艾瓦茲、索維洛、英瓦茲、達加茲這九個符文沒有逆位含義——它們的形狀上下對稱或寓意本身已包含兩面，抽到時永遠按正位解讀；其餘十五個符文抽出時正位與逆位各佔一半。',
+  faqQ3: '單符文和三符文佈局怎麼讀？',
+  faqA3: '單符文適合問一件事的核心答案；三符文按過去、現在、未來排列——過去看成因與背景，現在看當下的力量與阻礙，未來看事情可能的發展方向，三者要連起來讀。',
+  faqQ4: '盧恩占卜的結果準嗎？',
+  faqA4: '沒有科學證據表明符文能預測未來。符文的價值在於提供一個反思的鏡子：它的意象幫你把模糊的處境說清楚，再由你自己判斷。不同流派對同一符文的解釋也有出入，本頁採用常見的傳統寓意。',
+  faqQ5: '盧恩占卜免費嗎？我的問題會被保存嗎？',
+  faqA5: '免費。占卜在本地完成，不聯網、不收費，也不會保存你輸入的問題；只有在你主動點「AI 解讀」時，結果摘要才會被發給伺服器做一次解讀。',
+  disclaimer: '北歐盧恩符文屬傳統術數，僅供參考，不構成決策依據。',
+  offlineNote: '本頁占卜在本地完成，不聯網、不保存問題；點「AI 解讀」時才會把結果摘要發給伺服器解讀。',
+  langLabel: '語言',
+  ai_interpret: 'AI 解讀'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Norse Runes · Local Divination',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'Act I · Your Question',
+  slogan: 'Twenty-four runes,<br>one world in each sign.',
+  subtitle: 'Free online Norse rune divination',
+  labelQuestion: 'Your question (optional)',
+  phQuestion: 'e.g. Should I take this opportunity?',
+  labelLayout: 'Casting layout',
+  optSingle: 'Single rune · One sign, one answer',
+  optThree: 'Three runes · Past · Present · Future',
+  btnCast: 'Cast the runes',
+  resultTitle: 'The Runes',
+  asked: 'Question',
+  layoutSingle: 'Single rune',
+  layoutThree: 'Three runes (Past · Present · Future)',
+  posPast: 'Past',
+  posPresent: 'Present',
+  posFuture: 'Future',
+  upright: 'Upright',
+  reversed: 'Reversed',
+  noReversed: 'No reversed position',
+  keywordsLabel: 'Keywords',
+  meaningLabel: 'Meaning',
+  faqTitle: 'Norse Runes: Free Divination & FAQ',
+  faqQ1: 'What are the Norse runes?',
+  faqA1: 'Runes are the letters used by the ancient Germanic and Norse peoples. The Elder Futhark has twenty-four runes; each is both a letter and an image with a meaning. In divination, runes are drawn at random and their meanings are read against your question.',
+  faqQ2: 'Why do some runes have no reversed meaning?',
+  faqA2: 'In most traditions, nine runes — Gebo, Hagalaz, Nauthiz, Isa, Jera, Eihwaz, Sowilo, Ingwaz and Dagaz — have no reversed meaning. Their shapes are symmetrical top to bottom, or their meaning already holds both sides, so they are always read upright. The other fifteen runes land upright or reversed with equal chance.',
+  faqQ3: 'How do I read a single rune and a three-rune cast?',
+  faqA3: 'A single rune suits one core answer about a matter. Three runes are laid out as past, present and future — past shows causes and background, present shows the forces and obstacles at work now, future shows where things may head. Read the three together.',
+  faqQ4: 'Are rune readings accurate?',
+  faqA4: 'There is no scientific evidence that runes can predict the future. Their value is as a mirror for reflection: the image helps you name a vague situation clearly, and you judge for yourself. Different schools also read the same rune differently; this page uses the common traditional meanings.',
+  faqQ5: 'Is rune divination free? Is my question saved?',
+  faqA5: 'Yes, free. The cast is computed locally in your browser — no internet, no charge, and your question is never saved. Only if you tap "AI Reading" is a summary of the result sent to the server for one reading.',
+  disclaimer: 'Norse runes are a traditional divination art, for reference only; they are not a basis for decisions.',
+  offlineNote: 'The cast runs locally, with no internet and no saved questions; only tapping "AI Reading" sends a result summary to the server.',
+  langLabel: 'Language',
+  ai_interpret: 'AI Reading'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '北欧ルーン · ローカル占い',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '第一幕 · 問うこと',
+  slogan: '二十四のルーン、<br>一文字に一世界。',
+  subtitle: '北欧ルーン 無料オンライン占い',
+  labelQuestion: '質問（任意）',
+  phQuestion: '例：このチャンスを受けるべき？',
+  labelLayout: '占いレイアウト',
+  optSingle: '一文字 · 一字で断ずる',
+  optThree: '三文字 · 過去 · 現在 · 未来',
+  btnCast: 'ルーンを投げる',
+  resultTitle: 'ルーン',
+  asked: '質問',
+  layoutSingle: '一文字',
+  layoutThree: '三文字（過去 · 現在 · 未来）',
+  posPast: '過去',
+  posPresent: '現在',
+  posFuture: '未来',
+  upright: '正位置',
+  reversed: '逆位置',
+  noReversed: '逆位置なし',
+  keywordsLabel: 'キーワード',
+  meaningLabel: '意味',
+  faqTitle: '北欧ルーン：無料占いとよくある質問',
+  faqQ1: '北欧ルーンとは何ですか？',
+  faqA1: 'ルーンは古代ゲルマン・北欧民族が用いた文字です。古フサルク（Elder Futhark）は二十四文字からなり、各文字は文字であると同時にイメージと意味を持ちます。占いではルーンをランダムに引き、その意味を質問に照らして読みます。',
+  faqQ2: 'なぜ逆位置のないルーンがあるのですか？',
+  faqA2: '多くの伝統では、ゲーボ、ハガラズ、ナウシズ、イーサ、イェラ、エイワズ、ソウィロ、イングワズ、ダガズの九文字には逆位置の意味がありません。形が上下対称であるか、意味そのものが両面を含んでいるため、常に正位置として読みます。残りの十五文字は正位置と逆位置が半々の確率で出ます。',
+  faqQ3: '一文字と三文字の読み方は？',
+  faqA3: '一文字は一つの事柄の核心的な答えに向きます。三文字は過去・現在・未来の並びです。過去は原因と背景、現在は今働いている力と障害、未来は物事の向かう先を示します。三つを合わせて読んでください。',
+  faqQ4: 'ルーン占いは当たりますか？',
+  faqA4: 'ルーンが未来を予言できるという科学的な証拠はありません。ルーンの価値は内省の鏡にあります。そのイメージが曖昧な状況を言葉にする手助けをし、判断はあなた自身が行います。流派によって同じルーンの解釈も異なります。このページでは一般的な伝統的意味を用いています。',
+  faqQ5: 'ルーン占いは無料ですか？質問は保存されますか？',
+  faqA5: '無料です。占いはローカルで計算され、ネット接続も料金も不要で、質問は保存されません。「AI 解釈」を押した場合にのみ、結果の要約が一度だけサーバーに送られて解釈されます。',
+  disclaimer: '北欧ルーンは伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  offlineNote: '占いはローカルで動作し、ネット不要・質問も保存されません。「AI 解釈」を押した時のみ結果要約がサーバーに送られます。',
+  langLabel: '言語',
+  ai_interpret: 'AI 解釈'
+}
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function langText(obj) {
+  if (!obj) return '';
+  if (obj[LANG]) return obj[LANG];
+  return obj['zh-CN'] || '';
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// 古弗萨克 24 符文。noRev 为 true 的 9 个符文无逆位（见 FAQ Q2），抽到永远正位；
+// 其余 15 个正位 / 逆位各 50%。rev 为 null 表示无逆位含义。
+var RUNES = [
+{ ch: 'ᚠ', name: 'Fehu', cn: '费胡', tr: 'f', noRev: false,
+  kw: { 'zh-CN': '财富、丰盛、新开始', 'zh-TW': '財富、豐盛、新開始', 'en': 'Wealth, abundance, new beginnings', 'ja': '富、豊かさ、新しい始まり' },
+  up: { 'zh-CN': '财富正在流动，新机会带来物质与精神的丰盛；宜分享，勿囤积。', 'zh-TW': '財富正在流動，新機會帶來物質與精神的豐盛；宜分享，勿囤積。', 'en': 'Wealth is flowing; a new opportunity brings material and spiritual abundance. Share it rather than hoarding it.', 'ja': '富が流れている。新しい機会が物質と心の豊かさをもたらす。分かち合うこと。' },
+  rev: { 'zh-CN': '财务受挫或贪心反噬，谨防损失与错失的机会。', 'zh-TW': '財務受挫或貪心反噬，謹防損失與錯失的機會。', 'en': 'Financial setback or greed backfiring — guard against loss and missed chances.', 'ja': '金銭的な挫折や欲の裏目。損失と機会の逸失に注意。' } },
+{ ch: 'ᚢ', name: 'Uruz', cn: '乌鲁兹', tr: 'u', noRev: false,
+  kw: { 'zh-CN': '力量、生命力、勇气', 'zh-TW': '力量、生命力、勇氣', 'en': 'Strength, vitality, courage', 'ja': '力、生命力、勇気' },
+  up: { 'zh-CN': '原始生命力充盈，凭体魄与意志可扛过难关、开创新局。', 'zh-TW': '原始生命力充盈，憑體魄與意志可扛過難關、開創新局。', 'en': 'Raw vitality is strong; body and will can carry you through hardship into something new.', 'ja': '原初の生命力が満ちている。体力と意志で難関を乗り越え、新しい局面を開ける。' },
+  rev: { 'zh-CN': '力量受阻或用错方向，留意健康透支与意志消沉。', 'zh-TW': '力量受阻或用錯方向，留意健康透支與意志消沉。', 'en': 'Strength blocked or misdirected; watch for exhaustion and loss of will.', 'ja': '力が阻まれ、方向を誤っている。健康の消耗と意気消沈に注意。' } },
+{ ch: 'ᚦ', name: 'Thurisaz', cn: '索里萨兹', tr: 'th', noRev: false,
+  kw: { 'zh-CN': '守护、决断、门槛', 'zh-TW': '守護、決斷、門檻', 'en': 'Protection, decisive action, gateway', 'ja': '守護、決断、門口' },
+  up: { 'zh-CN': '像荆棘一样守护边界，是行动或停下的关口；果断但勿鲁莽。', 'zh-TW': '像荊棘一樣守護邊界，是行動或停下的關口；果斷但勿魯莽。', 'en': 'A thorn guarding the boundary — a gateway to act or to hold; be decisive, not reckless.', 'ja': '荊のように境界を守る。行動か待機かの関門。果断に、しかし無謀にならず。' },
+  rev: { 'zh-CN': '防御有漏洞，或冲动行事招来危险；先稳住再动。', 'zh-TW': '防禦有漏洞，或衝動行事招來危險；先穩住再動。', 'en': 'Defences have gaps, or rash action invites danger; steady yourself first.', 'ja': '守りが手薄か、衝動的な行動が危険を招く。まず落ち着くこと。' } },
+{ ch: 'ᚨ', name: 'Ansuz', cn: '安苏兹', tr: 'a', noRev: false,
+  kw: { 'zh-CN': '智慧、言语、启示', 'zh-TW': '智慧、言語、啟示', 'en': 'Wisdom, speech, inspiration', 'ja': '知恵、言葉、啓示' },
+  up: { 'zh-CN': '言语与智慧之神在场，倾听、表达与学习都会带来启示。', 'zh-TW': '言語與智慧之神在場，傾聽、表達與學習都會帶來啟示。', 'en': 'The god of wisdom and speech is present; listening, speaking and learning bring insight.', 'ja': '知恵と言葉の神が共にある。聴くこと、語ること、学ぶことが啓示をもたらす。' },
+  rev: { 'zh-CN': '沟通失真或受人误导，话语不可轻信，留意信息来源。', 'zh-TW': '溝通失真或受人誤導，話語不可輕信，留意信息來源。', 'en': 'Communication is distorted or misleading; do not trust words at face value — check the source.', 'ja': '意思疎通が歪み、誤解や誤情報がある。言葉を鵜呑みにせず、出所を確認すること。' } },
+{ ch: 'ᚱ', name: 'Raidho', cn: '莱多', tr: 'r', noRev: false,
+  kw: { 'zh-CN': '旅程、前进、正道', 'zh-TW': '旅程、前進、正道', 'en': 'Journey, movement, the right road', 'ja': '旅、進むこと、正しい道' },
+  up: { 'zh-CN': '正在正确的路上，行动与节奏合拍，宜启程、宜坚持。', 'zh-TW': '正在正確的路上，行動與節奏合拍，宜啟程、宜堅持。', 'en': 'You are on the right road; action and rhythm agree — move forward and keep going.', 'ja': '正しい道の上にある。行動とリズムが合っている。進み、続けること。' },
+  rev: { 'zh-CN': '行程受阻或方向走偏，宜停下核对路线，勿硬赶路。', 'zh-TW': '行程受阻或方向走偏，宜停下核對路線，勿硬趕路。', 'en': 'The journey is delayed or off course; pause and check the route instead of pushing on.', 'ja': '旅が遅れ、道を外れている。無理に進まず、立ち止まって道を確認すること。' } },
+{ ch: 'ᚲ', name: 'Kenaz', cn: '凯纳兹', tr: 'k', noRev: false,
+  kw: { 'zh-CN': '火炬、知识、明晰', 'zh-TW': '火炬、知識、明晰', 'en': 'Torch, knowledge, clarity', 'ja': '松明、知識、明晰' },
+  up: { 'zh-CN': '火炬照亮暗处，知识与灵感清晰可见，宜学习、宜创作。', 'zh-TW': '火炬照亮暗處，知識與靈感清晰可見，宜學習、宜創作。', 'en': 'The torch lights the dark; knowledge and inspiration are clear — learn and create.', 'ja': '松明が暗闇を照らす。知識とひらめきが明らかになる。学び、創る時。' },
+  rev: { 'zh-CN': '视野昏暗、灵感枯竭，或看似希望实为假火；勿凭感觉下注。', 'zh-TW': '視野昏暗、靈感枯竭，或看似希望實為假火；勿憑感覺下注。', 'en': 'Vision is dim and inspiration dry, or a seeming hope is false fire; do not bet on feeling alone.', 'ja': '視界が暗く、ひらめきが枯れている。希望に見えるものが偽りの火のことも。感覚だけで賭けないこと。' } },
+{ ch: 'ᚷ', name: 'Gebo', cn: '盖博', tr: 'g', noRev: true,
+  kw: { 'zh-CN': '礼物、交换、伙伴', 'zh-TW': '禮物、交換、夥伴', 'en': 'Gift, exchange, partnership', 'ja': '贈り物、交換、仲間' },
+  up: { 'zh-CN': '礼物与交换带来平衡，伙伴关系互惠共赢；付出与接受同等重要。', 'zh-TW': '禮物與交換帶來平衡，夥伴關係互惠共贏；付出與接受同等重要。', 'en': 'Gift and exchange bring balance; partnership prospers both sides — giving and receiving matter equally.', 'ja': '贈り物と交換が均衡をもたらす。仲間関係は互いに恵み、与えることと受け取ることは等しく大切。' },
+  rev: null },
+{ ch: 'ᚹ', name: 'Wunjo', cn: '温佐', tr: 'w', noRev: false,
+  kw: { 'zh-CN': '喜悦、和谐、成功', 'zh-TW': '喜悅、和諧、成功', 'en': 'Joy, harmony, success', 'ja': '喜び、調和、成功' },
+  up: { 'zh-CN': '光照进来，心情与关系和谐，事情向好，宜享受成果。', 'zh-TW': '光照進來，心情與關係和諧，事情向好，宜享受成果。', 'en': 'Light comes in; mood and relationships are harmonious and things turn well — enjoy the result.', 'ja': '光が差し込む。心と関係が調和し、物事は好転する。成果を味わう時。' },
+  rev: { 'zh-CN': '喜悦受阻，关系失和或期望落空，宜先处理情绪再做决定。', 'zh-TW': '喜悅受阻，關係失和或期望落空，宜先處理情緒再做決定。', 'en': 'Joy is blocked; discord or disappointment — settle the feelings before deciding.', 'ja': '喜びが阻まれ、関係の不和や期待外れがある。決める前に感情を整えること。' } },
+{ ch: 'ᚺ', name: 'Hagalaz', cn: '哈加拉兹', tr: 'h', noRev: true,
+  kw: { 'zh-CN': '冰雹、突变、觉醒', 'zh-TW': '冰雹、突變、覺醒', 'en': 'Hail, sudden change, awakening', 'ja': '雹、急変、目覚め' },
+  up: { 'zh-CN': '如冰雹般的突变打碎旧局，虽无情却清扫出路；熬过即是觉醒。', 'zh-TW': '如冰雹般的突變打碎舊局，雖無情卻清掃出路；熬過即是覺醒。', 'en': 'Like hail, sudden change shatters the old pattern; harsh, yet it clears the way — endure it and wake up.', 'ja': '雹のような急変が古い枠組みを砕く。厳しいが道を清める。耐え抜けば目覚めがある。' },
+  rev: null },
+{ ch: 'ᚾ', name: 'Nauthiz', cn: '瑙蒂兹', tr: 'n', noRev: true,
+  kw: { 'zh-CN': '需求、约束、忍耐', 'zh-TW': '需求、約束、忍耐', 'en': 'Need, constraint, endurance', 'ja': '必要、制約、忍耐' },
+  up: { 'zh-CN': '匮乏与摩擦正是老师，忍耐与节制中磨出真正的力量。', 'zh-TW': '匱乏與摩擦正是老師，忍耐與節制中磨出真正的力量。', 'en': 'Lack and friction are the teachers here; endurance and restraint forge real strength.', 'ja': '欠乏と摩擦こそ教師。忍耐と節制の中で真の力が磨かれる。' },
+  rev: null },
+{ ch: 'ᛁ', name: 'Isa', cn: '伊萨', tr: 'i', noRev: true,
+  kw: { 'zh-CN': '冰、静止、等待', 'zh-TW': '冰、靜止、等待', 'en': 'Ice, stillness, waiting', 'ja': '氷、静止、待つこと' },
+  up: { 'zh-CN': '万物冻结，宜停不宜动；静止不是死亡，是积蓄。', 'zh-TW': '萬物凍結，宜停不宜動；靜止不是死亡，是積蓄。', 'en': 'All is frozen; hold still rather than move. Stillness is not death — it is gathering.', 'ja': '万物が凍る。動かず待つ時。静止は死ではなく、蓄えである。' },
+  rev: null },
+{ ch: 'ᛃ', name: 'Jera', cn: '耶拉', tr: 'j', noRev: true,
+  kw: { 'zh-CN': '丰收、循环、时节', 'zh-TW': '豐收、循環、時節', 'en': 'Harvest, cycles, right season', 'ja': '豊作、循環、時節' },
+  up: { 'zh-CN': '一年循环到了收获时，付出终有回报；顺应时节，勿催熟。', 'zh-TW': '一年循環到了收穫時，付出終有回報；順應時節，勿催熟。', 'en': 'The cycle has reached harvest; effort is repaid in its season. Follow the timing — do not force it ripe.', 'ja': '循環が収穫の時を迎えた。努力は報われる。時節に従い、無理に熟させないこと。' },
+  rev: null },
+{ ch: 'ᛇ', name: 'Eihwaz', cn: '艾瓦兹', tr: 'ï', noRev: true,
+  kw: { 'zh-CN': '紫杉、耐力、支柱', 'zh-TW': '紫杉、耐力、支柱', 'en': 'Yew, endurance, the axis', 'ja': 'イチイ、耐久、軸' },
+  up: { 'zh-CN': '如紫杉般柔韧而长寿，能屈能伸，守住中轴即可渡过考验。', 'zh-TW': '如紫杉般柔韌而長壽，能屈能伸，守住中軸即可渡過考驗。', 'en': 'Like the yew — flexible and long-lived; bend without breaking, hold the axis, and the trial passes.', 'ja': 'イチイのようにしなやかで長命。折れずに曲がり、軸を守れば試練を越えられる。' },
+  rev: null },
+{ ch: 'ᛈ', name: 'Perthro', cn: '佩斯罗', tr: 'p', noRev: false,
+  kw: { 'zh-CN': '命运、机缘、奥秘', 'zh-TW': '命運、機緣、奧秘', 'en': 'Fate, chance, mystery', 'ja': '運命、偶然、神秘' },
+  up: { 'zh-CN': '命运之杯正在摇动，隐藏的事将显现；凭直觉接住机缘。', 'zh-TW': '命運之杯正在搖動，隱藏的事將顯現；憑直覺接住機緣。', 'en': 'The cup of fate is shaking; hidden things will surface — trust intuition to catch the chance.', 'ja': '運命の杯が振られている。隠れたことが現れる。直感で機会を掴むこと。' },
+  rev: { 'zh-CN': '秘密、坏运或沉迷作祟，事情停滞；勿赌运气，宜收手整顿。', 'zh-TW': '秘密、壞運或沉迷作祟，事情停滯；勿賭運氣，宜收手整頓。', 'en': 'Secrets, bad luck or an old habit stalls things; do not gamble on luck — step back and sort it out.', 'ja': '秘密や悪運、依存が物事を止めている。運に賭けず、一度引いて整えること。' } },
+{ ch: 'ᛉ', name: 'Algiz', cn: '阿尔吉兹', tr: 'z', noRev: false,
+  kw: { 'zh-CN': '守护、庇护、高我', 'zh-TW': '守護、庇護、高我', 'en': 'Protection, sanctuary, higher self', 'ja': '守護、加護、高い自己' },
+  up: { 'zh-CN': '有庇护在身，宜保持警觉与正直，守护即力量。', 'zh-TW': '有庇護在身，宜保持警覺與正直，守護即力量。', 'en': 'Protection surrounds you; stay alert and upright — the guard itself is strength.', 'ja': '加護がある。警戒と誠実を保つこと。守りそのものが力である。' },
+  rev: { 'zh-CN': '庇护出现缺口，易受暗算或误导；收敛锋芒，勿轻信他人。', 'zh-TW': '庇護出現缺口，易受暗算或誤導；收斂鋒芒，勿輕信他人。', 'en': 'Protection has a gap; hidden danger or misleading advice — lower your profile and trust cautiously.', 'ja': '加護に隙がある。陰の危険や誤った助言に注意。目立たず、人を軽々しく信じないこと。' } },
+{ ch: 'ᛊ', name: 'Sowilo', cn: '索维洛', tr: 's', noRev: true,
+  kw: { 'zh-CN': '太阳、成功、完整', 'zh-TW': '太陽、成功、完整', 'en': 'Sun, success, wholeness', 'ja': '太陽、成功、全体性' },
+  up: { 'zh-CN': '如太阳般明朗有力，目标可成，荣誉与完整随之而来。', 'zh-TW': '如太陽般明朗有力，目標可成，榮譽與完整隨之而來。', 'en': 'Bright and strong as the sun; the goal can be reached, and honour and wholeness follow.', 'ja': '太陽のように明るく力強い。目標は叶い、名誉と全体性が伴う。' },
+  rev: null },
+{ ch: 'ᛏ', name: 'Tiwaz', cn: '提瓦兹', tr: 't', noRev: false,
+  kw: { 'zh-CN': '胜利、正义、勇气', 'zh-TW': '勝利、正義、勇氣', 'en': 'Victory, justice, courage', 'ja': '勝利、正義、勇気' },
+  up: { 'zh-CN': '以正义与勇气取胜，必要的牺牲换来公正的结果。', 'zh-TW': '以正義與勇氣取勝，必要的犧牲換來公正的結果。', 'en': 'Victory through justice and courage; a necessary sacrifice brings a fair outcome.', 'ja': '正義と勇気による勝利。必要な犠牲が公正な結果をもたらす。' },
+  rev: { 'zh-CN': '正义受挫或勇气不足，局势失衡；勿以强硬掩饰心虚。', 'zh-TW': '正義受挫或勇氣不足，局勢失衡；勿以強硬掩飾心虛。', 'en': 'Justice falters or courage fails; the balance is off — do not mask doubt with force.', 'ja': '正義が挫け、勇気が足りない。均衡が崩れている。強硬さで不安を隠さないこと。' } },
+{ ch: 'ᛒ', name: 'Berkana', cn: '贝尔卡纳', tr: 'b', noRev: false,
+  kw: { 'zh-CN': '生长、更新、孕育', 'zh-TW': '生長、更新、孕育', 'en': 'Growth, renewal, nurturing', 'ja': '成長、更新、育むこと' },
+  up: { 'zh-CN': '如白桦抽芽，新的生长正在孕育，宜呵护、宜耐心。', 'zh-TW': '如白樺抽芽，新的生長正在孕育，宜呵護、宜耐心。', 'en': 'Like birch buds, new growth is forming — nurture it patiently.', 'ja': '白樺の芽のように新しい成長が育っている。大切に育て、辛抱強く待つこと。' },
+  rev: { 'zh-CN': '生长受阻，家庭或关系出现问题；先修补根基再求发展。', 'zh-TW': '生長受阻，家庭或關係出現問題；先修補根基再求發展。', 'en': 'Growth is blocked; family or relationship trouble — repair the roots before reaching further.', 'ja': '成長が阻まれ、家庭や関係に問題がある。発展の前に根を修復すること。' } },
+{ ch: 'ᛖ', name: 'Ehwaz', cn: '埃瓦兹', tr: 'e', noRev: false,
+  kw: { 'zh-CN': '马、信任、协作', 'zh-TW': '馬、信任、協作', 'en': 'Horse, trust, teamwork', 'ja': '馬、信頼、協力' },
+  up: { 'zh-CN': '人马合一，信任与协作让前进顺畅；宜结伴而行。', 'zh-TW': '人馬合一，信任與協作讓前進順暢；宜結伴而行。', 'en': 'Horse and rider as one; trust and teamwork make the way smooth — go together.', 'ja': '馬と乗り手が一体。信頼と協力が進みを滑らかにする。共に行くこと。' },
+  rev: { 'zh-CN': '信任破裂或配合失调，关系生变；勿强求同行，宜先沟通。', 'zh-TW': '信任破裂或配合失調，關係生變；勿強求同行，宜先溝通。', 'en': 'Trust breaks or teamwork falters; the relationship shifts — do not force it, talk first.', 'ja': '信頼が壊れ、協力が乱れている。無理に共に行かず、まず話し合うこと。' } },
+{ ch: 'ᛗ', name: 'Mannaz', cn: '曼纳兹', tr: 'm', noRev: false,
+  kw: { 'zh-CN': '人、自我、合作', 'zh-TW': '人、自我、合作', 'en': 'Humanity, self, cooperation', 'ja': '人、自己、協力' },
+  up: { 'zh-CN': '以人为镜，看清自己；与人合作、互助可成事。', 'zh-TW': '以人為鏡，看清自己；與人合作、互助可成事。', 'en': 'Others are a mirror for the self; cooperation and mutual help get things done.', 'ja': '人は自己を映す鏡。協力と助け合いで物事が成る。' },
+  rev: { 'zh-CN': '自我欺骗或孤立无援，留意操纵与误判；先诚实面对自己。', 'zh-TW': '自我欺騙或孤立無援，留意操縱與誤判；先誠實面對自己。', 'en': 'Self-deception or isolation; watch for manipulation and misjudgement — be honest with yourself first.', 'ja': '自己欺瞞や孤立がある。操作や誤った判断に注意。まず自分に正直になること。' } },
+{ ch: 'ᛚ', name: 'Laguz', cn: '拉古兹', tr: 'l', noRev: false,
+  kw: { 'zh-CN': '水、流动、直觉', 'zh-TW': '水、流動、直覺', 'en': 'Water, flow, intuition', 'ja': '水、流れ、直感' },
+  up: { 'zh-CN': '如水流动，顺应直觉与情绪，柔中带力，可渡难关。', 'zh-TW': '如水流動，順應直覺與情緒，柔中帶力，可渡難關。', 'en': 'Like water, flow with intuition and feeling; softness carries strength through difficulty.', 'ja': '水のように流れ、直感と感情に従うこと。柔らかさの中に力が宿り、難関を越える。' },
+  rev: { 'zh-CN': '情绪混乱、直觉受阻，或被恐惧带偏；先静心，勿逆流硬撑。', 'zh-TW': '情緒混亂、直覺受阻，或被恐懼帶偏；先靜心，勿逆流硬撐。', 'en': 'Feelings are confused, intuition blocked, or fear leads astray; calm down first — do not fight the current.', 'ja': '感情が乱れ、直感が阻まれ、恐れに流されている。まず心を静めること。流れに逆らって無理をしないこと。' } },
+{ ch: 'ᛜ', name: 'Ingwaz', cn: '英瓦兹', tr: 'ng', noRev: true,
+  kw: { 'zh-CN': '种子、潜能、完成', 'zh-TW': '種子、潛能、完成', 'en': 'Seed, potential, completion', 'ja': '種、可能性、完成' },
+  up: { 'zh-CN': '种子已在土中，潜能正在孕育；时机一到即破土而出，宜静候。', 'zh-TW': '種子已在土中，潛能正在孕育；時機一到即破土而出，宜靜候。', 'en': 'The seed is in the earth and potential is gestating; when the moment comes it breaks through — wait quietly.', 'ja': '種は土の中にあり、可能性が育っている。時が来れば芽が出る。静かに待つこと。' },
+  rev: null },
+{ ch: 'ᛞ', name: 'Dagaz', cn: '达加兹', tr: 'd', noRev: true,
+  kw: { 'zh-CN': '黎明、突破、清明', 'zh-TW': '黎明、突破、清明', 'en': 'Dawn, breakthrough, clarity', 'ja': '夜明け、突破、明晰' },
+  up: { 'zh-CN': '黎明已至，黑暗过去，突破与清明同时到来。', 'zh-TW': '黎明已至，黑暗過去，突破與清明同時到來。', 'en': 'Dawn has come; darkness is past, and breakthrough arrives with clarity.', 'ja': '夜明けが来た。闇は去り、突破と明晰さが同時に訪れる。' },
+  rev: null },
+{ ch: 'ᛟ', name: 'Othala', cn: '奥萨拉', tr: 'o', noRev: false,
+  kw: { 'zh-CN': '家园、传承、归属', 'zh-TW': '家園、傳承、歸屬', 'en': 'Home, inheritance, belonging', 'ja': '家、継承、帰属' },
+  up: { 'zh-CN': '家园与传承是根基，归属感带来力量；宜珍惜传统与家人。', 'zh-TW': '家園與傳承是根基，歸屬感帶來力量；宜珍惜傳統與家人。', 'en': 'Home and heritage are the roots; belonging brings strength — cherish tradition and family.', 'ja': '家と継承が根である。帰属意識が力を与える。伝統と家族を大切にすること。' },
+  rev: { 'zh-CN': '家产纠纷或归属动摇，留意家族矛盾；根基未稳不宜远行。', 'zh-TW': '家產糾紛或歸屬動搖，留意家族矛盾；根基未穩不宜遠行。', 'en': 'Inheritance disputes or belonging shaken; watch family friction — do not move far while roots are unsteady.', 'ja': '家産の争いや帰属の揺らぎがある。家族の摩擦に注意。根が不安定なうちは遠くへ行かないこと。' } }
+];
+
+var NO_REV_NAMES = ['Gebo', 'Hagalaz', 'Nauthiz', 'Isa', 'Jera', 'Eihwaz', 'Sowilo', 'Ingwaz', 'Dagaz'];
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function runeName(r) { return r.name + ' · ' + r.cn; }
+function runeKeywords(r) { return langText(r.kw); }
+function runeMeaning(r, reversed) {
+  if (reversed && r.rev) return langText(r.rev);
+  return langText(r.up);
+}
+function drawRunes(n) {
+  var pool = RUNES.slice();
+  for (var i = pool.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+  }
+  var drawn = [];
+  for (var k = 0; k < n; k++) {
+    var r = pool[k];
+    var reversed = (!r.noRev) && (Math.random() < 0.5);
+    drawn.push({ rune: r, reversed: reversed });
+  }
+  return drawn;
+}
+
+function castRunes() {
+  var layout = document.getElementById('layout').value;
+  var n = (layout === 'three') ? 3 : 1;
+  var qEl = document.getElementById('question');
+  LAST_RESULT = {
+    layout: layout,
+    question: qEl ? qEl.value.trim() : '',
+    drawn: drawRunes(n)
+  };
+  var out = document.getElementById('ai-interpret-output');
+  if (out) out.innerHTML = '';
+  showResult(LAST_RESULT);
+  document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function showResult(res) {
+  var card = document.getElementById('result-card');
+  card.classList.remove('hidden');
+  var head = document.getElementById('result-head');
+  var headHtml = '<b>' + esc(t(res.layout === 'three' ? 'layoutThree' : 'layoutSingle')) + '</b>';
+  if (res.question) headHtml += '<br>' + esc(t('asked')) + '：' + esc(res.question);
+  head.innerHTML = headHtml;
+  var posKeys = ['posPast', 'posPresent', 'posFuture'];
+  var html = '';
+  res.drawn.forEach(function (d, i) {
+    var r = d.rune;
+    var pos = (res.layout === 'three') ? t(posKeys[i]) : '';
+    var orient = d.reversed ? t('reversed') : t('upright');
+    html += '<div class="rune-card">' +
+      (pos ? '<div class="rune-pos">' + esc(pos) + '</div>' : '') +
+      '<div class="rune-char' + (d.reversed ? ' reversed' : '') + '">' + esc(r.ch) + '</div>' +
+      '<div class="rune-name">' + esc(runeName(r)) + '</div>' +
+      '<div class="rune-translit">' + esc(r.tr) + '</div>' +
+      '<div><span class="orient-badge' + (d.reversed ? ' rev' : '') + '">' + esc(orient) + '</span></div>' +
+      '<div class="rune-kw"><b>' + esc(t('keywordsLabel')) + '：</b>' + esc(runeKeywords(r)) + '</div>' +
+      '<div class="rune-meaning"><b>' + esc(t('meaningLabel')) + '：</b>' + esc(runeMeaning(r, d.reversed)) + '</div>' +
+      (r.noRev ? '<div class="no-rev-note">' + esc(t('noReversed')) + '</div>' : '') +
+    '</div>';
+  });
+  document.getElementById('rune-grid').innerHTML = html;
+}
+
+applyI18n();
+// ==LOGIC-END==
+</script>
+<script src="/js/ai-jiegua.js"></script>
+<script>
+// ==AI-INTERPRET==
+// Shared AI 解读 button (/js/ai-jiegua.js). Summary comes from this page's
+// own result state; null means "no result yet" and the button only shows
+// a hint instead of calling the backend.
+window.getJieguaSummary = function() {
+  if (!LAST_RESULT || !LAST_RESULT.drawn || !LAST_RESULT.drawn.length) return null;
+  var layoutName = LAST_RESULT.layout === 'three' ? t('layoutThree') : t('layoutSingle');
+  var parts = LAST_RESULT.drawn.map(function (d) {
+    var r = d.rune;
+    var orient = d.reversed ? t('reversed') : t('upright');
+    return runeName(r) + '（' + orient + '）' + runeKeywords(r);
+  });
+  var s = '卢恩' + layoutName + '：' + parts.join('、');
+  if (LAST_RESULT.question) s += '；问题：' + LAST_RESULT.question;
+  return s;
+};
+window.getJieguaQuestion = function() { var el = document.getElementById('question'); return el ? el.value.trim() : ''; };
+if (window.AIInterpret) window.AIInterpret.attach();
+</script>
+</body>
+</html>

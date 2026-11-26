@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 占星骰子</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+  .gua-name-cn { display: block; font-size: .85rem; color: #9a9aab; font-weight: 400; margin-top: .2rem; letter-spacing: .05em; }
+  .guaci-note { font-size: .78rem; color: #6f6f80; margin-top: .5rem; line-height: 1.6; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .method-row { display: flex; gap: 2rem; }
+  .method-row > .field { flex: 1; min-width: 0; }
+  .num-row { display: flex; gap: 2rem; }
+  .num-row > .field { flex: 1; min-width: 0; }
+  .link-btn { background: none; border: none; color: #c9a962; font-size: .75rem; cursor: pointer; letter-spacing: .1em; padding: 0; margin-left: .5rem; font-family: inherit; }
+  .link-btn:hover { text-decoration: underline; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .verdict { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .level { color: #c9a962; font-weight: 700; }
+  .hex-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-top: 1.4rem; }
+  .hex-card { background: transparent; border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1.1rem 1.2rem; }
+  .hex-card h3 { font-size: .8rem; color: #b08d3e; font-weight: 400; letter-spacing: .25em; margin-bottom: .6rem; }
+  .hex-card .gua-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.25rem; font-weight: 700; color: #f0ead8; }
+  .hex-card .tri-info { font-size: .85rem; color: #9a9aab; margin: .4rem 0 .8rem; line-height: 1.7; }
+  .hex-card .tri-info b { color: #f0ead8; font-weight: 600; }
+  .hex-card .guaci { font-size: .88rem; color: #c8c2ae; line-height: 1.7; border-top: 1px dashed rgba(201,169,98,.35); padding-top: .7rem; margin-top: .7rem; }
+  .hex-diagram { width: 170px; margin: .2rem auto .7rem; }
+  .hex-row { display: flex; align-items: center; height: 13px; margin: 7px 0; }
+  .hex-row .bar { flex: 1; height: 13px; display: flex; }
+  .hex-row .bar .seg { flex: 1; background: #c9a962; border-radius: 2px; }
+  .hex-row.yin .bar { gap: 14px; }
+  .hex-row.changing .bar .seg { background: #e8c97a; box-shadow: 0 0 10px rgba(201,169,98,.7); }
+  .hex-row .mark { width: 22px; text-align: right; color: #c9a962; font-size: .8rem; flex-shrink: 0; }
+  .hex-row .mark .dot { font-size: .7rem; }
+  .hex-row .lbl { width: 22px; color: #6f6f80; font-size: .7rem; flex-shrink: 0; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .method-row, .num-row { flex-direction: column; gap: 0; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">占星骰子 · 本地占卜</div>
+    </div>
+  </a>
+          <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></span>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">一事一问 · 占星骰子</div>
+  <h1 class="slogan" data-i18n-html="slogan">三颗骰子，<br>掷出天意。</h1>
+  <p class="subtitle" data-i18n="subtitle">占星骰子免费在线占卜</p>
+
+  <section class="section">
+    <div class="field">
+      <label for="question" data-i18n="labelQuestion">所问之事（可选）</label>
+      <input type="text" id="question" placeholder="例如：这个机会要不要接？" data-i18n-ph="phQuestion">
+    </div>
+    <div class="num-row">
+      <div class="field">
+        <label for="planet-select" data-i18n="labelPlanet">第一颗骰子 · 行星</label>
+        <select id="planet-select"></select>
+      </div>
+      <div class="field">
+        <label for="sign-select" data-i18n="labelSign">第二颗骰子 · 星座</label>
+        <select id="sign-select"></select>
+      </div>
+      <div class="field">
+        <label for="house-select" data-i18n="labelHouse">第三颗骰子 · 宫位</label>
+        <select id="house-select"></select>
+      </div>
+    </div>
+    <p style="color:#9a9aab;font-size:.85rem;line-height:1.8;" data-i18n="hintFix">已选定的骰子会固定不动，只重掷标为“随机”的骰子；想全部重掷，点“全部随机重掷”。</p>
+    <button class="submit-btn" onclick="rollDice()" data-i18n="btnRoll">掷骰子</button>
+    <div style="text-align:center;margin-top:1rem;"><button type="button" class="link-btn" onclick="rollAll()" data-i18n="btnRollAll">全部随机重掷</button></div>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">骰子结果</div>
+    <div class="result-head" id="result-head"></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="hex-grid" id="hex-grid"></div>
+    <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="zhanxing" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+  </section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">占星骰子：免费占卜与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">占星骰子怎么玩？</summary>
+      <p data-i18n="faqA1">三颗骰子分别代表行星（什么能量）、星座（以什么方式）、宫位（在哪个生活领域）。全部随机可以一次掷出，也可以先固定其中一两颗，只重掷其余的骰子。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">这里的行星为什么是这 12 个？</summary>
+      <p data-i18n="faqA2">常用占星骰子是 10 颗行星——太阳、月亮、水星、金星、火星、木星、土星、天王星、海王星、冥王星——加上北交点与南交点，共 12 面；不含小行星与其他虚点。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">占星骰子和本命盘占星一样吗？</summary>
+      <p data-i18n="faqA3">不一样。骰子是即兴的提问工具：针对一个具体问题掷出一组象征组合，用来换角度联想；本命盘按出生时间与地点排盘，是一张固定的星图，结构与用法完全不同。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">掷出来的结果准吗？能当决策依据吗？</summary>
+      <p data-i18n="faqA4">诚实地说：不能。骰子是随机的，随机组合本身没有预测能力；它适合帮你换个角度想问题，不能替代事实、数据与专业建议，重要的决定请以现实依据为准。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">我的问题会被保存或上传吗？</summary>
+      <p data-i18n="faqA5">不会。本页掷骰在本地完成，不联网、不收费，也不保存你输入的问题；只有点“AI 解读”时，才会把结果摘要发送到服务器解读，并计入每日限额。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">占星骰子属传统占卜游戏，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="offlineNote">本页掷骰在本地完成，不联网、不收费、不保存你输入的问题；点“AI 解读”时才会把结果摘要发送到服务器解读，并计入每日限额。</span>
+  </footer>
+</div>
+</main>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。行星 / 星座 / 宫位名称保留中文 + 英文，见下方数据表。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '占星骰子 · 本地占卜',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '一事一问 · 占星骰子',
+  slogan: '三颗骰子，<br>掷出天意。',
+  subtitle: '占星骰子免费在线占卜',
+  labelQuestion: '所问之事（可选）',
+  phQuestion: '例如：这个机会要不要接？',
+  labelPlanet: '第一颗骰子 · 行星',
+  labelSign: '第二颗骰子 · 星座',
+  labelHouse: '第三颗骰子 · 宫位',
+  optRandom: '随机',
+  hintFix: '已选定的骰子会固定不动，只重掷标为“随机”的骰子；想全部重掷，点“全部随机重掷”。',
+  btnRoll: '掷骰子',
+  btnRollAll: '全部随机重掷',
+  resultTitle: '骰子结果',
+  cardPlanet: '行星 · 什么能量',
+  cardSign: '星座 · 以什么方式',
+  cardHouse: '宫位 · 在哪个领域',
+  kwLabel: '关键词',
+  asked: '所问',
+  colon: '：',
+  comma: '，',
+  reading1: '这组骰子说：{P}代表{PK}，此刻它以{S}的方式走进{H}的领域。',
+  reading2: '{S}的{SK}会放大{P}的{PK}，而{H}提醒你把注意力放在{HK}上。',
+  reading3: '若要顺势而为，先在{HK}上落子，再让{PK}按{S}的节奏推进。',
+  faqTitle: '占星骰子：免费占卜与使用常见问题',
+  faqQ1: '占星骰子怎么玩？',
+  faqA1: '三颗骰子分别代表行星（什么能量）、星座（以什么方式）、宫位（在哪个生活领域）。全部随机可以一次掷出，也可以先固定其中一两颗，只重掷其余的骰子。',
+  faqQ2: '这里的行星为什么是这 12 个？',
+  faqA2: '常用占星骰子是 10 颗行星——太阳、月亮、水星、金星、火星、木星、土星、天王星、海王星、冥王星——加上北交点与南交点，共 12 面；不含小行星与其他虚点。',
+  faqQ3: '占星骰子和本命盘占星一样吗？',
+  faqA3: '不一样。骰子是即兴的提问工具：针对一个具体问题掷出一组象征组合，用来换角度联想；本命盘按出生时间与地点排盘，是一张固定的星图，结构与用法完全不同。',
+  faqQ4: '掷出来的结果准吗？能当决策依据吗？',
+  faqA4: '诚实地说：不能。骰子是随机的，随机组合本身没有预测能力；它适合帮你换个角度想问题，不能替代事实、数据与专业建议，重要的决定请以现实依据为准。',
+  faqQ5: '我的问题会被保存或上传吗？',
+  faqA5: '不会。本页掷骰在本地完成，不联网、不收费，也不保存你输入的问题；只有点“AI 解读”时，才会把结果摘要发送到服务器解读，并计入每日限额。',
+  disclaimer: '占星骰子属传统占卜游戏，仅供参考，不构成决策依据。',
+  offlineNote: '本页掷骰在本地完成，不联网、不收费、不保存你输入的问题；点“AI 解读”时才会把结果摘要发送到服务器解读，并计入每日限额。',
+  langLabel: '语言',
+  ai_interpret: 'AI 解读'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '占星骰子 · 本地占卜',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '一事一問 · 占星骰子',
+  slogan: '三顆骰子，<br>擲出天意。',
+  subtitle: '占星骰子免費線上占卜',
+  labelQuestion: '所問之事（可選）',
+  phQuestion: '例如：這個機會要不要接？',
+  labelPlanet: '第一顆骰子 · 行星',
+  labelSign: '第二顆骰子 · 星座',
+  labelHouse: '第三顆骰子 · 宮位',
+  optRandom: '隨機',
+  hintFix: '已選定的骰子會固定不動，只重擲標為「隨機」的骰子；想全部重擲，點「全部隨機重擲」。',
+  btnRoll: '擲骰子',
+  btnRollAll: '全部隨機重擲',
+  resultTitle: '骰子結果',
+  cardPlanet: '行星 · 什麼能量',
+  cardSign: '星座 · 以什麼方式',
+  cardHouse: '宮位 · 在哪個領域',
+  kwLabel: '關鍵詞',
+  asked: '所問',
+  colon: '：',
+  comma: '，',
+  reading1: '這組骰子說：{P}代表{PK}，此刻它以{S}的方式走進{H}的領域。',
+  reading2: '{S}的{SK}會放大{P}的{PK}，而{H}提醒你把注意力放在{HK}上。',
+  reading3: '若要順勢而為，先在{HK}上落子，再讓{PK}按{S}的節奏推進。',
+  faqTitle: '占星骰子：免費占卜與使用常見問題',
+  faqQ1: '占星骰子怎麼玩？',
+  faqA1: '三顆骰子分別代表行星（什麼能量）、星座（以什麼方式）、宮位（在哪個生活領域）。全部隨機可以一次擲出，也可以先固定其中一兩顆，只重擲其餘的骰子。',
+  faqQ2: '這裡的行星為什麼是這 12 個？',
+  faqA2: '常用占星骰子是 10 顆行星——太陽、月亮、水星、金星、火星、木星、土星、天王星、海王星、冥王星——加上北交點與南交點，共 12 面；不含小行星與其他虛點。',
+  faqQ3: '占星骰子和本命盤占星一樣嗎？',
+  faqA3: '不一樣。骰子是即興的提問工具：針對一個具體問題擲出一組象徵組合，用來換角度聯想；本命盤按出生時間與地點排盤，是一張固定的星圖，結構與用法完全不同。',
+  faqQ4: '擲出來的結果準嗎？能當決策依據嗎？',
+  faqA4: '誠實地說：不能。骰子是隨機的，隨機組合本身沒有預測能力；它適合幫你換個角度想問題，不能替代事實、數據與專業建議，重要的決定請以現實依據為準。',
+  faqQ5: '我的問題會被保存或上傳嗎？',
+  faqA5: '不會。本頁擲骰在本地完成，不聯網、不收費，也不保存你輸入的問題；只有點「AI 解讀」時，才會把結果摘要發送到伺服器解讀，並計入每日限額。',
+  disclaimer: '占星骰子屬傳統占卜遊戲，僅供參考，不構成決策依據。',
+  offlineNote: '本頁擲骰在本地完成，不聯網、不收費、不保存你輸入的問題；點「AI 解讀」時才會把結果摘要發送到伺服器解讀，並計入每日限額。',
+  langLabel: '語言',
+  ai_interpret: 'AI 解讀'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': "Zhuge's Oracles",
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Astrology Dice · Local Divination',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'One Question · Astrology Dice',
+  slogan: 'Three dice,<br>one throw of fate.',
+  subtitle: 'Free online astrology dice divination',
+  labelQuestion: 'Your question (optional)',
+  phQuestion: 'e.g. Should I take this opportunity?',
+  labelPlanet: 'First die · Planet',
+  labelSign: 'Second die · Sign',
+  labelHouse: 'Third die · House',
+  optRandom: 'Random',
+  hintFix: 'Dice you have fixed stay put — only dice set to Random are re-rolled. Use “Re-roll all” to randomise everything.',
+  btnRoll: 'Roll the dice',
+  btnRollAll: 'Re-roll all',
+  resultTitle: 'The Dice',
+  cardPlanet: 'Planet · What energy',
+  cardSign: 'Sign · In what manner',
+  cardHouse: 'House · In which area of life',
+  kwLabel: 'Keyword',
+  asked: 'Question',
+  colon: ': ',
+  comma: ', ',
+  reading1: 'These dice say: {P} stands for {PK}, and right now it enters the realm of {H} in the manner of {S}.',
+  reading2: 'The {SK} of {S} amplifies the {PK} of {P}, while {H} asks you to focus on {HK}.',
+  reading3: 'To move with the current, start from {HK}, then let {PK} advance at the pace of {S}.',
+  faqTitle: 'Astrology Dice: Free Reading & FAQ',
+  faqQ1: 'How do you play astrology dice?',
+  faqA1: 'Three dice stand for the planet (what energy), the sign (in what manner) and the house (in which area of life). Roll all three at random, or fix one or two dice first and re-roll only the rest.',
+  faqQ2: 'Why these 12 planets?',
+  faqA2: 'The common dice set is the 10 planets — Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto — plus the North Node and South Node, 12 faces in total. It leaves out asteroids and other minor points.',
+  faqQ3: 'Is this the same as natal-chart astrology?',
+  faqA3: 'No. The dice are an on-the-spot tool for one question: they throw up a set of symbols to think with. A natal chart is cast from a birth time and place and is a fixed map — a different structure and a different use.',
+  faqQ4: 'Are the results accurate? Can I decide by them?',
+  faqA4: 'Honestly: no. The dice are random, and a random combination has no predictive power. They can help you look at a question from a new angle, but they cannot replace facts, data or professional advice — base important decisions on real evidence.',
+  faqQ5: 'Is my question saved or uploaded?',
+  faqA5: 'No. The dice are cast locally in your browser — no internet, no charge, and your question is never saved. Only the AI Reading sends a short summary to the server, and it counts toward the daily limit.',
+  disclaimer: 'Astrology dice are a traditional divination game, for reference only; they are not a basis for decisions.',
+  offlineNote: 'Dice are cast locally on this page — no internet, no charge, and your question is never saved. Only the AI Reading sends a short summary to the server, and it counts toward the daily limit.',
+  langLabel: 'Language',
+  ai_interpret: 'AI Reading'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '占星ダイス · ローカル占い',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '一事一問 · 占星ダイス',
+  slogan: '三つのダイス、<br>天意を投げる。',
+  subtitle: '占星ダイス 無料オンライン占い',
+  labelQuestion: '質問（任意）',
+  phQuestion: '例：このチャンスを受けるべき？',
+  labelPlanet: '1つ目のダイス · 惑星',
+  labelSign: '2つ目のダイス · 星座',
+  labelHouse: '3つ目のダイス · ハウス',
+  optRandom: 'ランダム',
+  hintFix: '固定したダイスはそのまま、ランダムに設定したダイスだけ振り直します。すべて振り直す場合は「すべて振り直す」を押してください。',
+  btnRoll: 'ダイスを振る',
+  btnRollAll: 'すべて振り直す',
+  resultTitle: 'ダイスの結果',
+  cardPlanet: '惑星 · どんなエネルギー',
+  cardSign: '星座 · どんなやり方で',
+  cardHouse: 'ハウス · どの領域で',
+  kwLabel: 'キーワード',
+  asked: '質問',
+  colon: '：',
+  comma: '、',
+  reading1: 'このダイスは語ります。{P}は{PK}を表し、今それは{S}のやり方で{H}の領域に入ります。',
+  reading2: '{S}の{SK}が{P}の{PK}を強め、{H}は{HK}に目を向けるよう促します。',
+  reading3: '流れに乗るには、まず{HK}から着手し、{PK}を{S}のリズムで進めましょう。',
+  faqTitle: '占星ダイス：無料占いとよくある質問',
+  faqQ1: '占星ダイスの遊び方は？',
+  faqA1: '三つのダイスはそれぞれ惑星（どんなエネルギー）、星座（どんなやり方）、ハウス（どの領域）を表します。すべてランダムに振ることも、一つか二つを固定して残りだけ振り直すこともできます。',
+  faqQ2: 'なぜこの12の惑星なのですか？',
+  faqA2: '一般的なダイスは10の惑星——太陽、月、水星、金星、火星、木星、土星、天王星、海王星、冥王星——に北交点と南交点を加えた12面です。小惑星やその他の仮想点は含まれていません。',
+  faqQ3: '出生図の占星術と同じですか？',
+  faqA3: 'いいえ。ダイスは一つの質問に対する即興の道具で、象徴の組み合わせから別の角度で考えるためのものです。出生図は出生時刻と場所から作る固定の星図で、構造も使い方もまったく異なります。',
+  faqQ4: '結果は当たりますか？判断の根拠にできますか？',
+  faqA4: '正直に言えば、できません。ダイスはランダムであり、ランダムな組み合わせに予測能力はありません。問題を新しい角度から見る助けにはなりますが、事実やデータ、専門家の助言の代わりにはなりません。大切な判断は現実の根拠に基づいてください。',
+  faqQ5: '質問は保存されたり送信されたりしますか？',
+  faqA5: 'いいえ。ダイスはブラウザ内でローカルに振られ、ネット接続も料金も不要で、入力した質問は保存されません。AI解釈を押したときだけ結果の要約がサーバーに送信され、1日の利用回数に数えられます。',
+  disclaimer: '占星ダイスは伝統的な占い遊びです。参考までとし、判断の根拠にはなりません。',
+  offlineNote: 'このページのダイスはローカルで振られ、ネット接続も料金も不要で、入力した質問は保存されません。AI解釈を押したときだけ結果の要約がサーバーに送信され、1日の利用回数に数えられます。',
+  langLabel: '言語',
+  ai_interpret: 'AI 解釈'
+}
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  buildDiceOptions();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// 占星骰子：三颗 12 面骰 —— 行星（什么能量）× 星座（以什么方式）× 宫位（在哪个生活领域）。
+// 行星组为常用骰子组合：10 颗行星 + 北交点 / 南交点。名称保留中文 + 英文。
+// 每项：name（4 语名称）、kw（4 语关键词）、m（4 语释义，1-2 句）。
+var PLANETS = [
+  { name: {'zh-CN':'太阳','zh-TW':'太陽',en:'Sun',ja:'太陽'}, kw: {'zh-CN':'核心自我','zh-TW':'核心自我',en:'core self',ja:'核となる自己'}, m: {'zh-CN':'代表你是谁、想成为谁，是整张星盘的中心，也是生命力与意志的来源。','zh-TW':'代表你是誰、想成為誰，是整張星盤的中心，也是生命力與意志的來源。',en:'Who you are and who you mean to become — the centre of the chart, and the source of vitality and will.',ja:'あなたが誰であり、誰になろうとしているのか。星図の中心であり、生命力と意志の源です。'} },
+  { name: {'zh-CN':'月亮','zh-TW':'月亮',en:'Moon',ja:'月'}, kw: {'zh-CN':'情绪与需求','zh-TW':'情緒與需求',en:'emotional needs',ja:'感情と欲求'}, m: {'zh-CN':'代表内在的感受、本能反应与安全感，指向你真正需要什么才能安心。','zh-TW':'代表內在的感受、本能反應與安全感，指向你真正需要什麼才能安心。',en:'Inner feelings, instincts and the need for safety — what you truly need in order to feel at ease.',ja:'内面の感情、本能的な反応、安全感の欲求。安心するために本当に必要なものを示します。'} },
+  { name: {'zh-CN':'水星','zh-TW':'水星',en:'Mercury',ja:'水星'}, kw: {'zh-CN':'思考与沟通','zh-TW':'思考與溝通',en:'thought and communication',ja:'思考と伝達'}, m: {'zh-CN':'代表你如何思考、学习与表达，是理解、说话与交换信息的方式。','zh-TW':'代表你如何思考、學習與表達，是理解、說話與交換資訊的方式。',en:'How you think, learn and speak — the way you understand things and exchange information.',ja:'どのように考え、学び、表現するか。物事を理解し、情報をやり取りするやり方です。'} },
+  { name: {'zh-CN':'金星','zh-TW':'金星',en:'Venus',ja:'金星'}, kw: {'zh-CN':'爱与价值','zh-TW':'愛與價值',en:'love and values',ja:'愛と価値'}, m: {'zh-CN':'代表你喜欢什么、如何去爱，以及你认为什么东西值得拥有与珍惜。','zh-TW':'代表你喜歡什麼、如何去愛，以及你認為什麼東西值得擁有與珍惜。',en:'What you love, how you love, and what you consider worth having and treasuring.',ja:'何を好み、どう愛し、何を価値あるものとみなすかを示します。'} },
+  { name: {'zh-CN':'火星','zh-TW':'火星',en:'Mars',ja:'火星'}, kw: {'zh-CN':'行动与勇气','zh-TW':'行動與勇氣',en:'action and courage',ja:'行動と勇気'}, m: {'zh-CN':'代表欲望、竞争与行动力，是把想法变成现实的冲劲，也是直面冲突的勇气。','zh-TW':'代表欲望、競爭與行動力，是把想法變成現實的衝勁，也是直面衝突的勇氣。',en:'Desire, competition and drive — the push that turns ideas into action, and the courage to face conflict.',ja:'欲望、競争、行動力。考えを現実に変える推進力であり、対立に向き合う勇気です。'} },
+  { name: {'zh-CN':'木星','zh-TW':'木星',en:'Jupiter',ja:'木星'}, kw: {'zh-CN':'成长与机会','zh-TW':'成長與機會',en:'growth and opportunity',ja:'成長と機会'}, m: {'zh-CN':'代表扩张、幸运与意义，指向成长的方向、出现的机会与值得相信的事。','zh-TW':'代表擴張、幸運與意義，指向成長的方向、出現的機會與值得相信的事。',en:'Expansion, luck and meaning — where growth is possible, which doors open, and what is worth believing in.',ja:'拡大、幸運、意味。成長の方向、開かれる機会、信じるに値することを示します。'} },
+  { name: {'zh-CN':'土星','zh-TW':'土星',en:'Saturn',ja:'土星'}, kw: {'zh-CN':'责任与结构','zh-TW':'責任與結構',en:'responsibility and structure',ja:'責任と構造'}, m: {'zh-CN':'代表规则、界限与长期的责任，提醒你打基础、守承诺，慢但扎实。','zh-TW':'代表規則、界限與長期的責任，提醒你打基礎、守承諾，慢但紮實。',en:'Rules, limits and long-term responsibility — a reminder to build foundations, keep promises, and go slow but solid.',ja:'規則、境界、長期的な責任。基礎を築き、約束を守り、ゆっくりでも確実に進むよう促します。'} },
+  { name: {'zh-CN':'天王星','zh-TW':'天王星',en:'Uranus',ja:'天王星'}, kw: {'zh-CN':'变革与自由','zh-TW':'變革與自由',en:'change and freedom',ja:'変革と自由'}, m: {'zh-CN':'代表打破常规、突然的改变与对独立的渴望，事情可能以意想不到的方式转向。','zh-TW':'代表打破常規、突然的改變與對獨立的渴望，事情可能以意想不到的方式轉向。',en:'Breaking the rules, sudden change and the urge for independence — things may turn in unexpected ways.',ja:'常識を破ること、突然の変化、独立への渇望。物事が思いがけない方向に転じるかもしれません。'} },
+  { name: {'zh-CN':'海王星','zh-TW':'海王星',en:'Neptune',ja:'海王星'}, kw: {'zh-CN':'梦想与直觉','zh-TW':'夢想與直覺',en:'dreams and intuition',ja:'夢と直感'}, m: {'zh-CN':'代表想象、同情与直觉，也代表边界模糊的地方：美好的愿景，或看不清的迷雾。','zh-TW':'代表想像、同情與直覺，也代表邊界模糊的地方：美好的願景，或看不清的迷霧。',en:'Imagination, compassion and intuition — and the places where boundaries blur: a beautiful vision, or a fog that hides the view.',ja:'想像力、共感、直感。境界が曖昧になる場所でもあります。美しい理想か、見通せない霧か。'} },
+  { name: {'zh-CN':'冥王星','zh-TW':'冥王星',en:'Pluto',ja:'冥王星'}, kw: {'zh-CN':'转化与力量','zh-TW':'轉化與力量',en:'transformation and power',ja:'変容と力'}, m: {'zh-CN':'代表彻底的改变、深层的真相与力量的流动，旧的东西结束，新的东西从中长出来。','zh-TW':'代表徹底的改變、深層的真相與力量的流動，舊的東西結束，新的東西從中長出來。',en:'Complete change, deep truth and the flow of power — the old ends, and something new grows out of it.',ja:'徹底的な変化、深層の真実、力の流れ。古いものが終わり、そこから新しいものが生まれます。'} },
+  { name: {'zh-CN':'北交点','zh-TW':'北交點',en:'North Node',ja:'北交点'}, kw: {'zh-CN':'成长方向','zh-TW':'成長方向',en:'direction of growth',ja:'成長の方向'}, m: {'zh-CN':'代表此生要学习的方向与人生课题，指向不熟悉、却值得走向的地方。','zh-TW':'代表此生要學習的方向與人生課題，指向不熟悉、卻值得走向的地方。',en:'The direction to grow in this life — unfamiliar territory that is worth moving toward.',ja:'今生で学ぶべき方向と人生の課題。不慣れでも、進む価値のある場所を示します。'} },
+  { name: {'zh-CN':'南交点','zh-TW':'南交點',en:'South Node',ja:'南交点'}, kw: {'zh-CN':'过去与习惯','zh-TW':'過去與習慣',en:'the past and old habits',ja:'過去と習慣'}, m: {'zh-CN':'代表已经熟悉、天生擅长的东西，也代表容易停留的舒适区：是根基，也是包袱。','zh-TW':'代表已經熟悉、天生擅長的東西，也代表容易停留的舒適區：是根基，也是包袱。',en:'What is already familiar and comes naturally — the comfort zone that is both a foundation and a weight.',ja:'すでに慣れ親しみ、生まれつき得意なこと。心地よい場所であると同時に、重荷にもなり得ます。'} }
+];
+var SIGNS = [
+  { name: {'zh-CN':'白羊座','zh-TW':'白羊座',en:'Aries',ja:'牡羊座'}, kw: {'zh-CN':'直接果断','zh-TW':'直接果斷',en:'direct and bold',ja:'率直で大胆'}, m: {'zh-CN':'能量像点火：直接、果断、先行动再说，冲劲足，但需要学会把事情做完。','zh-TW':'能量像點火：直接、果斷、先行動再說，衝勁足，但需要學會把事情做完。',en:'Energy like striking a match: direct, bold, act first — full of drive, but it must learn to finish what it starts.',ja:'火をつけるようなエネルギー。率直で大胆、まず行動。勢いは十分ですが、最後までやり遂げることを学ぶ必要があります。'} },
+  { name: {'zh-CN':'金牛座','zh-TW':'金牛座',en:'Taurus',ja:'牡牛座'}, kw: {'zh-CN':'稳定务实','zh-TW':'穩定務實',en:'steady and practical',ja:'安定と実用性'}, m: {'zh-CN':'能量沉稳耐心，重视感官享受与实际成果，慢慢来，但一旦认定就很难动摇。','zh-TW':'能量沉穩耐心，重視感官享受與實際成果，慢慢來，但一旦認定就很難動搖。',en:'Steady and patient energy that values comfort and real results — slow to move, but hard to shake once decided.',ja:'落ち着いて忍耐強いエネルギー。感覚的な心地よさと実際的な成果を重んじ、ゆっくり進みますが、一度決めたら揺らぎません。'} },
+  { name: {'zh-CN':'双子座','zh-TW':'雙子座',en:'Gemini',ja:'双子座'}, kw: {'zh-CN':'好奇灵活','zh-TW':'好奇靈活',en:'curious and adaptable',ja:'好奇心と柔軟性'}, m: {'zh-CN':'能量在交流与变化中流动：好奇、灵活、善于把不同的想法与人连接起来。','zh-TW':'能量在交流與變化中流動：好奇、靈活、善於把不同的想法與人連接起來。',en:'Energy that flows through talk and change: curious, adaptable, good at connecting different ideas and people.',ja:'交流と変化の中を流れるエネルギー。好奇心旺盛で柔軟、異なる考えや人々をつなぐのが得意です。'} },
+  { name: {'zh-CN':'巨蟹座','zh-TW':'巨蟹座',en:'Cancer',ja:'蟹座'}, kw: {'zh-CN':'守护与归属','zh-TW':'守護與歸屬',en:'protection and belonging',ja:'守ることと帰属'}, m: {'zh-CN':'以感受为先，重视归属与安全感，守护自己在乎的人与地方，情绪来得深也去得慢。','zh-TW':'以感受為先，重視歸屬與安全感，守護自己在乎的人與地方，情緒來得深也去得慢。',en:'Feeling comes first: belonging and safety matter most, guarding the people and places it cares about; feelings run deep and linger.',ja:'感情を最優先にし、帰属と安心を重んじ、大切な人や場所を守ります。感情は深く、長く残ります。'} },
+  { name: {'zh-CN':'狮子座','zh-TW':'獅子座',en:'Leo',ja:'獅子座'}, kw: {'zh-CN':'热情表现','zh-TW':'熱情表現',en:'warmth and self-expression',ja:'情熱と自己表現'}, m: {'zh-CN':'能量像舞台灯光：热情、大方、渴望被看见，慷慨待人，也需要掌声与认可。','zh-TW':'能量像舞台燈光：熱情、大方、渴望被看見，慷慨待人，也需要掌聲與認可。',en:'Energy like stage light: warm, generous, wanting to be seen — giving freely, but also needing applause and recognition.',ja:'舞台の照明のようなエネルギー。情熱的で気前がよく、見られたいと願います。惜しみなく与えますが、拍手と承認も必要とします。'} },
+  { name: {'zh-CN':'处女座','zh-TW':'處女座',en:'Virgo',ja:'乙女座'}, kw: {'zh-CN':'细致有序','zh-TW':'細緻有序',en:'careful and orderly',ja:'細やかさと秩序'}, m: {'zh-CN':'善于分析与改进，把混乱整理成系统：细致、务实，追求有用、干净与恰到好处。','zh-TW':'善於分析與改進，把混亂整理成系統：細緻、務實，追求有用、乾淨與恰到好處。',en:'Good at analysing and improving, turning mess into system: careful, practical, aiming for what is useful, clean and just right.',ja:'分析と改善が得意で、混乱を仕組みに変えます。細やかで実用的、有用で清潔でちょうどよいことを目指します。'} },
+  { name: {'zh-CN':'天秤座','zh-TW':'天秤座',en:'Libra',ja:'天秤座'}, kw: {'zh-CN':'平衡和谐','zh-TW':'平衡和諧',en:'balance and harmony',ja:'バランスと調和'}, m: {'zh-CN':'擅长从两边看问题，寻求公平与和谐的相处方式，重视关系，也讨厌冲突与粗糙。','zh-TW':'擅長從兩邊看問題，尋求公平與和諧的相處方式，重視關係，也討厭衝突與粗糙。',en:'Good at seeing both sides, seeking fair and harmonious ways to relate — valuing connection, disliking conflict and roughness.',ja:'両面から物事を見るのが得意で、公平で調和のとれた関係を求めます。人とのつながりを重んじ、対立や粗さを嫌います。'} },
+  { name: {'zh-CN':'天蝎座','zh-TW':'天蠍座',en:'Scorpio',ja:'蠍座'}, kw: {'zh-CN':'深刻专注','zh-TW':'深刻專注',en:'depth and focus',ja:'深さと集中'}, m: {'zh-CN':'能量向内集中：深刻、专注、不怕触碰别人回避的东西，直面真相，也守得住秘密。','zh-TW':'能量向內集中：深刻、專注、不怕觸碰別人迴避的東西，直面真相，也守得住秘密。',en:'Energy turned inward: deep, focused, unafraid to touch what others avoid — facing the truth head-on and keeping secrets well.',ja:'エネルギーを内側に集中させます。深く、集中力があり、他人が避けるものにも向き合い、真実を直視し、秘密を守ります。'} },
+  { name: {'zh-CN':'射手座','zh-TW':'射手座',en:'Sagittarius',ja:'射手座'}, kw: {'zh-CN':'乐观探索','zh-TW':'樂觀探索',en:'optimism and exploration',ja:'楽観と探求'}, m: {'zh-CN':'目光望向远方：乐观、坦率、渴望自由与更大的图景，相信事情总有意义与出路。','zh-TW':'目光望向遠方：樂觀、坦率、渴望自由與更大的圖景，相信事情總有意義與出路。',en:'Eyes on the horizon: optimistic, frank, hungry for freedom and the bigger picture, trusting that things have meaning and a way out.',ja:'視線は遠くへ。楽観的で率直、自由と大きな展望を求め、物事には意味と出口があると信じます。'} },
+  { name: {'zh-CN':'摩羯座','zh-TW':'摩羯座',en:'Capricorn',ja:'山羊座'}, kw: {'zh-CN':'自律长远','zh-TW':'自律長遠',en:'discipline and the long view',ja:'自律と長期的な視野'}, m: {'zh-CN':'重视成果与责任：自律、长远、一步一个脚印，愿意为目标长期投入，不怕慢。','zh-TW':'重視成果與責任：自律、長遠、一步一個腳印，願意為目標長期投入，不怕慢。',en:'Results and responsibility matter: disciplined, long-sighted, one step at a time — willing to invest for years, unafraid of slow.',ja:'成果と責任を重んじます。自律的で長期的な視野を持ち、一歩ずつ着実に進み、目標のために長く取り組むことを厭いません。'} },
+  { name: {'zh-CN':'水瓶座','zh-TW':'水瓶座',en:'Aquarius',ja:'水瓶座'}, kw: {'zh-CN':'独立创新','zh-TW':'獨立創新',en:'independence and innovation',ja:'独立と革新'}, m: {'zh-CN':'喜欢打破旧规则，用新方式连接众人：独立、理性、着眼未来与群体，也有点疏离。','zh-TW':'喜歡打破舊規則，用新方式連接眾人：獨立、理性、著眼未來與群體，也有點疏離。',en:'Likes breaking old rules and connecting people in new ways: independent, rational, future- and group-minded, with a touch of distance.',ja:'古い規則を破り、新しいやり方で人々をつなぐのが好きです。独立心があり理性的で、未来と集団に目を向け、少し距離を置くところもあります。'} },
+  { name: {'zh-CN':'双鱼座','zh-TW':'雙魚座',en:'Pisces',ja:'魚座'}, kw: {'zh-CN':'共情想象','zh-TW':'共情想像',en:'empathy and imagination',ja:'共感と想像'}, m: {'zh-CN':'感受力强，边界柔软：共情、想象、容易与他人的情绪与梦想融为一体，也需要独处回血。','zh-TW':'感受力強，邊界柔軟：共情、想像、容易與他人的情緒與夢想融為一體，也需要獨處回血。',en:'Strongly feeling, softly bounded: empathy and imagination, easily merging with others’ feelings and dreams — and needing solitude to recharge.',ja:'感受性が強く、境界は柔らかです。共感と想像力に富み、他人の感情や夢と溶け合いやすく、回復には一人の時間が必要です。'} }
+];
+var HOUSES = [
+  { n: 1, name: {'zh-CN':'第1宫','zh-TW':'第1宮',en:'1st House',ja:'第1ハウス'}, kw: {'zh-CN':'自我形象','zh-TW':'自我形象',en:'self-image',ja:'自己像'}, m: {'zh-CN':'你的外在表现与第一印象，以及你如何开始任何事：别人第一眼看到的你。','zh-TW':'你的外在表現與第一印象，以及你如何開始任何事：別人第一眼看到的你。',en:'How you come across and the first impression you make — and how you begin anything: the you that others meet first.',ja:'外に現れる姿と第一印象、そして何事をどう始めるか。他人が最初に出会うあなたです。'} },
+  { n: 2, name: {'zh-CN':'第2宫','zh-TW':'第2宮',en:'2nd House',ja:'第2ハウス'}, kw: {'zh-CN':'金钱价值','zh-TW':'金錢價值',en:'money and values',ja:'お金と価値'}, m: {'zh-CN':'收入、拥有的东西与花钱的方式，以及你认为什么值得拥有、什么才算有价值。','zh-TW':'收入、擁有的東西與花錢的方式，以及你認為什麼值得擁有、什麼才算有價值。',en:'Income, possessions and spending — and what you believe is worth having, what counts as valuable.',ja:'収入、所有物、お金の使い方。そして何を持つ価値があり、何が価値あるものとみなすか。'} },
+  { n: 3, name: {'zh-CN':'第3宫','zh-TW':'第3宮',en:'3rd House',ja:'第3ハウス'}, kw: {'zh-CN':'沟通学习','zh-TW':'溝通學習',en:'communication and learning',ja:'伝達と学び'}, m: {'zh-CN':'日常交流、学习、短途出行与身边环境，也包括兄弟姐妹与邻里之间的往来。','zh-TW':'日常交流、學習、短途出行與身邊環境，也包括兄弟姐妹與鄰里之間的往來。',en:'Everyday talk, learning, short trips and your immediate surroundings — including siblings and neighbours.',ja:'日常の会話、学び、近場の移動、身近な環境。兄弟姉妹や近所の人々との関わりも含みます。'} },
+  { n: 4, name: {'zh-CN':'第4宫','zh-TW':'第4宮',en:'4th House',ja:'第4ハウス'}, kw: {'zh-CN':'家庭根基','zh-TW':'家庭根基',en:'home and roots',ja:'家庭と基盤'}, m: {'zh-CN':'家、父母与私人生活，以及内在的安全感：累了可以回去的地方。','zh-TW':'家、父母與私人生活，以及內在的安全感：累了可以回去的地方。',en:'Home, parents and private life, and the inner sense of safety — the place you can return to when tired.',ja:'家、親、私生活、そして内面の安心感。疲れたときに帰ることのできる場所です。'} },
+  { n: 5, name: {'zh-CN':'第5宫','zh-TW':'第5宮',en:'5th House',ja:'第5ハウス'}, kw: {'zh-CN':'创造恋爱','zh-TW':'創造戀愛',en:'creativity and romance',ja:'創造と恋愛'}, m: {'zh-CN':'自我表达、恋爱、子女与让你开心的事：玩乐、创作与投入热情的地方。','zh-TW':'自我表達、戀愛、子女與讓你開心的事：玩樂、創作與投入熱情的地方。',en:'Self-expression, romance, children and what brings joy: play, creation and the things you pour passion into.',ja:'自己表現、恋愛、子ども、喜びをもたらすもの。遊び、創作、情熱を注ぐ場所です。'} },
+  { n: 6, name: {'zh-CN':'第6宫','zh-TW':'第6宮',en:'6th House',ja:'第6ハウス'}, kw: {'zh-CN':'健康工作','zh-TW':'健康工作',en:'health and daily work',ja:'健康と日常の仕事'}, m: {'zh-CN':'身体、习惯与日常事务，也包括工作方式与服务他人的态度：日子是怎么过出来的。','zh-TW':'身體、習慣與日常事務，也包括工作方式與服務他人的態度：日子是怎麼過出來的。',en:'Body, habits and daily tasks — including how you work and serve others: what your days are actually made of.',ja:'身体、習慣、日常の用事。働き方や他者への奉仕の姿勢も含みます。日々が何でできているか、です。'} },
+  { n: 7, name: {'zh-CN':'第7宫','zh-TW':'第7宮',en:'7th House',ja:'第7ハウス'}, kw: {'zh-CN':'伴侣合作','zh-TW':'伴侶合作',en:'partnership',ja:'パートナーシップ'}, m: {'zh-CN':'一对一的关系：伴侣、合伙人与公开的对手，照见自己的那面镜子。','zh-TW':'一對一的關係：伴侶、合夥人與公開的對手，照見自己的那面鏡子。',en:'One-to-one relationships: partners, collaborators and open rivals — the mirror that shows you yourself.',ja:'一対一の関係。伴侶、協力者、そして公然の相手。自分を映し出す鏡です。'} },
+  { n: 8, name: {'zh-CN':'第8宫','zh-TW':'第8宮',en:'8th House',ja:'第8ハウス'}, kw: {'zh-CN':'共有资源','zh-TW':'共有資源',en:'shared resources',ja:'共有の資源'}, m: {'zh-CN':'他人的钱、共同的资源与亲密关系中的信任，也包括深刻的转化与放下。','zh-TW':'他人的錢、共同的資源與親密關係中的信任，也包括深刻的轉化與放下。',en:'Other people’s money, shared resources and trust in intimacy — along with deep transformation and letting go.',ja:'他人のお金、共有の資源、親密な関係における信頼。深い変容と手放すことも含みます。'} },
+  { n: 9, name: {'zh-CN':'第9宫','zh-TW':'第9宮',en:'9th House',ja:'第9ハウス'}, kw: {'zh-CN':'旅行信念','zh-TW':'旅行信念',en:'travel and beliefs',ja:'旅行と信念'}, m: {'zh-CN':'远行、高等教育、哲学与信仰：走出去看世界，以及你相信的人生意义。','zh-TW':'遠行、高等教育、哲學與信仰：走出去看世界，以及你相信的人生意義。',en:'Long journeys, higher learning, philosophy and faith: going out to see the world, and what you believe life means.',ja:'遠い旅、高等教育、哲学と信仰。世界を見に出ること、そして人生の意味として信じるものです。'} },
+  { n: 10, name: {'zh-CN':'第10宫','zh-TW':'第10宮',en:'10th House',ja:'第10ハウス'}, kw: {'zh-CN':'事业声望','zh-TW':'事業聲望',en:'career and reputation',ja:'仕事と評価'}, m: {'zh-CN':'职业、公众形象与社会地位：你在世界中想达成的成就，以及别人如何评价你。','zh-TW':'職業、公眾形象與社會地位：你在世界中想達成的成就，以及別人如何評價你。',en:'Career, public image and standing: what you want to achieve in the world, and how others judge you for it.',ja:'仕事、公のイメージ、社会的な地位。世界の中で成し遂げたいこと、そして他人があなたをどう評価するか。'} },
+  { n: 11, name: {'zh-CN':'第11宫','zh-TW':'第11宮',en:'11th House',ja:'第11ハウス'}, kw: {'zh-CN':'朋友理想','zh-TW':'朋友理想',en:'friends and ideals',ja:'友人と理想'}, m: {'zh-CN':'社群、朋友与团体，以及你为未来许下的愿望：和谁同行，要去哪里。','zh-TW':'社群、朋友與團體，以及你為未來許下的願望：和誰同行，要去哪裡。',en:'Community, friends and groups — and the wishes you hold for the future: who you walk with, and where you are headed.',ja:'コミュニティ、友人、団体。そして未来に託す願い。誰と歩み、どこへ向かうのか。'} },
+  { n: 12, name: {'zh-CN':'第12宫','zh-TW':'第12宮',en:'12th House',ja:'第12ハウス'}, kw: {'zh-CN':'潜意识','zh-TW':'潛意識',en:'the subconscious',ja:'潜在意識'}, m: {'zh-CN':'独处、幕后与未被看见的部分：潜意识、旧的牵挂，以及需要放下、需要休息的东西。','zh-TW':'獨處、幕後與未被看見的部分：潛意識、舊的牽掛，以及需要放下、需要休息的東西。',en:'Solitude, the behind-the-scenes and the unseen: the subconscious, old attachments, and what needs rest or release.',ja:'一人きりの時間、舞台裏、見えない部分。潜在意識、古い執着、そして休ませ、手放すべきものです。'} }
+];
+
+// ---- 显示与掷骰 ----
+function displayName(item) {
+  if (LANG === 'en') return item.name.en + ' · ' + item.name['zh-CN'];
+  return item.name[LANG] + ' ' + item.name.en;
+}
+function itemMeaning(item) { return item.m[LANG] || item.m['zh-CN']; }
+function itemKw(item) { return item.kw[LANG] || item.kw['zh-CN']; }
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function buildDiceOptions() {
+  var ps = document.getElementById('planet-select');
+  var ss = document.getElementById('sign-select');
+  var hs = document.getElementById('house-select');
+  if (!ps || !ss || !hs) return;
+  var pv = ps.value, sv = ss.value, hv = hs.value;
+  ps.innerHTML = '<option value="">' + t('optRandom') + '</option>' + PLANETS.map(function(p, i) {
+    return '<option value="' + i + '">' + displayName(p) + '</option>';
+  }).join('');
+  ss.innerHTML = '<option value="">' + t('optRandom') + '</option>' + SIGNS.map(function(s, i) {
+    return '<option value="' + i + '">' + displayName(s) + '</option>';
+  }).join('');
+  hs.innerHTML = '<option value="">' + t('optRandom') + '</option>' + HOUSES.map(function(h, i) {
+    return '<option value="' + i + '">' + displayName(h) + '</option>';
+  }).join('');
+  ps.value = pv; ss.value = sv; hs.value = hv;
+}
+
+function rollOne(n) { return Math.floor(Math.random() * n); }
+
+// 掷骰子：已在下拉框里选定的骰子固定不动，只重掷标为“随机”的骰子。
+function rollDice() {
+  var ps = document.getElementById('planet-select');
+  var ss = document.getElementById('sign-select');
+  var hs = document.getElementById('house-select');
+  var pi = ps.value === '' ? rollOne(12) : parseInt(ps.value, 10);
+  var si = ss.value === '' ? rollOne(12) : parseInt(ss.value, 10);
+  var hi = hs.value === '' ? rollOne(12) : parseInt(hs.value, 10);
+  showResult({ pi: pi, si: si, hi: hi });
+}
+
+// 全部随机重掷：三颗骰子都回到“随机”再掷。
+function rollAll() {
+  var ps = document.getElementById('planet-select');
+  var ss = document.getElementById('sign-select');
+  var hs = document.getElementById('house-select');
+  ps.value = ''; ss.value = ''; hs.value = '';
+  rollDice();
+}
+
+// ---- 合成句与综合解读（纯函数，不碰 DOM，便于测试） ----
+function composeSentence(p, s, h) {
+  var pk = itemKw(p), sk = itemKw(s), hk = itemKw(h);
+  if (LANG === 'en') return displayName(p) + ' (' + pk + ') in ' + displayName(s) + ' (' + sk + ') in the ' + h.name.en + ' (' + hk + ')';
+  if (LANG === 'ja') return displayName(p) + '（' + pk + '）が' + displayName(s) + '（' + sk + '）で' + h.name.ja + '（' + hk + '）に';
+  if (LANG === 'zh-TW') return displayName(p) + '（' + pk + '）在' + displayName(s) + '（' + sk + '）於' + h.name['zh-TW'] + '（' + hk + '）';
+  return displayName(p) + '（' + pk + '）在' + displayName(s) + '（' + sk + '）于' + h.name['zh-CN'] + '（' + hk + '）';
+}
+
+function fillTpl(str, map) {
+  var out = str;
+  for (var k in map) out = out.split('{' + k + '}').join(map[k]);
+  return out;
+}
+
+function composeReading(p, s, h) {
+  var map = {
+    P: displayName(p), PK: itemKw(p),
+    S: displayName(s), SK: itemKw(s),
+    H: displayName(h), HK: itemKw(h)
+  };
+  var parts = [t('reading1'), t('reading2'), t('reading3')].map(function(x) { return fillTpl(x, map); });
+  return parts.join(LANG === 'en' ? ' ' : '');
+}
+
+function makeResult(r) {
+  var p = PLANETS[r.pi], s = SIGNS[r.si], h = HOUSES[r.hi];
+  return { p: p, s: s, h: h, sentence: composeSentence(p, s, h), reading: composeReading(p, s, h) };
+}
+
+function diceCard(title, item) {
+  return '<div class="hex-card"><h3>' + title + '</h3>' +
+    '<div class="gua-name">' + displayName(item) + '</div>' +
+    '<div class="tri-info">' + t('kwLabel') + t('colon') + '<b>' + itemKw(item) + '</b></div>' +
+    '<div class="guaci">' + itemMeaning(item) + '</div></div>';
+}
+
+function showResult(r, noScroll) {
+  LAST_RESULT = r;
+  var res = makeResult(r);
+  var q = document.getElementById('question').value.trim();
+  var head = '';
+  if (q) head += t('asked') + t('colon') + '<b>' + esc(q) + '</b>';
+  document.getElementById('result-head').innerHTML = head;
+  document.getElementById('verdict').innerHTML = '<span class="level">' + res.sentence + '</span><br><br>' + res.reading;
+  document.getElementById('hex-grid').innerHTML =
+    diceCard(t('cardPlanet'), res.p) +
+    diceCard(t('cardSign'), res.s) +
+    diceCard(t('cardHouse'), res.h);
+  document.getElementById('result-card').classList.remove('hidden');
+  if (!noScroll) document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ---- AI 解读：供 /js/ai-jiegua.js 调用 ----
+// 优先读 JS 状态变量 LAST_RESULT，未掷骰时返回 null，共享脚本会提示先掷骰。
+window.getJieguaQuestion = function() {
+  var el = document.getElementById('question');
+  return el ? el.value.trim() : '';
+};
+window.getJieguaSummary = function() {
+  if (!LAST_RESULT) return null;
+  var r = LAST_RESULT;
+  var p = PLANETS[r.pi], s = SIGNS[r.si], h = HOUSES[r.hi];
+  var q = window.getJieguaQuestion();
+  var out = '占星骰子：' + p.name['zh-CN'] + '在' + s.name['zh-CN'] + h.name['zh-CN'] + '；' +
+    p.kw['zh-CN'] + '、' + s.kw['zh-CN'] + '、' + h.kw['zh-CN'];
+  if (q) out += '；问题：' + q;
+  return out;
+};
+// ==LOGIC-END==
+
+// 初始化界面语言（localStorage 优先，否则按浏览器语言自动检测）
+buildDiceOptions();
+applyI18n();
+</script>
+<script src="/js/ai-jiegua.js"></script>
+<script>
+// 共享脚本与本页主脚本都已加载后再挂接（getJieguaSummary 已定义）。
+if (window.AIInterpret) window.AIInterpret.attach();
+</script>
+</body>
+</html>

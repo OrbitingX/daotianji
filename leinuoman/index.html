@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 雷诺曼</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+  .gua-name-cn { display: block; font-size: .85rem; color: #9a9aab; font-weight: 400; margin-top: .2rem; letter-spacing: .05em; }
+  .guaci-note { font-size: .78rem; color: #6f6f80; margin-top: .5rem; line-height: 1.6; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .method-row { display: flex; gap: 2rem; }
+  .method-row > .field { flex: 1; min-width: 0; }
+  .num-row { display: flex; gap: 2rem; }
+  .num-row > .field { flex: 1; min-width: 0; }
+  .link-btn { background: none; border: none; color: #c9a962; font-size: .75rem; cursor: pointer; letter-spacing: .1em; padding: 0; margin-left: .5rem; font-family: inherit; }
+  .link-btn:hover { text-decoration: underline; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .verdict { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .level { color: #c9a962; font-weight: 700; }
+  .hex-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-top: 1.4rem; }
+  .hex-card { background: transparent; border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1.1rem 1.2rem; }
+  .hex-card h3 { font-size: .8rem; color: #b08d3e; font-weight: 400; letter-spacing: .25em; margin-bottom: .6rem; }
+  .hex-card .gua-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.25rem; font-weight: 700; color: #f0ead8; }
+  .hex-card .tri-info { font-size: .85rem; color: #9a9aab; margin: .4rem 0 .8rem; line-height: 1.7; }
+  .hex-card .tri-info b { color: #f0ead8; font-weight: 600; }
+  .hex-card .guaci { font-size: .88rem; color: #c8c2ae; line-height: 1.7; border-top: 1px dashed rgba(201,169,98,.35); padding-top: .7rem; margin-top: .7rem; }
+
+  /* ---- 雷诺曼牌阵 ---- */
+  .len-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem; margin-top: 1.2rem; }
+  .len-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .len-card { border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1.1rem 1.2rem; background: rgba(201,169,98,.03); }
+  .len-card h3 { font-size: .8rem; color: #b08d3e; font-weight: 400; letter-spacing: .25em; margin-bottom: .6rem; }
+  .len-num { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2rem; color: #c9a962; line-height: 1; }
+  .len-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.25rem; font-weight: 700; color: #f0ead8; margin-top: .4rem; }
+  .len-playing { font-size: .85rem; color: #9a9aab; margin-top: .3rem; }
+  .len-kw { font-size: .9rem; color: #c9a962; margin-top: .7rem; line-height: 1.7; }
+  .len-meaning { font-size: .88rem; color: #c8c2ae; line-height: 1.8; border-top: 1px dashed rgba(201,169,98,.35); padding-top: .7rem; margin-top: .7rem; }
+  .len-row-label { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin: 1.6rem 0 .2rem; }
+  .len-row-label:first-of-type { margin-top: 1.2rem; }
+  .result-note { font-size: .85rem; color: #9a9aab; line-height: 1.8; margin-top: 1rem; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .method-row, .num-row { flex-direction: column; gap: 0; }
+    .len-grid.cols-3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">雷诺曼 · 本地占卜</div>
+    </div>
+  </a>
+          <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></span>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">第一幕 · 问事信息</div>
+  <h1 class="slogan" data-i18n-html="slogan">三十六张牌，<br>一眼见人心。</h1>
+  <p class="subtitle" data-i18n="subtitle">雷诺曼免费在线占卜</p>
+
+  <section class="section">
+    <div class="field">
+      <label for="question" data-i18n="labelQuestion">所问之事（可选）</label>
+      <input type="text" id="question" placeholder="例如：这份工作要不要换？" data-i18n-ph="phQuestion">
+    </div>
+    <div class="field">
+      <label for="layout" data-i18n="labelLayout">牌阵</label>
+      <select id="layout">
+        <option value="single" selected data-i18n="optSingle">单张牌</option>
+        <option value="three" data-i18n="optThree">三张牌（过去 · 现在 · 未来）</option>
+        <option value="nine" data-i18n="optNine">九宫格 3×3</option>
+      </select>
+    </div>
+    <button class="submit-btn" onclick="doDraw()" data-i18n="btnSubmit">洗牌 · 抽雷诺曼</button>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">牌阵</div>
+    <div class="result-head" id="result-head"></div>
+    <div id="result-body"></div>
+    <div class="result-note" id="result-note"></div>
+    <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="leinuoman" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+  </section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">雷诺曼：免费占卜与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">雷诺曼和塔罗有什么区别？</summary>
+      <p data-i18n="faqA1">雷诺曼用 36 张牌，牌义固定直接，适合问具体的事和近期的发展；塔罗有 78 张牌，象征更丰富，适合问心理与深层议题。两者可以互补，但不要对同一个问题反复抽牌。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">三张牌怎么读？</summary>
+      <p data-i18n="faqA2">从左到右是过去、现在、未来；中间那张是核心，左右两张修饰它。也可以把三张牌合起来读成一句话。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">九宫格怎么读？</summary>
+      <p data-i18n="faqA3">九宫格按行阅读：上行是过去，中行是现在，下行是未来；每行三张牌合起来讲一个阶段，中间那张（第 5 张）是整局的中心。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">抽到的牌会重复吗？</summary>
+      <p data-i18n="faqA4">不会。本页每次抽牌都从 36 张里不放回抽取，同一局里不会出现同一张牌两次；点“再抽一次”会重新洗牌。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">占卜结果准吗？能当决策依据吗？</summary>
+      <p data-i18n="faqA5">雷诺曼是传统占卜工具，牌义来自 19 世纪以来的通行解释，本页只做参考。结果不能代替专业建议（医疗、法律、财务等），重要决定请结合现实信息判断。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">雷诺曼属传统占卜，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="offlineNote">本页完全离线运行，抽牌在本地完成，不向任何服务器发送数据。</span>
+  </footer>
+</div>
+</main>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。牌名保留中文 + 英文，见 cardName()。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '雷诺曼 · 本地占卜',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '第一幕 · 问事信息',
+  slogan: '三十六张牌，<br>一眼见人心。',
+  subtitle: '雷诺曼免费在线占卜',
+  labelQuestion: '所问之事（可选）',
+  phQuestion: '例如：这份工作要不要换？',
+  labelLayout: '牌阵',
+  optSingle: '单张牌',
+  optThree: '三张牌（过去 · 现在 · 未来）',
+  optNine: '九宫格 3×3',
+  btnSubmit: '洗牌 · 抽雷诺曼',
+  resultTitle: '牌阵',
+  asked: '所问',
+  layoutLabel: '牌阵',
+  layoutSingle: '单张牌',
+  layoutThree: '三张牌',
+  layoutNine: '九宫格 3×3',
+  rowPast: '过去',
+  rowPresent: '现在',
+  rowFuture: '未来',
+  posPast: '过去',
+  posPresent: '现在',
+  posFuture: '未来',
+  playingLabel: '扑克牌',
+  kwLabel: '关键词',
+  meaningLabel: '牌义',
+  noteNine: '九宫格按行阅读：上行是过去，中行是现在，下行是未来；中间那张（第 5 张）是整局的中心。',
+  noteThree: '从左到右是过去、现在、未来；中间那张是核心，左右两张修饰它。',
+  faqTitle: '雷诺曼：免费占卜与使用常见问题',
+  faqQ1: '雷诺曼和塔罗有什么区别？',
+  faqA1: '雷诺曼用 36 张牌，牌义固定直接，适合问具体的事和近期的发展；塔罗有 78 张牌，象征更丰富，适合问心理与深层议题。两者可以互补，但不要对同一个问题反复抽牌。',
+  faqQ2: '三张牌怎么读？',
+  faqA2: '从左到右是过去、现在、未来；中间那张是核心，左右两张修饰它。也可以把三张牌合起来读成一句话。',
+  faqQ3: '九宫格怎么读？',
+  faqA3: '九宫格按行阅读：上行是过去，中行是现在，下行是未来；每行三张牌合起来讲一个阶段，中间那张（第 5 张）是整局的中心。',
+  faqQ4: '抽到的牌会重复吗？',
+  faqA4: '不会。本页每次抽牌都从 36 张里不放回抽取，同一局里不会出现同一张牌两次；点“再抽一次”会重新洗牌。',
+  faqQ5: '占卜结果准吗？能当决策依据吗？',
+  faqA5: '雷诺曼是传统占卜工具，牌义来自 19 世纪以来的通行解释，本页只做参考。结果不能代替专业建议（医疗、法律、财务等），重要决定请结合现实信息判断。',
+  disclaimer: '雷诺曼属传统占卜，仅供参考，不构成决策依据。',
+  offlineNote: '本页完全离线运行，抽牌在本地完成，不向任何服务器发送数据。',
+  langLabel: '语言',
+  ai_interpret: 'AI 解读'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '雷諾曼 · 本地占卜',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '第一幕 · 問事資訊',
+  slogan: '三十六張牌，<br>一眼見人心。',
+  subtitle: '雷諾曼免費線上占卜',
+  labelQuestion: '所問之事（可選）',
+  phQuestion: '例如：這份工作要不要換？',
+  labelLayout: '牌陣',
+  optSingle: '單張牌',
+  optThree: '三張牌（過去 · 現在 · 未來）',
+  optNine: '九宮格 3×3',
+  btnSubmit: '洗牌 · 抽雷諾曼',
+  resultTitle: '牌陣',
+  asked: '所問',
+  layoutLabel: '牌陣',
+  layoutSingle: '單張牌',
+  layoutThree: '三張牌',
+  layoutNine: '九宮格 3×3',
+  rowPast: '過去',
+  rowPresent: '現在',
+  rowFuture: '未來',
+  posPast: '過去',
+  posPresent: '現在',
+  posFuture: '未來',
+  playingLabel: '撲克牌',
+  kwLabel: '關鍵詞',
+  meaningLabel: '牌義',
+  noteNine: '九宮格按行閱讀：上行是過去，中行是現在，下行是未來；中間那張（第 5 張）是整局的中心。',
+  noteThree: '從左到右是過去、現在、未來；中間那張是核心，左右兩張修飾它。',
+  faqTitle: '雷諾曼：免費占卜與使用常見問題',
+  faqQ1: '雷諾曼和塔羅有什麼區別？',
+  faqA1: '雷諾曼用 36 張牌，牌義固定直接，適合問具體的事和近期的發展；塔羅有 78 張牌，象徵更豐富，適合問心理與深層議題。兩者可以互補，但不要對同一個問題反覆抽牌。',
+  faqQ2: '三張牌怎麼讀？',
+  faqA2: '從左到右是過去、現在、未來；中間那張是核心，左右兩張修飾它。也可以把三張牌合起來讀成一句話。',
+  faqQ3: '九宮格怎麼讀？',
+  faqA3: '九宮格按行閱讀：上行是過去，中行是現在，下行是未來；每行三張牌合起來講一個階段，中間那張（第 5 張）是整局的中心。',
+  faqQ4: '抽到的牌會重複嗎？',
+  faqA4: '不會。本頁每次抽牌都從 36 張裡不放回抽取，同一局裡不會出現同一張牌兩次；點「再抽一次」會重新洗牌。',
+  faqQ5: '占卜結果準嗎？能當決策依據嗎？',
+  faqA5: '雷諾曼是傳統占卜工具，牌義來自 19 世紀以來的通行解釋，本頁只做參考。結果不能代替專業建議（醫療、法律、財務等），重要決定請結合現實資訊判斷。',
+  disclaimer: '雷諾曼屬傳統占卜，僅供參考，不構成決策依據。',
+  offlineNote: '本頁完全離線運行，抽牌在本地完成，不向任何伺服器發送數據。',
+  langLabel: '語言',
+  ai_interpret: 'AI 解讀'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Lenormand · Local Divination',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'Act I · Your Question',
+  slogan: 'Thirty-six cards,<br>and the heart is laid bare.',
+  subtitle: 'Free online Lenormand reading',
+  labelQuestion: 'Your question (optional)',
+  phQuestion: 'e.g. Should I change jobs?',
+  labelLayout: 'Spread',
+  optSingle: 'Single card',
+  optThree: 'Three cards (past · present · future)',
+  optNine: 'Nine-card 3×3 grid',
+  btnSubmit: 'Shuffle · Draw Lenormand',
+  resultTitle: 'The Spread',
+  asked: 'Question',
+  layoutLabel: 'Spread',
+  layoutSingle: 'Single card',
+  layoutThree: 'Three cards',
+  layoutNine: 'Nine-card 3×3 grid',
+  rowPast: 'Past',
+  rowPresent: 'Present',
+  rowFuture: 'Future',
+  posPast: 'Past',
+  posPresent: 'Present',
+  posFuture: 'Future',
+  playingLabel: 'Playing card',
+  kwLabel: 'Keywords',
+  meaningLabel: 'Meaning',
+  noteNine: 'Read the 3×3 grid by rows: the top row is the past, the middle row is the present, the bottom row is the future; the centre card (card 5) is the heart of the whole reading.',
+  noteThree: 'Read left to right as past, present, future; the middle card is the core, and the two outer cards modify it.',
+  faqTitle: 'Lenormand: Free Reading & FAQ',
+  faqQ1: 'What is the difference between Lenormand and Tarot?',
+  faqA1: 'Lenormand uses 36 cards with fixed, direct meanings — best for concrete questions and near-term developments. Tarot has 78 cards with richer symbolism, better for psychological and deeper questions. The two complement each other, but do not keep drawing on the same question.',
+  faqQ2: 'How do I read three cards?',
+  faqA2: 'Read left to right as past, present, future; the middle card is the core, and the two outer cards modify it. You can also read the three cards together as one sentence.',
+  faqQ3: 'How do I read the nine-card grid?',
+  faqA3: 'Read the grid by rows: the top row is the past, the middle row is the present, the bottom row is the future; each row of three cards tells one phase, and the centre card (card 5) is the heart of the whole reading.',
+  faqQ4: 'Can the same card appear twice in a draw?',
+  faqA4: 'No. Every draw here takes cards without replacement from the 36, so no card appears twice in one spread; drawing again reshuffles the deck.',
+  faqQ5: 'Is the reading accurate? Can I use it to make decisions?',
+  faqA5: 'Lenormand is a traditional divination tool; the card meanings follow the standard interpretations in use since the 19th century, and this page is for reference only. A reading cannot replace professional advice (medical, legal, financial), so weigh important decisions against real-world information.',
+  disclaimer: 'Lenormand is a traditional divination art, for reference only; it is not a basis for decisions.',
+  offlineNote: 'This page runs fully offline. The draw is done locally and no data is sent to any server.',
+  langLabel: 'Language',
+  ai_interpret: 'AI Reading'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: 'ルノルマン · ローカル占い',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '第一幕 · 問うこと',
+  slogan: '三十六枚のカード、<br>心はひと目で見える。',
+  subtitle: 'ルノルマン 無料オンライン占い',
+  labelQuestion: '質問（任意）',
+  phQuestion: '例：転職すべき？',
+  labelLayout: 'スプレッド',
+  optSingle: '1枚引き',
+  optThree: '3枚引き（過去 · 現在 · 未来）',
+  optNine: '9枚 3×3 グリッド',
+  btnSubmit: 'シャッフル · カードを引く',
+  resultTitle: 'スプレッド',
+  asked: '質問',
+  layoutLabel: 'スプレッド',
+  layoutSingle: '1枚引き',
+  layoutThree: '3枚引き',
+  layoutNine: '9枚 3×3 グリッド',
+  rowPast: '過去',
+  rowPresent: '現在',
+  rowFuture: '未来',
+  posPast: '過去',
+  posPresent: '現在',
+  posFuture: '未来',
+  playingLabel: 'トランプ',
+  kwLabel: 'キーワード',
+  meaningLabel: '意味',
+  noteNine: '3×3 グリッドは行ごとに読みます：上段が過去、中段が現在、下段が未来。中央のカード（5枚目）が全体の中心です。',
+  noteThree: '左から右へ過去・現在・未来と読みます。中央のカードが核となり、両端のカードがそれを修飾します。',
+  faqTitle: 'ルノルマン：無料占いとよくある質問',
+  faqQ1: 'ルノルマンとタロットの違いは？',
+  faqA1: 'ルノルマンは36枚のカードで、意味が固定され直接的です。具体的な事柄や近い将来の展開を問うのに適しています。タロットは78枚で象徴が豊かで、心理や深いテーマに向いています。両者は補い合いますが、同じ質問で繰り返し引かないでください。',
+  faqQ2: '3枚引きはどう読みますか？',
+  faqA2: '左から右へ過去・現在・未来と読みます。中央のカードが核となり、両端のカードがそれを修飾します。3枚を合わせて一文として読むこともできます。',
+  faqQ3: '9枚グリッドはどう読みますか？',
+  faqA3: '行ごとに読みます：上段が過去、中段が現在、下段が未来。各行3枚で一つの段階を語り、中央のカード（5枚目）が全体の中心です。',
+  faqQ4: '同じカードが2回出ることはありますか？',
+  faqA4: 'ありません。このページでは36枚から重複なしで引くため、同じスプレッドで同じカードが2回出ることはありません。もう一度引く場合は改めてシャッフルします。',
+  faqQ5: '占い結果は当たりますか？判断の根拠にできますか？',
+  faqA5: 'ルノルマンは伝統的な占術で、カードの意味は19世紀以来の標準的な解釈に従っています。このページは参考までです。結果は専門的な助言（医療・法律・財務など）の代わりにはなりません。大切な決断は現実の情報と合わせて判断してください。',
+  disclaimer: 'ルノルマンは伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  offlineNote: 'このページは完全オフラインで動作します。抽選はローカルで行われ、データは外部サーバーに送信されません。',
+  langLabel: '言語',
+  ai_interpret: 'AI 解釈'
+}
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// 雷诺曼 36 张牌：编号、中文名、繁体名、英文名、传统扑克牌对应、关键词、牌义。
+// 牌义为 19 世纪以来通行的标准解释；扑克牌对应为传统雷诺曼牌面的标准配对。
+var CARDS = [
+{ n: 1, cn: '骑手', tw: '騎手', en: 'Rider', pc: '9♥', kw: { zh: ['消息','到来','新开始','速度','访客'], tw: ['消息','到來','新的開始','速度','訪客'], en: ['news','arrival','new beginnings','speed','visitor'], ja: ['知らせ','到着','新しい始まり','速さ','訪問者'] }, m: { zh: '骑手带来消息与新动向，常指即将到来的消息、访客或新机会，事情正在路上，进展较快。', tw: '騎手帶來消息與新動向，常指即將到來的消息、訪客或新機會，事情正在路上，進展較快。', en: 'The Rider brings news and new developments — a message, visitor, or opportunity is on its way, and things are moving fast.', ja: '騎手は知らせと新たな展開を運んでくる。メッセージや訪問者、新しい機会が近づいており、物事は速く進む。' } },
+{ n: 2, cn: '四叶草', tw: '四葉草', en: 'Clover', pc: '6♦', kw: { zh: ['幸运','小确幸','轻松','短暂的好运'], tw: ['幸運','小確幸','輕鬆','短暫的好運'], en: ['luck','small joys','ease','brief good fortune'], ja: ['幸運','小さな喜び','気軽さ','短い幸運'] }, m: { zh: '象征小幸运与轻松的机遇，事情向好但好运短暂，要及时把握。', tw: '象徵小幸運與輕鬆的機遇，事情向好但好運短暫，要及時把握。', en: 'A small stroke of luck and a light opportunity; things turn favorable, but the luck is brief — seize it while it lasts.', ja: '小さな幸運と軽やかなチャンス。物事は好転するが、幸運は短いので逃さず掴むこと。' } },
+{ n: 3, cn: '船', tw: '船', en: 'Ship', pc: '10♠', kw: { zh: ['远行','旅程','贸易','距离','向往'], tw: ['遠行','旅程','貿易','距離','嚮往'], en: ['travel','journey','trade','distance','longing'], ja: ['旅行','旅路','貿易','距離','憧れ'] }, m: { zh: '代表远行、长途旅行或远方的机会，也指距离与渴望，事情需要时间跨越距离。', tw: '代表遠行、長途旅行或遠方的機會，也指距離與渴望，事情需要時間跨越距離。', en: 'Long-distance travel or opportunities from afar; also distance and longing — things take time to cross the distance.', ja: '遠方への旅や遠くからの機会。距離と憧れも表し、物事には時間がかかる。' } },
+{ n: 4, cn: '房子', tw: '房子', en: 'House', pc: 'K♥', kw: { zh: ['家庭','稳定','安全','根基'], tw: ['家庭','穩定','安全','根基'], en: ['home','stability','security','foundation'], ja: ['家庭','安定','安全','基盤'] }, m: { zh: '象征家、稳定与安全感，指家庭事务或稳固的基础，事情扎实可靠。', tw: '象徵家、穩定與安全感，指家庭事務或穩固的基礎，事情紮實可靠。', en: 'Home, stability, and safety; family matters or a solid foundation — things are grounded and reliable.', ja: '家庭、安定、安全。家庭の問題や確かな基盤を表し、物事は地に足がついている。' } },
+{ n: 5, cn: '树', tw: '樹', en: 'Tree', pc: '7♥', kw: { zh: ['健康','成长','缓慢','根基','长久'], tw: ['健康','成長','緩慢','根基','長久'], en: ['health','growth','slowness','roots','longevity'], ja: ['健康','成長','ゆっくり','根','長寿'] }, m: { zh: '代表健康、成长与缓慢扎实的发展，事情需要时间生根，注重长期。', tw: '代表健康、成長與緩慢紮實的發展，事情需要時間生根，注重長期。', en: 'Health, growth, and slow, steady development; things need time to take root — think long term.', ja: '健康、成長、ゆっくりとした着実な発展。物事は根付くのに時間がかかり、長期的に考えること。' } },
+{ n: 6, cn: '云', tw: '雲', en: 'Clouds', pc: 'K♣', kw: { zh: ['困惑','阴霾','不确定','暂时遮蔽'], tw: ['困惑','陰霾','不確定','暫時遮蔽'], en: ['confusion','gloom','uncertainty','temporary cover'], ja: ['困惑','曇り','不確実','一時的な覆い'] }, m: { zh: '象征困惑与不确定，像乌云暂时遮住阳光，事情不明朗，但云会过去。', tw: '象徵困惑與不確定，像烏雲暫時遮住陽光，事情不明朗，但雲會過去。', en: 'Confusion and uncertainty, like clouds temporarily hiding the sun; things are unclear, but clouds pass.', ja: '困惑と不確実。雲が一時的に太陽を隠すように、物事は不明瞭だが、雲はやがて去る。' } },
+{ n: 7, cn: '蛇', tw: '蛇', en: 'Snake', pc: 'Q♣', kw: { zh: ['欺骗','诱惑','嫉妒','复杂','欲望'], tw: ['欺騙','誘惑','嫉妒','複雜','慾望'], en: ['deception','temptation','jealousy','complication','desire'], ja: ['欺瞞','誘惑','嫉妬','複雑','欲望'] }, m: { zh: '代表欺骗、嫉妒或复杂的欲望，也指诱惑与弯曲的道路，需警惕身边的人。', tw: '代表欺騙、嫉妒或複雜的慾望，也指誘惑與彎曲的道路，需警惕身邊的人。', en: 'Deception, jealousy, or tangled desire; also temptation and winding paths — watch the people around you.', ja: '欺瞞、嫉妬、絡み合った欲望。誘惑と曲がりくねった道も表す。周囲の人々に注意。' } },
+{ n: 8, cn: '棺材', tw: '棺材', en: 'Coffin', pc: '9♦', kw: { zh: ['结束','终结','转变','疾病','放下'], tw: ['結束','終結','轉變','疾病','放下'], en: ['ending','closure','transformation','illness','letting go'], ja: ['終わり','終結','変化','病気','手放す'] }, m: { zh: '象征一段事情的结束与转变，旧的结束才有新的开始，也可指疾病或停滞。', tw: '象徵一段事情的結束與轉變，舊的結束才有新的開始，也可指疾病或停滯。', en: 'The end of a chapter and transformation; only when the old ends can the new begin; it can also point to illness or stagnation.', ja: '一つの章の終わりと変化。古いものが終わってこそ新しいものが始まる。病気や停滞を示すこともある。' } },
+{ n: 9, cn: '花束', tw: '花束', en: 'Bouquet', pc: 'Q♠', kw: { zh: ['礼物','欣赏','美丽','感谢','愉快'], tw: ['禮物','欣賞','美麗','感謝','愉快'], en: ['gift','appreciation','beauty','gratitude','pleasure'], ja: ['贈り物','感謝','美しさ','喜び','社交'] }, m: { zh: '代表礼物、赞美与愉快的社交，事情带来美好与感谢，是好运的社交信号。', tw: '代表禮物、讚美與愉快的社交，事情帶來美好與感謝，是好運的社交信號。', en: 'Gifts, praise, and pleasant social moments; things bring beauty and thanks — a good social sign.', ja: '贈り物、賞賛、楽しい社交。物事は美しさと感謝をもたらす。' } },
+{ n: 10, cn: '镰刀', tw: '鐮刀', en: 'Scythe', pc: 'J♦', kw: { zh: ['突然切断','决定','危险','收割','果断'], tw: ['突然切斷','決定','危險','收割','果斷'], en: ['sudden cut','decision','danger','harvest','decisiveness'], ja: ['突然の切断','決断','危険','収穫','果断'] }, m: { zh: '象征突然的切断或果断的决定，事情可能戛然而止，也指收割成果，需果断行事。', tw: '象徵突然的切斷或果斷的決定，事情可能戛然而止，也指收割成果，需果斷行事。', en: 'A sudden cut or decisive action; things may stop abruptly; also harvesting results — act decisively.', ja: '突然の切断や果断な決断を表す。物事が突然止まることもある。収穫も意味し、果断に行動すること。' } },
+{ n: 11, cn: '鞭子', tw: '鞭子', en: 'Whip', pc: 'J♣', kw: { zh: ['冲突','争吵','重复','惩罚','激烈'], tw: ['衝突','爭吵','重複','懲罰','激烈'], en: ['conflict','argument','repetition','punishment','intensity'], ja: ['対立','口論','繰り返し','罰','激しさ'] }, m: { zh: '代表争吵、冲突或反复出现的问题，也指激烈的争论与惩罚，需注意言语。', tw: '代表爭吵、衝突或反覆出現的問題，也指激烈的爭論與懲罰，需注意言語。', en: 'Arguments, conflict, or recurring problems; also heated debate — mind your words.', ja: '口論や対立、繰り返される問題。激しい議論も表す。言葉に注意。' } },
+{ n: 12, cn: '鸟', tw: '鳥', en: 'Birds', pc: '7♦', kw: { zh: ['沟通','交谈','焦虑','消息','热闹'], tw: ['溝通','交談','焦慮','消息','熱鬧'], en: ['communication','conversation','anxiety','news','bustle'], ja: ['コミュニケーション','会話','不安','知らせ','賑わい'] }, m: { zh: '象征沟通、交谈与来来往往的消息，也指紧张与焦虑，事情多在言语往来中。', tw: '象徵溝通、交談與來來往往的消息，也指緊張與焦慮，事情多在言語往來中。', en: 'Communication and back-and-forth messages; also nervousness and chatter — much happens through talk.', ja: 'コミュニケーションと往復するメッセージ。緊張やおしゃべりも表す。' } },
+{ n: 13, cn: '孩子', tw: '孩子', en: 'Child', pc: 'J♠', kw: { zh: ['新开始','天真','单纯','小事','孩子'], tw: ['新的開始','天真','單純','小事','孩子'], en: ['new beginning','innocence','simplicity','small matters','a child'], ja: ['新しい始まり','純真','単純','小さな事','子ども'] }, m: { zh: '代表新的开始与天真单纯，也指孩子或小事，事情处于萌芽阶段。', tw: '代表新的開始與天真單純，也指孩子或小事，事情處於萌芽階段。', en: 'A fresh start and innocence; also a child or small matter — things are just sprouting.', ja: '新しい始まりと純真。子どもや小さな事柄も表し、物事は芽生えたばかり。' } },
+{ n: 14, cn: '狐狸', tw: '狐狸', en: 'Fox', pc: '9♣', kw: { zh: ['狡猾','算计','自保','机智','工作'], tw: ['狡猾','算計','自保','機智','工作'], en: ['cunning','calculation','self-protection','shrewdness','work'], ja: ['狡猾','計算','自己防衛','機知','仕事'] }, m: { zh: '象征狡猾与算计，也指职场中的精明与自保，需留心他人的动机。', tw: '象徵狡猾與算計，也指職場中的精明與自保，需留心他人的動機。', en: 'Cunning and calculation; also workplace shrewdness and self-protection — check the motives of others.', ja: '狡猾と計算。職場での抜け目なさと自己防衛も表す。他人の動機に注意。' } },
+{ n: 15, cn: '熊', tw: '熊', en: 'Bear', pc: '10♣', kw: { zh: ['力量','权威','保护','财务','强势'], tw: ['力量','權威','保護','財務','強勢'], en: ['strength','authority','protection','finances','power'], ja: ['力','権威','保護','財政','強さ'] }, m: { zh: '代表力量、权威与保护，也指财务与资源，事情有强有力的靠山或涉及金钱。', tw: '代表力量、權威與保護，也指財務與資源，事情有強有力的靠山或涉及金錢。', en: 'Strength, authority, and protection; also finances and resources — a powerful backer, or money matters.', ja: '力、権威、保護。財政と資源も表す。頼れる後ろ盾、あるいは金銭の問題。' } },
+{ n: 16, cn: '星星', tw: '星星', en: 'Stars', pc: '6♥', kw: { zh: ['希望','灵感','目标','成功','清晰'], tw: ['希望','靈感','目標','成功','清晰'], en: ['hope','inspiration','goals','success','clarity'], ja: ['希望','ひらめき','目標','成功','明確さ'] }, m: { zh: '象征希望、灵感与明确的目标，指引方向，事情有实现愿望的可能。', tw: '象徵希望、靈感與明確的目標，指引方向，事情有實現願望的可能。', en: 'Hope, inspiration, and clear goals; a guiding light — wishes have a chance to come true.', ja: '希望、ひらめき、明確な目標。道しるべとなり、願いが叶う可能性がある。' } },
+{ n: 17, cn: '鹳', tw: '鸛', en: 'Stork', pc: 'Q♥', kw: { zh: ['变化','搬迁','新生','改进','移动'], tw: ['變化','搬遷','新生','改進','移動'], en: ['change','relocation','rebirth','improvement','movement'], ja: ['変化','引っ越し','新生','改善','移動'] }, m: { zh: '代表变化、搬家或新生，事情正在改善与移动，迎来新的阶段。', tw: '代表變化、搬家或新生，事情正在改善與移動，迎來新的階段。', en: 'Change, moving house, or new birth; things are improving and moving into a new phase.', ja: '変化、引っ越し、新しい誕生。物事は改善しつつ移動し、新しい段階に入る。' } },
+{ n: 18, cn: '狗', tw: '狗', en: 'Dog', pc: '10♥', kw: { zh: ['忠诚','朋友','信任','支持','陪伴'], tw: ['忠誠','朋友','信任','支持','陪伴'], en: ['loyalty','friendship','trust','support','companionship'], ja: ['忠誠','友情','信頼','支え','寄り添い'] }, m: { zh: '象征忠诚的朋友与可靠的支持，指值得信任的人，事情有朋友相助。', tw: '象徵忠誠的朋友與可靠的支持，指值得信任的人，事情有朋友相助。', en: 'A loyal friend and reliable support; someone worth trusting — friends help the matter along.', ja: '忠実な友人と頼れる支え。信頼に値する人。友人が物事を助けてくれる。' } }
+];
+CARDS.push(
+{ n: 19, cn: '塔', tw: '塔', en: 'Tower', pc: '6♠', kw: { zh: ['权威','机构','孤立','规则','高度'], tw: ['權威','機構','孤立','規則','高度'], en: ['authority','institution','isolation','rules','height'], ja: ['権威','機関','孤立','規則','高さ'] }, m: { zh: '代表官方机构、权威与规则，也指孤立与高处，事情涉及正式程序或需要独处。', tw: '代表官方機構、權威與規則，也指孤立與高處，事情涉及正式程序或需要獨處。', en: 'Official institutions, authority, and rules; also isolation and high places — formal procedures, or time alone.', ja: '公的機関、権威、規則。孤立や高所も表す。正式な手続き、あるいは一人の時間。' } },
+{ n: 20, cn: '花园', tw: '花園', en: 'Garden', pc: '8♠', kw: { zh: ['社交','公开','聚会','名声','群体'], tw: ['社交','公開','聚會','名聲','群體'], en: ['social life','public','gatherings','reputation','community'], ja: ['社交','公共','集まり','評判','共同体'] }, m: { zh: '象征公开场合、社交与聚会，指名声与群体活动，事情发生在众人面前。', tw: '象徵公開場合、社交與聚會，指名聲與群體活動，事情發生在眾人面前。', en: 'Public settings, social gatherings, and reputation; things happen in front of others.', ja: '公共の場、社交、集まり、評判。物事は人々の目の前で起こる。' } },
+{ n: 21, cn: '山', tw: '山', en: 'Mountain', pc: '8♣', kw: { zh: ['阻碍','困难','拖延','挑战','坚固'], tw: ['阻礙','困難','拖延','挑戰','堅固'], en: ['obstacle','difficulty','delay','challenge','solidity'], ja: ['障害','困難','遅れ','挑戦','堅固'] }, m: { zh: '代表阻碍与挑战，事情进展缓慢、困难重重，但山可以翻越。', tw: '代表阻礙與挑戰，事情進展緩慢、困難重重，但山可以翻越。', en: 'Obstacles and challenges; progress is slow and hard — but mountains can be crossed.', ja: '障害と挑戦。進みは遅く困難が多いが、山は越えられる。' } },
+{ n: 22, cn: '十字路口', tw: '十字路口', en: 'Crossroads', pc: 'Q♦', kw: { zh: ['选择','决定','分岔','机会','方向'], tw: ['選擇','決定','分岔','機會','方向'], en: ['choice','decision','fork','opportunity','direction'], ja: ['選択','決断','分岐','機会','方向'] }, m: { zh: '象征面临选择与分岔路口，需要做出决定，不同方向通向不同结果。', tw: '象徵面臨選擇與分岔路口，需要做出決定，不同方向通向不同結果。', en: 'A choice at a fork in the road; a decision must be made — each direction leads somewhere different.', ja: '分かれ道での選択。決断が必要で、方向が違えば結果も違う。' } },
+{ n: 23, cn: '老鼠', tw: '老鼠', en: 'Mice', pc: '7♣', kw: { zh: ['损耗','焦虑','偷窃','磨损','压力'], tw: ['損耗','焦慮','偷竊','磨損','壓力'], en: ['loss','anxiety','theft','wear','stress'], ja: ['損失','不安','盗み','摩耗','ストレス'] }, m: { zh: '代表损耗、焦虑与逐渐流失，事情在被一点点侵蚀，需及时止损。', tw: '代表損耗、焦慮與逐漸流失，事情在被一點點侵蝕，需及時止損。', en: 'Gradual loss, worry, and erosion; things are being nibbled away — stop the leak in time.', ja: '少しずつの損失、不安、侵食。物事は少しずつ蝕まれている。早めに食い止めること。' } },
+{ n: 24, cn: '心', tw: '心', en: 'Heart', pc: 'J♥', kw: { zh: ['爱情','情感','真心','热情','关系'], tw: ['愛情','情感','真心','熱情','關係'], en: ['love','emotion','sincerity','passion','relationship'], ja: ['愛','感情','真心','情熱','関係'] }, m: { zh: '象征爱情与真挚的情感，指感情关系与发自内心的事，事情关乎心。', tw: '象徵愛情與真摯的情感，指感情關係與發自內心的事，事情關乎心。', en: 'Love and genuine feeling; matters of the heart and emotional bonds.', ja: '愛と真摯な感情。恋愛関係と心からの事柄。' } },
+{ n: 25, cn: '戒指', tw: '戒指', en: 'Ring', pc: 'A♣', kw: { zh: ['承诺','契约','循环','婚姻','合作'], tw: ['承諾','契約','循環','婚姻','合作'], en: ['commitment','contract','cycle','marriage','partnership'], ja: ['約束','契約','循環','結婚','協力'] }, m: { zh: '代表承诺、契约与合作关系，也指婚姻或重复的循环，事情有正式的约定。', tw: '代表承諾、契約與合作關係，也指婚姻或重複的循環，事情有正式的約定。', en: 'Commitment, contracts, and partnerships; also marriage or repeating cycles — a formal agreement binds the matter.', ja: '約束、契約、協力関係。結婚や繰り返しの循環も表す。正式な約束が物事を結ぶ。' } },
+{ n: 26, cn: '书', tw: '書', en: 'Book', pc: '10♦', kw: { zh: ['知识','秘密','学习','未知','记录'], tw: ['知識','秘密','學習','未知','記錄'], en: ['knowledge','secrets','learning','the unknown','records'], ja: ['知識','秘密','学び','未知','記録'] }, m: { zh: '象征知识与秘密，指尚未揭开的事或需要学习的东西，事情仍有未知的一面。', tw: '象徵知識與秘密，指尚未揭開的事或需要學習的東西，事情仍有未知的一面。', en: 'Knowledge and secrets; something not yet revealed, or something to learn — part of the matter remains unknown.', ja: '知識と秘密。まだ明かされていないこと、あるいは学ぶべきこと。物事には未知の面が残る。' } },
+{ n: 27, cn: '信', tw: '信', en: 'Letter', pc: '7♠', kw: { zh: ['消息','文件','书面','通知','沟通'], tw: ['消息','文件','書面','通知','溝通'], en: ['message','document','written word','notice','communication'], ja: ['メッセージ','文書','文字','通知','連絡'] }, m: { zh: '代表书面消息、文件与通知，事情通过文字传递，留意信件与邮件。', tw: '代表書面消息、文件與通知，事情通過文字傳遞，留意信件與郵件。', en: 'Written messages, documents, and notices; things arrive in writing — watch your mail and inbox.', ja: '書面のメッセージ、文書、通知。物事は文字で届く。手紙やメールに注意。' } },
+{ n: 28, cn: '男人', tw: '男人', en: 'Man', pc: 'A♥', kw: { zh: ['男性','阳性','行动','伴侣'], tw: ['男性','陽性','行動','伴侶'], en: ['man','masculine','action','partner'], ja: ['男性','陽性','行動','パートナー'] }, m: { zh: '在牌阵中常代表男性问卜者本人或生命中的重要男性，也指行动力。', tw: '在牌陣中常代表男性問卜者本人或生命中的重要男性，也指行動力。', en: 'Usually the male querent himself, or a significant man in their life; also drive and action.', ja: '多くの場合、男性の質問者本人、あるいは人生における重要な男性。行動力も表す。' } },
+{ n: 29, cn: '女人', tw: '女人', en: 'Woman', pc: 'A♠', kw: { zh: ['女性','阴性','直觉','伴侣'], tw: ['女性','陰性','直覺','伴侶'], en: ['woman','feminine','intuition','partner'], ja: ['女性','陰性','直感','パートナー'] }, m: { zh: '在牌阵中常代表女性问卜者本人或生命中的重要女性，也指直觉与感受。', tw: '在牌陣中常代表女性問卜者本人或生命中的重要女性，也指直覺與感受。', en: 'Usually the female querent herself, or a significant woman in their life; also intuition and feeling.', ja: '多くの場合、女性の質問者本人、あるいは人生における重要な女性。直感と感情も表す。' } },
+{ n: 30, cn: '百合', tw: '百合', en: 'Lily', pc: 'K♠', kw: { zh: ['平和','成熟','纯洁','长久'], tw: ['平和','成熟','純潔','長久'], en: ['peace','maturity','purity','longevity'], ja: ['平和','成熟','純潔','長久'] }, m: { zh: '象征平和、成熟与纯洁，也指长久的关系，事情趋于和谐稳定。', tw: '象徵平和、成熟與純潔，也指長久的關係，事情趨於和諧穩定。', en: 'Peace, maturity, and purity; also long-lasting relationships — things settle into harmony.', ja: '平和、成熟、純潔。長く続く関係も表し、物事は調和へ向かう。' } },
+{ n: 31, cn: '太阳', tw: '太陽', en: 'Sun', pc: 'A♦', kw: { zh: ['成功','快乐','能量','光明','胜利'], tw: ['成功','快樂','能量','光明','勝利'], en: ['success','joy','energy','light','victory'], ja: ['成功','喜び','エネルギー','光','勝利'] }, m: { zh: '代表成功、快乐与光明，是牌中最积极的牌之一，事情向好、能量充足。', tw: '代表成功、快樂與光明，是牌中最積極的牌之一，事情向好、能量充足。', en: 'Success, joy, and light; one of the most positive cards — things go well, energy is high.', ja: '成功、喜び、光。最も前向きなカードの一つ。物事はうまくいき、エネルギーに満ちている。' } },
+{ n: 32, cn: '月亮', tw: '月亮', en: 'Moon', pc: '8♥', kw: { zh: ['情绪','直觉','名声','夜晚','潜意识'], tw: ['情緒','直覺','名聲','夜晚','潛意識'], en: ['emotion','intuition','reputation','night','subconscious'], ja: ['感情','直感','評判','夜','潜在意識'] }, m: { zh: '象征情绪、直觉与名声，也指潜意识与夜晚，事情与感受和声誉有关。', tw: '象徵情緒、直覺與名聲，也指潛意識與夜晚，事情與感受和聲譽有關。', en: 'Emotion, intuition, and reputation; also the subconscious and the night — feelings and standing matter here.', ja: '感情、直感、評判。潜在意識と夜も表す。気持ちと評判が関わる。' } },
+{ n: 33, cn: '钥匙', tw: '鑰匙', en: 'Key', pc: '8♦', kw: { zh: ['答案','开启','解决','关键','命运'], tw: ['答案','開啟','解決','關鍵','命運'], en: ['answer','opening','solution','pivotal','destiny'], ja: ['答え','開く','解決','鍵','運命'] }, m: { zh: '代表关键的答案与解决之道，事情的门将被打开，把握住就是转机。', tw: '代表關鍵的答案與解決之道，事情的門將被打開，把握住就是轉機。', en: 'The key answer and solution; a door is about to open — seize it and the situation turns.', ja: '鍵となる答えと解決策。扉が開こうとしている。掴めば転機となる。' } },
+{ n: 34, cn: '鱼', tw: '魚', en: 'Fish', pc: 'K♦', kw: { zh: ['金钱','财富','流动','丰盛','商业'], tw: ['金錢','財富','流動','豐盛','商業'], en: ['money','wealth','flow','abundance','business'], ja: ['お金','富','流れ','豊かさ','商売'] }, m: { zh: '象征金钱、财富与流动的资源，指商业与物质收获，事情与钱财有关。', tw: '象徵金錢、財富與流動的資源，指商業與物質收穫，事情與錢財有關。', en: 'Money, wealth, and flowing resources; business and material gain — the matter involves finances.', ja: 'お金、富、流れる資源。商売と物質的な収穫。物事は金銭に関わる。' } },
+{ n: 35, cn: '锚', tw: '錨', en: 'Anchor', pc: '9♠', kw: { zh: ['稳定','坚持','长久','工作','安全'], tw: ['穩定','堅持','長久','工作','安全'], en: ['stability','persistence','longevity','work','security'], ja: ['安定','忍耐','長久','仕事','安全'] }, m: { zh: '代表稳定、坚持与长久，也指工作与安全感，事情牢固可靠、值得坚守。', tw: '代表穩定、堅持與長久，也指工作與安全感，事情牢固可靠、值得堅守。', en: 'Stability, persistence, and the long term; also work and security — things are solid and worth holding on to.', ja: '安定、忍耐、長期的視点。仕事と安心感も表す。物事は堅固で、守る価値がある。' } },
+{ n: 36, cn: '十字架', tw: '十字架', en: 'Cross', pc: '6♣', kw: { zh: ['命运','负担','考验','信仰','宿命'], tw: ['命運','負擔','考驗','信仰','宿命'], en: ['fate','burden','trial','faith','destiny'], ja: ['運命','負担','試練','信仰','宿命'] }, m: { zh: '象征命运的考验与沉重的负担，指必须承受的事，也指信仰与宿命。', tw: '象徵命運的考驗與沉重的負擔，指必須承受的事，也指信仰與宿命。', en: 'A fated trial and heavy burden; something that must be borne — also faith and destiny.', ja: '運命の試練と重い負担。背負わねばならないこと。信仰と宿命も表す。' } }
+);
+
+// Fisher-Yates 洗牌，不放回抽取
+function shuffleDeck() {
+  var d = CARDS.slice();
+  for (var i = d.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = d[i]; d[i] = d[j]; d[j] = tmp;
+  }
+  return d;
+}
+function drawCards(n) { return shuffleDeck().slice(0, n); }
+
+function cardName(c) {
+  if (LANG === 'en') return c.en + ' ' + c.cn;
+  if (LANG === 'ja') return c.cn + ' ' + c.en;
+  if (LANG === 'zh-TW') return c.tw;
+  return c.cn;
+}
+function cardKw(c) {
+  if (LANG === 'en') return c.kw.en;
+  if (LANG === 'ja') return c.kw.ja;
+  if (LANG === 'zh-TW') return c.kw.tw;
+  return c.kw.zh;
+}
+function cardMeaning(c) {
+  if (LANG === 'en') return c.m.en;
+  if (LANG === 'ja') return c.m.ja;
+  if (LANG === 'zh-TW') return c.m.tw;
+  return c.m.zh;
+}
+function kwJoin(kw) { return LANG === 'en' ? kw.join(', ') : LANG === 'ja' ? kw.join('、') : kw.join('、'); }
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function lenCardHTML(c, posLabel) {
+  return '<div class="len-card"><h3>' + esc(posLabel) + '</h3>' +
+    '<div class="len-num">' + c.n + '</div>' +
+    '<div class="len-name">' + esc(cardName(c)) + '</div>' +
+    '<div class="len-playing">' + t('playingLabel') + '：' + esc(c.pc) + '</div>' +
+    '<div class="len-kw">' + t('kwLabel') + '：' + esc(kwJoin(cardKw(c))) + '</div>' +
+    '<div class="len-meaning">' + t('meaningLabel') + '：' + esc(cardMeaning(c)) + '</div></div>';
+}
+
+function layoutName(layout) {
+  return layout === 'single' ? t('layoutSingle') : layout === 'three' ? t('layoutThree') : t('layoutNine');
+}
+
+function showResult(r, noScroll) {
+  LAST_RESULT = r;
+  var head = '';
+  if (r.question) head += t('asked') + '：<b>' + esc(r.question) + '</b><br>';
+  head += t('layoutLabel') + '：<b>' + esc(layoutName(r.layout)) + '</b>';
+  document.getElementById('result-head').innerHTML = head;
+
+  var body = '';
+  var note = '';
+  if (r.layout === 'single') {
+    body = '<div class="len-grid">' + lenCardHTML(r.cards[0], t('layoutSingle')) + '</div>';
+  } else if (r.layout === 'three') {
+    var pos = [t('posPast'), t('posPresent'), t('posFuture')];
+    body = '<div class="len-grid">';
+    for (var i = 0; i < 3; i++) body += lenCardHTML(r.cards[i], pos[i]);
+    body += '</div>';
+    note = t('noteThree');
+  } else {
+    var rows = [t('rowPast'), t('rowPresent'), t('rowFuture')];
+    for (var k = 0; k < 3; k++) {
+      body += '<div class="len-row-label">' + esc(rows[k]) + '</div><div class="len-grid cols-3">';
+      for (var m = 0; m < 3; m++) body += lenCardHTML(r.cards[k * 3 + m], rows[k]);
+      body += '</div>';
+    }
+    note = t('noteNine');
+  }
+  document.getElementById('result-body').innerHTML = body;
+  document.getElementById('result-note').textContent = note;
+
+  document.getElementById('result-card').classList.remove('hidden');
+  if (!noScroll) document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function doDraw() {
+  var layout = document.getElementById('layout').value;
+  var n = layout === 'single' ? 1 : layout === 'three' ? 3 : 9;
+  var q = document.getElementById('question').value.trim();
+  showResult({ layout: layout, cards: drawCards(n), question: q });
+}
+
+// ---- AI 解读：供 /js/ai-jiegua.js 调用 ----
+// 未抽牌时返回 null，共享脚本会提示先抽牌。摘要固定用中文关键词。
+window.getJieguaQuestion = function() {
+  var el = document.getElementById('question');
+  return el ? el.value.trim() : '';
+};
+window.getJieguaSummary = function() {
+  if (!LAST_RESULT) return null;
+  var r = LAST_RESULT;
+  var layoutNameZh = r.layout === 'single' ? '单张牌' : r.layout === 'three' ? '三张牌' : '九宫格';
+  var parts = r.cards.map(function(c) { return c.cn + '（' + c.kw.zh.join('、') + '）'; });
+  var s = '雷诺曼' + layoutNameZh + '：' + parts.join('、');
+  if (r.question) s += '；问题：' + r.question;
+  return s;
+};
+// ==LOGIC-END==
+
+// 初始化界面语言（localStorage 优先，否则按浏览器语言自动检测）
+applyI18n();
+</script>
+<script src="/js/ai-jiegua.js"></script>
+<script>
+// 共享脚本与本页主脚本都已加载后再挂接（getJieguaSummary 已定义）。
+if (window.AIInterpret) window.AIInterpret.attach();
+</script>
+</body>
+</html>

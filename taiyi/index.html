@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 太乙神数</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { display: block; font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45); color: #f0ead8; font-size: .9rem; padding: .3rem .1rem; outline: none; border-radius: 0; font-family: inherit; cursor: pointer; }
+  .lang-switch select:focus { border-bottom-color: #c9a962; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .link-btn { background: none; border: none; color: #c9a962; font-size: .75rem; cursor: pointer; letter-spacing: .1em; padding: 0; margin-left: .5rem; font-family: inherit; }
+  .link-btn:hover { text-decoration: underline; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+  .note { font-size: .8rem; color: #6f6f80; line-height: 1.7; margin-top: .8rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .verdict { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .level { color: #c9a962; font-weight: 700; }
+  .verdict .raw { margin-top: .7rem; padding-top: .7rem; border-top: 1px dashed rgba(201,169,98,.35); font-size: .85rem; color: #9a9aab; line-height: 1.8; }
+  table.data-table { width: 100%; border-collapse: collapse; margin-top: .6rem; font-size: .92rem; }
+  table.data-table th, table.data-table td { text-align: left; padding: .55rem .4rem; border-bottom: 1px solid rgba(201,169,98,.18); line-height: 1.6; color: #c8c2ae; vertical-align: top; }
+  table.data-table th { color: #b08d3e; font-weight: 400; letter-spacing: .12em; font-size: .8rem; white-space: nowrap; }
+  table.data-table td b { color: #f0ead8; font-weight: 600; }
+  .gold { color: #c9a962; }
+  .muted { color: #9a9aab; }
+  .small { font-size: .82rem; }
+
+  /* 九宫格 */
+  .palace-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-top: 1rem; }
+  .palace { border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: .8rem .8rem .9rem; min-height: 118px; background: transparent; }
+  .palace.taiyi-here { border-color: #c9a962; background: rgba(201,169,98,.07); box-shadow: 0 0 0 1px rgba(201,169,98,.35); }
+  .palace.center { opacity: .75; }
+  .palace-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .55rem; }
+  .palace-num { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.05rem; color: #f0ead8; font-weight: 700; }
+  .palace-gua { font-size: .78rem; color: #b08d3e; letter-spacing: .1em; }
+  .palace-zhou { font-size: .72rem; color: #6f6f80; }
+  .palace-body { font-size: .82rem; line-height: 1.75; color: #c8c2ae; }
+  .palace-body .occ { display: inline-block; border: 1px solid rgba(201,169,98,.4); border-radius: 999px; padding: 0 .5rem; margin: 0 .25rem .3rem 0; font-size: .78rem; color: #f0ead8; white-space: nowrap; }
+  .palace-body .occ.taiyi { background: rgba(201,169,98,.18); color: #e8c97a; border-color: #c9a962; font-weight: 700; }
+  .palace-body .occ.zhu { border-color: rgba(201,169,98,.55); }
+  .palace-body .occ.ke { border-color: rgba(154,154,171,.5); color: #c8c2ae; }
+  .palace-body .empty { color: #6f6f80; }
+
+  .geju-item { border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: .9rem 1.1rem; margin-top: .8rem; }
+  .geju-item h4 { font-size: .95rem; color: #c9a962; font-weight: 600; margin-bottom: .35rem; letter-spacing: .1em; }
+  .geju-item p { font-size: .88rem; color: #c8c2ae; line-height: 1.8; }
+  .geju-item p.def { color: #9a9aab; font-size: .82rem; }
+
+  .shen-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .5rem 1rem; margin-top: .8rem; font-size: .88rem; line-height: 1.9; color: #c8c2ae; }
+  .shen-list .shen-tianmu { color: #e8c97a; font-weight: 700; }
+  .shen-list .shen-tianmu::after { content: ' ◀ 天目'; font-size: .75rem; color: #c9a962; font-weight: 400; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+  footer a { color: #c9a962; text-decoration: none; border-bottom: 1px solid rgba(201,169,98,.4); }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .palace-grid { grid-template-columns: repeat(3, 1fr); gap: .4rem; }
+    .palace { padding: .6rem .5rem .7rem; min-height: 104px; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">太乙神数 · 本地占卜</div>
+    </div>
+  </a>
+              <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></span>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">第一幕 · 问事信息</div>
+  <h1 class="slogan" data-i18n-html="slogan">太乙既临，<br>五将自明。</h1>
+  <p class="subtitle" data-i18n="subtitle">太乙神数免费在线占卜排盘</p>
+
+  <section class="section">
+    <div class="field">
+      <label for="question" data-i18n="labelQuestion">所问之事（可选）</label>
+      <input type="text" id="question" placeholder="例如：此事进退如何？" data-i18n-ph="phQuestion">
+    </div>
+    <div class="field">
+      <label for="datetime"><span data-i18n="labelTime">时间</span> <button type="button" class="link-btn" onclick="useNow()" data-i18n="btnNow">用当前时间</button></label>
+      <input type="datetime-local" id="datetime">
+      <div class="error" id="time-error"></div>
+    </div>
+    <button class="submit-btn" onclick="doTaiyi()" data-i18n="btnSubmit">起太乙 · 排时盘</button>
+    <p class="note" data-i18n="formNote">太乙以问事之时起盘：先定年月日时四局，再以时局排五将、断吉凶。</p>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">太乙时盘</div>
+    <div class="result-head" id="result-head"></div>
+    <div id="data-status"></div>
+
+    <div class="section-title" style="margin-top:2rem" data-i18n="juTitle">积数与局数</div>
+    <table class="data-table" id="ju-table"></table>
+
+    <div class="section-title" style="margin-top:2rem" data-i18n="palaceTitle">九宫 · 太乙与五将</div>
+    <div class="palace-grid" id="palace-grid"></div>
+
+    <div class="section-title" style="margin-top:2rem" data-i18n="generalsTitle">五将与主客算</div>
+    <table class="data-table" id="generals-table"></table>
+
+    <div id="verdict-wrap"></div>
+    <div id="geju-wrap"></div>
+    <div id="chengbing-wrap"></div>
+
+    <div class="section-title" style="margin-top:2rem" data-i18n="shenTitle">十六神</div>
+    <div class="shen-list" id="shen-list"></div>
+    <p class="note" id="shen-note"></p>
+    <p class="note" data-i18n="methodNote">排盘口径：万历戊子（1588）冬至为锚，积年 10155505（太乙秘书口径）；太乙年自冬至起算；冬至至夏至为阳遁，夏至至冬至为阴遁；月积数＝积年×12＋月序（子月为一，闰月并入本月）；日积数＝积年×365.2425＋自冬至起日数；时积数＝日积数×12＋时辰（子时为零）。第 60 局原数据缺载，遇之仅列立成表数，不出断语。</p>
+    <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="taiyi" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+  </section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">太乙神数：免费排盘与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">太乙神数是什么？</summary>
+      <p data-i18n="faqA1">太乙神数是古代用于推测国运与大事的术数，以太乙积年起局，观太乙所在之宫与五将之向来断吉凶。传说中它与奇门遁甲、大六壬并称“三式”，其中太乙最重天时与大势。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">太乙与奇门、六壬并称三式是什么意思？</summary>
+      <p data-i18n="faqA2">三式是古代最高的三门术数：太乙测天时国运，奇门测地利行军，大六壬测人事吉凶。三者都以天干地支与九宫起盘，但所重不同：太乙看大势，奇门看方位时机，六壬看具体人事。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">五将怎么看？</summary>
+      <p data-i18n="faqA3">五将分主客：主算、主大将、主参将属己方（主），客算、客大将、客参将属对方（客）。算长且和者利，和为算数阴阳调和；大将发者有力，囚者受制，不出者无力。主客相较，利主则宜守、利客则宜动，断语中会明言。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">年月日时四局有什么区别？</summary>
+      <p data-i18n="faqA4">年局看一岁大势，月局看一月进退，日局看一日吉凶，时局看问事当下。本页以时局为主盘排五将、断吉凶，年月日局并列于积数表，供对照大势。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">太乙神数排盘免费吗？</summary>
+      <p data-i18n="faqA5">免费。本页排盘在本地计算，不联网、不收费，也不会保存你输入的问题；局数断语数据于首次使用时自本站加载。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">太乙神数属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink">数据与出处</a><br>
+    <span data-i18n="attrLine">局数与断语数据：comprehensive-shushu-engine（GPL-3.0），取《太乙金镜式经》立成表与《太乙秘书》断语。</span><br>
+    <span data-i18n="offlineNote">排盘在本地计算，不向任何服务器发送数据；农历换算使用本地 lunar.js。</span>
+  </footer>
+</div>
+</main>
+
+<script src="lunar.js"></script>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。古典断语原文一律保留中文，见 classicalNote。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'ai_interpret': 'AI 解读',
+  'navGroup1': '一事一问', 'navGroup2': '一生之图', 'navGroup3': '两人之间',
+  'nav_jiemeng': '解梦', 'nav_liuyao': '六爻占卜', 'nav_meihua': '梅花易数', 'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌', 'nav_leinuoman': '雷诺曼', 'nav_lunen': '北欧卢恩符文', 'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬', 'nav_jinkoujue': '金口诀', 'nav_taiyi': '太乙神数', 'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数', 'nav_lingqi': '灵棋经', 'nav_cezi': '测字', 'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字', 'nav_ziwei': '紫微斗数', 'nav_tieban': '铁板神数', 'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易', 'nav_taixuan': '太玄经', 'nav_huangji': '皇极经世', 'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命', 'nav_xiyang': '西洋占星', 'nav_yindu': '印度占星', 'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘', 'nav_bazi-hepan': '八字合盘', 'nav_ziwei-hepan': '紫微合盘', 'nav_yindu-hepan': '印度合盘',
+  brandSub: '太乙神数 · 本地占卜',
+  navSoon: '即将上线', footNote: '本地运行 · 无需联网', langLabel: '语言',
+  eyebrow: '第一幕 · 问事信息',
+  slogan: '太乙既临，<br>五将自明。',
+  subtitle: '太乙神数免费在线占卜排盘',
+  labelQuestion: '所问之事（可选）', phQuestion: '例如：此事进退如何？',
+  labelTime: '时间', btnNow: '用当前时间', btnSubmit: '起太乙 · 排时盘',
+  formNote: '太乙以问事之时起盘：先定年月日时四局，再以时局排五将、断吉凶。',
+  errNoTime: '请先选择时间。', errBadTime: '时间格式不正确。',
+  resultTitle: '太乙时盘', juTitle: '积数与局数', palaceTitle: '九宫 · 太乙与五将',
+  generalsTitle: '五将与主客算', shenTitle: '十六神',
+  methodNote: '排盘口径：万历戊子（1588）冬至为锚，积年 10155505（太乙秘书口径）；太乙年自冬至起算；冬至至夏至为阳遁，夏至至冬至为阴遁；月积数＝积年×12＋月序（子月为一，闰月并入本月）；日积数＝积年×365.2425＋自冬至起日数；时积数＝日积数×12＋时辰（子时为零）。第 60 局原数据缺载，遇之仅列立成表数，不出断语。',
+  asked: '所问', solarDate: '公历', lunarDate: '农历', bazi: '四柱', taiyiYear: '太乙年', jinian: '积年', yuan: '元', dun: '遁',
+  level: '局', jishu: '积数', juNum: '局数', palace: '太乙宫', luogua: '落宫卦',
+  levelYear: '年局', levelMonth: '月局', levelDay: '日局', levelHour: '时局', mainChart: '（主盘）',
+  dunYang: '阳遁', dunYin: '阴遁',
+  palaceNames: {1:'一宫',2:'二宫',3:'三宫',4:'四宫',5:'五宫',6:'六宫',7:'七宫',8:'八宫',9:'九宫'},
+  palaceGua: {1:'乾',2:'离',3:'艮',4:'震',5:'中五',6:'兑',7:'坤',8:'坎',9:'巽'},
+  genRole: '将位', genPalace: '宫位', genSuan: '算数', genHe: '算和', genCat: '算象',
+  genZhusuan: '主算', genZhuDajiang: '主大将', genZhuCanjang: '主参将',
+  genKesuan: '客算', genKeDajiang: '客大将', genKeCanjang: '客参将',
+  he: '和', buhe: '不和', buchu: '不出', weizai: '未载',
+  tianmu: '天目（文昌）', kemu: '客目', shiji: '始击', jishen: '计神', taiyi: '太乙',
+  verdictTitle: '本局断语', rawTitle: '原文',
+  gejuTitle: '格局', gejuNone: '本局未见掩、迫、囚、击、关、格、对之形。',
+  chengbingTitle: '乘兵', cbChu: '出', cbZhan: '战', cbZhen: '阵', cbQi: '旗', cbBei: '注',
+  shenNote: '十六神以天目为首顺行；各神定位见上表，金字者为本局天目。乾坤重留：大武（坤）与阴德（乾）在天目循环中各重一格。',
+  classicalNote: '',
+  dataLoading: '正在加载局数断语数据……', dataFail: '断语数据未能加载，仅列积数与局数；请检查网络后重试。',
+  juMissing: '第 60 局原数据缺载判局，仅列立成表数。',
+  nayin: '纳音',
+  faqTitle: '太乙神数：免费排盘与使用常见问题',
+  faqQ1: '太乙神数是什么？',
+  faqA1: '太乙神数是古代用于推测国运与大事的术数，以太乙积年起局，观太乙所在之宫与五将之向来断吉凶。传说中它与奇门遁甲、大六壬并称“三式”，其中太乙最重天时与大势。',
+  faqQ2: '太乙与奇门、六壬并称三式是什么意思？',
+  faqA2: '三式是古代最高的三门术数：太乙测天时国运，奇门测地利行军，大六壬测人事吉凶。三者都以天干地支与九宫起盘，但所重不同：太乙看大势，奇门看方位时机，六壬看具体人事。',
+  faqQ3: '五将怎么看？',
+  faqA3: '五将分主客：主算、主大将、主参将属己方（主），客算、客大将、客参将属对方（客）。算长且和者利，和为算数阴阳调和；大将发者有力，囚者受制，不出者无力。主客相较，利主则宜守、利客则宜动，断语中会明言。',
+  faqQ4: '年月日时四局有什么区别？',
+  faqA4: '年局看一岁大势，月局看一月进退，日局看一日吉凶，时局看问事当下。本页以时局为主盘排五将、断吉凶，年月日局并列于积数表，供对照大势。',
+  faqQ5: '太乙神数排盘免费吗？',
+  faqA5: '免费。本页排盘在本地计算，不联网、不收费，也不会保存你输入的问题；局数断语数据于首次使用时自本站加载。',
+  disclaimer: '太乙神数属传统术数，仅供参考，不构成决策依据。',
+  attrLine: '局数与断语数据：comprehensive-shushu-engine（GPL-3.0），取《太乙金镜式经》立成表与《太乙秘书》断语。',
+  offlineNote: '排盘在本地计算，不向任何服务器发送数据；农历换算使用本地 lunar.js。'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'ai_interpret': 'AI 解讀',
+  'navGroup1': '一事一問', 'navGroup2': '一生之圖', 'navGroup3': '兩人之間',
+  'nav_jiemeng': '解夢', 'nav_liuyao': '六爻占卜', 'nav_meihua': '梅花易數', 'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌', 'nav_leinuoman': '雷諾曼', 'nav_lunen': '北歐盧恩符文', 'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬', 'nav_jinkoujue': '金口訣', 'nav_taiyi': '太乙神數', 'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數', 'nav_lingqi': '靈棋經', 'nav_cezi': '測字', 'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字', 'nav_ziwei': '紫微斗數', 'nav_tieban': '鐵板神數', 'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易', 'nav_taixuan': '太玄經', 'nav_huangji': '皇極經世', 'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命', 'nav_xiyang': '西洋占星', 'nav_yindu': '印度占星', 'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤', 'nav_bazi-hepan': '八字合盤', 'nav_ziwei-hepan': '紫微合盤', 'nav_yindu-hepan': '印度合盤',
+  brandSub: '太乙神數 · 本地占卜',
+  navSoon: '即將上線', footNote: '本地運行 · 無需聯網', langLabel: '語言',
+  eyebrow: '第一幕 · 問事資訊',
+  slogan: '太乙既臨，<br>五將自明。',
+  subtitle: '太乙神數免費線上占卜排盤',
+  labelQuestion: '所問之事（可選）', phQuestion: '例如：此事進退如何？',
+  labelTime: '時間', btnNow: '用當前時間', btnSubmit: '起太乙 · 排時盤',
+  formNote: '太乙以問事之時起盤：先定年月日時四局，再以時局排五將、斷吉凶。',
+  errNoTime: '請先選擇時間。', errBadTime: '時間格式不正確。',
+  resultTitle: '太乙時盤', juTitle: '積數與局數', palaceTitle: '九宮 · 太乙與五將',
+  generalsTitle: '五將與主客算', shenTitle: '十六神',
+  methodNote: '排盤口徑：萬曆戊子（1588）冬至為錨，積年 10155505（太乙秘書口徑）；太乙年自冬至起算；冬至至夏至為陽遁，夏至至冬至為陰遁；月積數＝積年×12＋月序（子月為一，閏月併入本月）；日積數＝積年×365.2425＋自冬至起日數；時積數＝日積數×12＋時辰（子時為零）。第 60 局原數據缺載，遇之僅列立成表數，不出斷語。',
+  asked: '所問', solarDate: '公曆', lunarDate: '農曆', bazi: '四柱', taiyiYear: '太乙年', jinian: '積年', yuan: '元', dun: '遁',
+  level: '局', jishu: '積數', juNum: '局數', palace: '太乙宮', luogua: '落宮卦',
+  levelYear: '年局', levelMonth: '月局', levelDay: '日局', levelHour: '時局', mainChart: '（主盤）',
+  dunYang: '陽遁', dunYin: '陰遁',
+  palaceNames: {1:'一宮',2:'二宮',3:'三宮',4:'四宮',5:'五宮',6:'六宮',7:'七宮',8:'八宮',9:'九宮'},
+  palaceGua: {1:'乾',2:'離',3:'艮',4:'震',5:'中五',6:'兌',7:'坤',8:'坎',9:'巽'},
+  genRole: '將位', genPalace: '宮位', genSuan: '算數', genHe: '算和', genCat: '算象',
+  genZhusuan: '主算', genZhuDajiang: '主大將', genZhuCanjang: '主參將',
+  genKesuan: '客算', genKeDajiang: '客大將', genKeCanjang: '客參將',
+  he: '和', buhe: '不和', buchu: '不出', weizai: '未載',
+  tianmu: '天目（文昌）', kemu: '客目', shiji: '始擊', jishen: '計神', taiyi: '太乙',
+  verdictTitle: '本局斷語', rawTitle: '原文',
+  gejuTitle: '格局', gejuNone: '本局未見掩、迫、囚、擊、關、格、對之形。',
+  chengbingTitle: '乘兵', cbChu: '出', cbZhan: '戰', cbZhen: '陣', cbQi: '旗', cbBei: '註',
+  shenNote: '十六神以天目為首順行；各神定位見上表，金字者為本局天目。乾坤重留：大武（坤）與陰德（乾）在天目循環中各重一格。',
+  classicalNote: '',
+  dataLoading: '正在加載局數斷語數據……', dataFail: '斷語數據未能加載，僅列積數與局數；請檢查網絡後重試。',
+  juMissing: '第 60 局原數據缺載判局，僅列立成表數。',
+  nayin: '納音',
+  faqTitle: '太乙神數：免費排盤與使用常見問題',
+  faqQ1: '太乙神數是什麼？',
+  faqA1: '太乙神數是古代用於推測國運與大事的術數，以太乙積年起局，觀太乙所在之宮與五將之向來斷吉凶。傳說中它與奇門遁甲、大六壬並稱「三式」，其中太乙最重天時與大勢。',
+  faqQ2: '太乙與奇門、六壬並稱三式是什麼意思？',
+  faqA2: '三式是古代最高的三門術數：太乙測天時國運，奇門測地利行軍，大六壬測人事吉凶。三者都以天干地支與九宮起盤，但所重不同：太乙看大勢，奇門看方位時機，六壬看具體人事。',
+  faqQ3: '五將怎麼看？',
+  faqA3: '五將分主客：主算、主大將、主參將屬己方（主），客算、客大將、客參將屬對方（客）。算長且和者利，和為算數陰陽調和；大將發者有力，囚者受制，不出者無力。主客相較，利主則宜守、利客則宜動，斷語中會明言。',
+  faqQ4: '年月日時四局有什麼區別？',
+  faqA4: '年局看一歲大勢，月局看一月進退，日局看一日吉凶，時局看問事當下。本頁以時局為主盤排五將、斷吉凶，年月日局並列於積數表，供對照大勢。',
+  faqQ5: '太乙神數排盤免費嗎？',
+  faqA5: '免費。本頁排盤在本地計算，不聯網、不收費，也不會保存你輸入的問題；局數斷語數據於首次使用時自本站加載。',
+  disclaimer: '太乙神數屬傳統術數，僅供參考，不構成決策依據。',
+  attrLine: '局數與斷語數據：comprehensive-shushu-engine（GPL-3.0），取《太乙金鏡式經》立成表與《太乙秘書》斷語。',
+  offlineNote: '排盤在本地計算，不向任何伺服器發送數據；農曆換算使用本地 lunar.js。'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'ai_interpret': 'AI Reading',
+  'navGroup1': 'One Question', 'navGroup2': 'Life Chart', 'navGroup3': 'Between Two',
+  'nav_jiemeng': 'Dream Interpretation', 'nav_liuyao': 'Six Lines Divination', 'nav_meihua': 'Meihua Yishu', 'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot', 'nav_leinuoman': 'Lenormand', 'nav_lunen': 'Norse Runes', 'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren', 'nav_jinkoujue': 'Jinkou Jue', 'nav_taiyi': 'Taiyi Shenshu', 'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles', 'nav_lingqi': 'Lingqi Jing', 'nav_cezi': 'Character Divination', 'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)', 'nav_ziwei': 'Ziwei Doushu', 'nav_tieban': 'Tieban Shenshu', 'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi', 'nav_taixuan': 'Taixuan Jing', 'nav_huangji': 'Huangji Jingshi', 'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing', 'nav_xiyang': 'Western Astrology', 'nav_yindu': 'Vedic Astrology', 'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry', 'nav_bazi-hepan': 'Bazi Compatibility', 'nav_ziwei-hepan': 'Ziwei Compatibility', 'nav_yindu-hepan': 'Vedic Compatibility',
+  brandSub: 'Taiyi Shenshu · Local Divination',
+  navSoon: 'Soon', footNote: 'Runs locally · No internet needed', langLabel: 'Language',
+  eyebrow: 'Act I · Your Question',
+  slogan: 'Taiyi has arrived;<br>the five generals stand revealed.',
+  subtitle: 'Free online Taiyi Shenshu divination chart',
+  labelQuestion: 'Your question (optional)', phQuestion: 'e.g. Should I advance or retreat in this matter?',
+  labelTime: 'Time', btnNow: 'Use now', btnSubmit: 'Cast the Taiyi hour chart',
+  formNote: 'Taiyi casts by the moment you ask: first the year, month, day and hour bureaus are fixed, then the hour bureau is charted with the five generals.',
+  errNoTime: 'Please choose a time first.', errBadTime: 'The time format is invalid.',
+  resultTitle: 'Taiyi Hour Chart', juTitle: 'Accumulations & Bureaus', palaceTitle: 'Nine Palaces · Taiyi & the Five Generals',
+  generalsTitle: 'The Five Generals & Host/Guest Counts', shenTitle: 'The Sixteen Spirits',
+  methodNote: 'Method: anchored on the winter solstice of Wanli Wuzhi (1588), accumulated years 10,155,505 (Taiyi Mishu reckoning); the Taiyi year starts at the winter solstice; yang dun runs winter solstice to summer solstice, yin dun summer solstice to winter solstice; month accumulation = years × 12 + month order (Zi month first, leap month counted with its month); day accumulation = years × 365.2425 + days since the winter solstice; hour accumulation = day accumulation × 12 + hour (Zi hour = 0). Bureau 60 is missing from the source data: only the standing-table numbers are shown for it, without a verdict.',
+  asked: 'Question', solarDate: 'Solar date', lunarDate: 'Lunar date', bazi: 'Four Pillars', taiyiYear: 'Taiyi year', jinian: 'Accumulated years', yuan: 'Yuan', dun: 'Dun',
+  level: 'Bureau', jishu: 'Accumulation', juNum: 'Bureau no.', palace: 'Taiyi palace', luogua: 'Palace trigram',
+  levelYear: 'Year bureau', levelMonth: 'Month bureau', levelDay: 'Day bureau', levelHour: 'Hour bureau', mainChart: '(main chart)',
+  dunYang: 'Yang dun', dunYin: 'Yin dun',
+  palaceNames: {1:'Palace 1',2:'Palace 2',3:'Palace 3',4:'Palace 4',5:'Palace 5',6:'Palace 6',7:'Palace 7',8:'Palace 8',9:'Palace 9'},
+  palaceGua: {1:'Qian',2:'Li',3:'Gen',4:'Zhen',5:'Centre',6:'Dui',7:'Kun',8:'Kan',9:'Xun'},
+  genRole: 'General', genPalace: 'Palace', genSuan: 'Count', genHe: 'Harmony', genCat: 'Count pattern',
+  genZhusuan: 'Host count', genZhuDajiang: 'Host great general', genZhuCanjang: 'Host lieutenant',
+  genKesuan: 'Guest count', genKeDajiang: 'Guest great general', genKeCanjang: 'Guest lieutenant',
+  he: 'Harmonious', buhe: 'Not harmonious', buchu: 'Not emerged', weizai: 'Not recorded',
+  tianmu: 'Tianmu (Wenchang)', kemu: 'Guest eye', shiji: 'Shiji', jishen: 'Jishen', taiyi: 'Taiyi',
+  verdictTitle: 'Verdict for this bureau', rawTitle: 'Original text',
+  gejuTitle: 'Configurations', gejuNone: 'No masking, pressing, imprisoning, striking, closing, blocking or opposing configuration appears in this bureau.',
+  chengbingTitle: 'Taking Up Arms', cbChu: 'Sally', cbZhan: 'Battle', cbZhen: 'Formation', cbQi: 'Banner', cbBei: 'Note',
+  shenNote: 'The sixteen spirits are led by Tianmu and proceed in order; their stations are shown above, the gold one being this bureau\u2019s Tianmu. Qian and Kun linger: Dawu (Kun) and Yinde (Qian) each repeat one step in the Tianmu cycle.',
+  classicalNote: 'Classical verdicts are shown in Chinese.',
+  dataLoading: 'Loading bureau verdict data…', dataFail: 'Verdict data could not be loaded; only accumulations and bureau numbers are shown. Please check your connection and try again.',
+  juMissing: 'Bureau 60 has no verdict in the source data; only the standing-table numbers are shown.',
+  nayin: 'Nayin',
+  faqTitle: 'Taiyi Shenshu: Free Chart & FAQ',
+  faqQ1: 'What is Taiyi Shenshu?',
+  faqA1: 'Taiyi Shenshu is an ancient art for forecasting the fate of states and great matters. It casts bureaus from the accumulated Taiyi years and reads fortune from the palace Taiyi occupies and the direction of the five generals. Tradition ranks it with Qimen Dunjia and Da Liuren as the "Three Styles", with Taiyi weighing the grand trend of heaven most.',
+  faqQ2: 'What does it mean that Taiyi, Qimen and Liuren are called the Three Styles?',
+  faqA2: 'The Three Styles are the three highest ancient divination arts: Taiyi reads the timing and fortune of states, Qimen reads terrain and the timing of movement, and Da Liuren reads the fortune of personal affairs. All three cast charts from the stems, branches and nine palaces, but each weighs something different: Taiyi the grand trend, Qimen direction and timing, Liuren specific human affairs.',
+  faqQ3: 'How do I read the five generals?',
+  faqA3: 'The five generals split into host and guest: host count, host great general and host lieutenant belong to your side (host); guest count, guest great general and guest lieutenant belong to the other side (guest). A long and harmonious count favours its side; a general that issues forth is strong, one imprisoned is checked, one not emerged is powerless. Comparing host and guest, favouring the host means hold, favouring the guest means move — the verdict states it plainly.',
+  faqQ4: 'What is the difference between the year, month, day and hour bureaus?',
+  faqA4: 'The year bureau shows the trend of the year, the month bureau the advance and retreat of the month, the day bureau the fortune of the day, and the hour bureau the moment you ask. This page charts the hour bureau as the main chart with the five generals and the verdict, and lists the year, month and day bureaus alongside it for the wider trend.',
+  faqQ5: 'Is the Taiyi Shenshu chart free?',
+  faqA5: 'Yes, free. The chart is computed locally in your browser — no internet, no charge, and your question is never saved; the bureau verdict data is loaded from this site on first use.',
+  disclaimer: 'Taiyi Shenshu is a traditional divination art, for reference only; it is not a basis for decisions.',
+  attrLine: 'Bureau and verdict data: comprehensive-shushu-engine (GPL-3.0), from the standing tables of the Taiyi Jinjing Shijing and the verdicts of the Taiyi Mishu.',
+  offlineNote: 'Charts are computed locally; no data is sent to any server. Lunar conversion uses the local lunar.js.'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'ai_interpret': 'AI 解釈',
+  'navGroup1': '一事一問', 'navGroup2': '一生之図', 'navGroup3': '二人の間',
+  'nav_jiemeng': '夢占い', 'nav_liuyao': '六爻占い', 'nav_meihua': '梅花易数', 'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット', 'nav_leinuoman': 'ルノルマン', 'nav_lunen': '北欧ルーン', 'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬', 'nav_jinkoujue': '金口訣', 'nav_taiyi': '太乙神数', 'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数', 'nav_lingqi': '霊棋経', 'nav_cezi': '測字', 'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字', 'nav_ziwei': '紫微斗数', 'nav_tieban': '鉄板神数', 'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易', 'nav_taixuan': '太玄経', 'nav_huangji': '皇極経世', 'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い', 'nav_xiyang': '西洋占星術', 'nav_yindu': 'インド占星術', 'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤', 'nav_bazi-hepan': '八字合盤', 'nav_ziwei-hepan': '紫微合盤', 'nav_yindu-hepan': 'インド合盤',
+  brandSub: '太乙神数 · ローカル占い',
+  navSoon: '近日公開', footNote: 'ローカル動作 · ネット不要', langLabel: '言語',
+  eyebrow: '第一幕 · 問うこと',
+  slogan: '太乙既に臨み、<br>五将自ずと明らかなり。',
+  subtitle: '太乙神数 無料オンライン占い排盤',
+  labelQuestion: '質問（任意）', phQuestion: '例：この件は進むべきか退くべきか？',
+  labelTime: '時間', btnNow: '現在時刻を使う', btnSubmit: '太乙の時盤を立てる',
+  formNote: '太乙は問うた時刻で起盤します。まず年月日時四局を定め、時局で五将を排し吉凶を断じます。',
+  errNoTime: 'まず時間を選択してください。', errBadTime: '時間の形式が正しくありません。',
+  resultTitle: '太乙時盤', juTitle: '積数と局数', palaceTitle: '九宮 · 太乙と五将',
+  generalsTitle: '五将と主客算', shenTitle: '十六神',
+  methodNote: '排盤口径：万暦戊子（1588年）冬至を起点とし、積年10155505（『太乙秘書』口径）。太乙年は冬至から起算。冬至から夏至まで陽遁、夏至から冬至まで陰遁。月積数＝積年×12＋月序（子月を一とし、閏月は本月に併せる）。日積数＝積年×365.2425＋冬至からの日数。時積数＝日積数×12＋時辰（子時を零とする）。第60局は原データに判局がなく、立成表の数のみを示し、断語はありません。',
+  asked: '質問', solarDate: '西暦', lunarDate: '旧暦', bazi: '四柱', taiyiYear: '太乙年', jinian: '積年', yuan: '元', dun: '遁',
+  level: '局', jishu: '積数', juNum: '局数', palace: '太乙宮', luogua: '落宮卦',
+  levelYear: '年局', levelMonth: '月局', levelDay: '日局', levelHour: '時局', mainChart: '（主盤）',
+  dunYang: '陽遁', dunYin: '陰遁',
+  palaceNames: {1:'一宮',2:'二宮',3:'三宮',4:'四宮',5:'五宮',6:'六宮',7:'七宮',8:'八宮',9:'九宮'},
+  palaceGua: {1:'乾',2:'離',3:'艮',4:'震',5:'中五',6:'兌',7:'坤',8:'坎',9:'巽'},
+  genRole: '将位', genPalace: '宮位', genSuan: '算数', genHe: '算和', genCat: '算象',
+  genZhusuan: '主算', genZhuDajiang: '主大将', genZhuCanjang: '主参将',
+  genKesuan: '客算', genKeDajiang: '客大将', genKeCanjang: '客参将',
+  he: '和', buhe: '不和', buchu: '不出', weizai: '未載',
+  tianmu: '天目（文昌）', kemu: '客目', shiji: '始撃', jishen: '計神', taiyi: '太乙',
+  verdictTitle: '本局断語', rawTitle: '原文',
+  gejuTitle: '格局', gejuNone: '本局に掩・迫・囚・撃・関・格・対の形は見られません。',
+  chengbingTitle: '乗兵', cbChu: '出', cbZhan: '戦', cbZhen: '陣', cbQi: '旗', cbBei: '注',
+  shenNote: '十六神は天目を首として順行します。各神の定位は上表の通り、金字が本局の天目です。乾坤重留：大武（坤）と陰徳（乾）は天目循環でそれぞれ一格重なります。',
+  classicalNote: '古典の断語は中国語原文のまま表示しています。',
+  dataLoading: '局数断語データを読み込み中……', dataFail: '断語データを読み込めませんでした。積数と局数のみ表示します。接続を確認して再試行してください。',
+  juMissing: '第60局は原データに判局がなく、立成表の数のみ表示します。',
+  nayin: '納音',
+  faqTitle: '太乙神数：無料排盤とよくある質問',
+  faqQ1: '太乙神数とは？',
+  faqA1: '太乙神数は、国運や大事を推し量る古代の占術です。太乙積年で局を立て、太乙のいる宮と五将の向きから吉凶を断じます。奇門遁甲・大六壬と並んで「三式」と称され、その中で太乙は天時と大勢を最も重んじます。',
+  faqQ2: '太乙と奇門・六壬を並べて三式というのはどういう意味？',
+  faqA2: '三式は古代最高の三門の占術です。太乙は天時・国運を測り、奇門は地利・行軍を測り、大六壬は人事の吉凶を測ります。三者とも干支と九宮で起盤しますが、重きが異なります。太乙は大勢、奇門は方位と時機、六壬は具体的な人事です。',
+  faqQ3: '五将はどう見ますか？',
+  faqA3: '五将は主客に分かれます。主算・主大将・主参将は自分側（主）、客算・客大将・客参将は相手側（客）です。算が長く和する方が利し、和とは算数の陰陽調和です。大将が発すれば力があり、囚われれば制せられ、出なければ力なし。主客を比べ、主が利すれば守り、客が利すれば動くべきで、断語に明言されます。',
+  faqQ4: '年月日時四局の違いは？',
+  faqA4: '年局は一年の大勢、月局は一月の進退、日局は一日の吉凶、時局は問うたその瞬間です。本頁では時局を主盤として五将を排し吉凶を断じ、年月日局を積数表に並べて大勢を対照します。',
+  faqQ5: '太乙神数の排盤は無料ですか？',
+  faqA5: '無料です。本頁の排盤はローカルで計算され、ネット接続も料金も不要で、入力した質問は保存されません。局数断語データは初回利用時に本サイトから読み込みます。',
+  disclaimer: '太乙神数は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  attrLine: '局数と断語データ：comprehensive-shushu-engine（GPL-3.0）、『太乙金鏡式経』立成表と『太乙秘書』断語による。',
+  offlineNote: '排盤はローカルで計算され、データは外部サーバーに送信されません。旧暦換算はローカルの lunar.js を使います。'
+}
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function palaceName(n) { return (t('palaceNames') || {})[n] || ('Palace ' + n); }
+function palaceGua(n) { return (t('palaceGua') || {})[n] || ''; }
+
+function applyI18n() {
+  if (typeof document === 'undefined') return;
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('nav_taiyi');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var te = document.getElementById('time-error'); if (te) te.textContent = '';
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==TAIYI-LOGIC==
+// 太乙神数排盘核心（纯函数，不依赖 DOM；Lunar 由 lunar.js 提供）。
+// 口径：万历戊子（1588）冬至为锚，积年 10155505（太乙秘书）；太乙年自冬至起算；
+// 冬至至夏至阳遁，夏至至冬至阴遁；月积数＝积年×12＋月序（子月为一）；
+// 日积数＝积年×365.2425＋自冬至起日数；时积数＝日积数×12＋时辰（子时为零）。
+var TAIYI_ANCHOR_YEAR = 1588;
+var TAIYI_ANCHOR_JINIAN = 10155505;
+var TAIYI_YUAN_NAMES = ['戊子', '庚子', '壬子', '甲子', '丙子'];
+var PALACE_SEQ_YANG = [1, 2, 3, 4, 6, 7, 8, 9];
+var PALACE_SEQ_YIN = [9, 8, 7, 6, 4, 3, 2, 1];
+var PALACE_SYMBOL = {1: '乾', 2: '午', 3: '艮', 4: '卯', 6: '酉', 7: '坤', 8: '子', 9: '巽'};
+var PALACE_ZHOU = {1: '冀州', 2: '荆州', 3: '青州', 4: '徐州', 5: '豫州', 6: '雍州', 7: '梁州', 8: '兖州', 9: '扬州'};
+var BRANCH_PALACE = {'子': 8, '丑': 3, '寅': 3, '卯': 4, '辰': 9, '巳': 9, '午': 2, '未': 7, '申': 7, '酉': 6, '戌': 1, '亥': 1, '艮': 3, '巽': 9, '坤': 7, '乾': 1};
+var SHEN_HOME = {'地主': '子', '阳德': '丑', '和德': '艮', '吕申': '寅', '高丛': '卯', '太阳': '辰', '太炅': '巽', '大炅': '巽', '大神': '巳', '大威': '午', '天道': '未', '大武': '坤', '武德': '申', '太簇': '酉', '阴主': '戌', '阴德': '乾', '大义': '亥'};
+var SHEN_RING = ['地主', '阳德', '和德', '吕申', '高丛', '太阳', '太炅', '大神', '大威', '天道', '大武', '武德', '太簇', '阴主', '大义', '阴德'];
+var SHEN_ALIAS = {'大炅': '太炅'};
+var OPP = {1: 9, 9: 1, 2: 8, 8: 2, 3: 7, 7: 3, 4: 6, 6: 4, 5: 5};
+var CN_NUM = {'一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9};
+var ZHI_LIST = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+
+function taiyiMod(n, m) { var r = n % m; return r === 0 ? m : (r < 0 ? r + m : r); }
+function taiyiMod0(n, m) { var r = n % m; return r < 0 ? r + m : r; }
+function solarToDate(s) { return new Date(s.getYear(), s.getMonth() - 1, s.getDay(), s.getHour(), s.getMinute(), s.getSecond()); }
+// 注意：lunar.js 的节气表按农历年（春节起）编排，表内冬至是该农历年十一月的冬至；
+// 对冬至后、春节前的日期，表内冬至仍是上一个冬至。故取 date±80 天三探，取不晚于 date 的最晚者。
+function prevJieqi(date, name) {
+  var cands = [];
+  [-80, 0, 80].forEach(function (off) {
+    var probe = new Date(date.getTime() + off * 86400000);
+    var s = Lunar.fromDate(probe).getJieQiTable()[name];
+    if (s) cands.push(solarToDate(s));
+  });
+  var best = null;
+  cands.forEach(function (d) { if (d <= date && (best === null || d > best)) best = d; });
+  if (best) return best;
+  return cands.sort(function (a, b) { return a - b; })[0];
+}
+function prevDongzhi(date) { return prevJieqi(date, '冬至'); }
+function dunType(date) {
+  var dz = prevJieqi(date, '冬至');
+  var xz = prevJieqi(date, '夏至');
+  return dz > xz ? 'yang' : 'yin';
+}
+function taiyiYearOf(date) { return prevDongzhi(date).getFullYear(); }
+function jinianFor(taiyiYear) { return TAIYI_ANCHOR_JINIAN + (taiyiYear - TAIYI_ANCHOR_YEAR); }
+function juFromJinian(j) { return taiyiMod(j, 72); }
+function yuanName(taiyiYear) {
+  var off = taiyiMod0(taiyiYear - TAIYI_ANCHOR_YEAR, 1800);
+  return TAIYI_YUAN_NAMES[Math.floor(off / 360) % 5];
+}
+function taiyiPalace(ju, dun) {
+  var seq = dun === 'yang' ? PALACE_SEQ_YANG : PALACE_SEQ_YIN;
+  return seq[Math.floor((ju - 1) / 3) % 8];
+}
+function hourZhiIndex(date) { return Math.floor((((date.getHours() + 1) % 24)) / 2); }
+function palaceOfGod(godName) {
+  if (!godName) return null;
+  var home = SHEN_HOME[godName];
+  return home ? BRANCH_PALACE[home] : null;
+}
+function palaceOfJishen(j) {
+  if (j === null || j === undefined || j === '') return null;
+  if (BRANCH_PALACE[j] !== undefined) return BRANCH_PALACE[j];
+  if (CN_NUM[j] !== undefined) return CN_NUM[j];
+  var n = parseInt(j, 10);
+  if (!isNaN(n) && n >= 1 && n <= 9) return n;
+  return null;
+}
+function shenCanon(name) { return SHEN_ALIAS[name] || name; }
+
+function computeTaiyi(date) {
+  var lunar = Lunar.fromDate(date);
+  var dz = prevDongzhi(date);
+  var tyYear = dz.getFullYear();
+  var J = jinianFor(tyYear);
+  var dun = dunType(date);
+  var nianJu = juFromJinian(J);
+  var lunarMonth = lunar.getMonth();
+  var mIdx = taiyiMod0(lunarMonth - 11, 12) + 1;
+  var yueJishu = J * 12 + mIdx;
+  var yueJu = juFromJinian(yueJishu);
+  var daysSince = (date - dz) / 86400000;
+  var riJishu = J * 365.2425 + daysSince;
+  var riJu = juFromJinian(Math.floor(riJishu));
+  var h = hourZhiIndex(date);
+  var shiJishu = riJishu * 12 + h;
+  var shiJu = juFromJinian(Math.floor(shiJishu));
+  var bz = lunar.getEightChar();
+  return {
+    date: date, lunar: lunar, dun: dun,
+    taiyiYear: tyYear, jinian: J, yuan: yuanName(tyYear),
+    daysSinceDongzhi: daysSince, hourZhi: ZHI_LIST[h], hourIndex: h,
+    lunarMonth: lunarMonth, monthIndex: mIdx,
+    bazi: [bz.getYear().toString(), bz.getMonth().toString(), bz.getDay().toString(), bz.getTime().toString()],
+    levels: [
+      {key: 'year', jishu: J, ju: nianJu, palace: taiyiPalace(nianJu, dun)},
+      {key: 'month', jishu: yueJishu, ju: yueJu, palace: taiyiPalace(yueJu, dun)},
+      {key: 'day', jishu: riJishu, ju: riJu, palace: taiyiPalace(riJu, dun)},
+      {key: 'hour', jishu: shiJishu, ju: shiJu, palace: taiyiPalace(shiJu, dun)}
+    ],
+    hourJu: shiJu, hourPalace: taiyiPalace(shiJu, dun)
+  };
+}
+
+function lookupJu(data, dun, ju) {
+  if (!data) return {licheng: null, panju: null};
+  var side = dun === 'yang' ? 'yang' : 'yin';
+  var lc = data['licheng_' + side] || {};
+  var pj = data['panju_' + side] || {};
+  return {licheng: lc[String(ju)] || null, panju: pj[String(ju)] || null};
+}
+function suanCategories(n, data) {
+  var out = [];
+  if (n === null || n === undefined) return out;
+  if (data && data.suanhe) {
+    for (var k in data.suanhe) {
+      if (data.suanhe[k] && data.suanhe[k].indexOf(n) !== -1) out.push(k);
+    }
+  }
+  var r = n % 10;
+  if (r === 1 || r === 3 || r === 7 || r === 9) out.push('单阳');
+  if (r === 2 || r === 4 || r === 6 || r === 8) out.push('单阴');
+  if (n === 10 || n === 20 || n === 30 || n === 40) out.push('无人');
+  return out;
+}
+function progAdjacent(p1, p2, dun) {
+  if (p1 === null || p2 === null || p1 === p2) return false;
+  var prog = dun === 'yang' ? PALACE_SEQ_YANG : PALACE_SEQ_YIN;
+  var i1 = prog.indexOf(p1), i2 = prog.indexOf(p2);
+  if (i1 < 0 || i2 < 0) return false;
+  var d = Math.abs(i1 - i2);
+  return d === 1 || d === prog.length - 1;
+}
+function detectGeju(chart, data) {
+  var out = [];
+  if (!data || !data.geju) return out;
+  var g = data.geju;
+  function add(key, who) {
+    if (g[key]) out.push({key: key, who: who, def: g[key].def, duan: g[key].duan});
+  }
+  var tp = chart.taiyiPalace, dun = chart.dun;
+  var tmP = chart.tianmuPalace, sjP = chart.shijiPalace, kmP = chart.kemuPalace;
+  if (sjP !== null && sjP === tp) add('掩', '始击掩太乙');
+  if (sjP !== null && chart.zhuDajiang !== null && sjP === chart.zhuDajiang) add('掩', '始击掩主大将');
+  if (sjP !== null && chart.keDajiang !== null && sjP === chart.keDajiang) add('掩', '始击掩客大将');
+  if (sjP !== null && progAdjacent(sjP, tp, dun)) add('击', '始击宫击太乙');
+  if (tmP !== null && progAdjacent(tmP, tp, dun)) add('迫', '文昌迫太乙');
+  if (tmP !== null && tmP === tp) add('囚', '文昌囚太乙');
+  if (chart.zhuDajiang !== null && chart.zhuDajiang === tp) add('囚', '主大将囚太乙宫');
+  if (chart.zhuCanjang !== null && chart.zhuCanjang === tp) add('囚', '主参将囚太乙宫');
+  if (chart.keDajiang !== null && chart.keDajiang === tp) add('囚', '客大将囚太乙宫');
+  if (chart.keCanjang !== null && chart.keCanjang === tp) add('囚', '客参将囚太乙宫');
+  if (chart.zhuDajiang !== null && chart.keDajiang !== null && chart.zhuDajiang === chart.keDajiang) add('关', '主客大将同宫');
+  if (chart.keDajiang !== null && tmP !== null && chart.keDajiang === tmP) add('关', '客犯文昌宫');
+  if (chart.zhuDajiang !== null && sjP !== null && chart.zhuDajiang === sjP) add('关', '主犯始击宫');
+  var opp = OPP[tp];
+  if (chart.keDajiang !== null && chart.keDajiang === opp) add('格', '客大将格太乙');
+  if (chart.keCanjang !== null && chart.keCanjang === opp) add('格', '客参将格太乙');
+  if (chart.zhuDajiang !== null && chart.zhuDajiang === opp) add('格', '主大将格太乙');
+  if (chart.zhuCanjang !== null && chart.zhuCanjang === opp) add('格', '主参将格太乙');
+  if (kmP !== null && kmP === opp) add('格', '客目格太乙');
+  if (tmP !== null && tmP === opp) add('对', '文昌对太乙');
+  return out;
+}
+function buildHourChart(computed, data) {
+  var lk = lookupJu(data, computed.dun, computed.hourJu);
+  var lc = lk.licheng, pj = lk.panju;
+  var src = pj || lc || {};
+  var tianmu = src.tianmu || null;
+  var kemu = lc ? (lc.kemu || null) : null;
+  var shiji = pj ? (pj.shiji || null) : null;
+  var jishen = src.jishen !== undefined ? src.jishen : null;
+  return {
+    dun: computed.dun, ju: computed.hourJu, taiyiPalace: computed.hourPalace,
+    licheng: lc, panju: pj, hasPanju: !!pj,
+    tianmu: tianmu, kemu: kemu, shiji: shiji, jishen: jishen,
+    tianmuPalace: palaceOfGod(tianmu), kemuPalace: palaceOfGod(kemu), shijiPalace: palaceOfGod(shiji),
+    jishenPalace: palaceOfJishen(jishen),
+    zhusuan: (src.zhusuan === undefined ? null : src.zhusuan),
+    zhuhe: pj ? (pj.zhuhe || '') : (lc ? (lc.zhu_note || '') : ''),
+    zhuDajiang: pj ? (pj.zhu_dajiang === undefined ? null : pj.zhu_dajiang) : null,
+    zhuCanjang: pj ? (pj.zhu_canjang === undefined ? null : pj.zhu_canjang) : null,
+    kesuan: (src.kesuan === undefined ? null : src.kesuan),
+    kehe: pj ? (pj.kehe || '') : (lc ? (lc.ke_note || '') : ''),
+    keDajiang: pj ? (pj.ke_dajiang === undefined ? null : pj.ke_dajiang) : null,
+    keCanjang: pj ? (pj.ke_canjang === undefined ? null : pj.ke_canjang) : null,
+    duan: pj ? (pj.duan || '') : '',
+    raw: pj ? (pj.raw || '') : ''
+  };
+}
+// ==TAIYI-LOGIC-END==
+</script>
+<script>
+// ==RENDER==
+var DATA_TAIYI = null, DATA_MING = null;
+var DATA_TAIYI_PROMISE = null, DATA_MING_PROMISE = null;
+var DATA_TAIYI_FAILED = false;
+
+function loadMing() {
+  if (DATA_MING) return Promise.resolve(DATA_MING);
+  if (!DATA_MING_PROMISE) {
+    DATA_MING_PROMISE = fetch('/data/taiyi_ming.json').then(function (r) {
+      if (!r.ok) throw new Error('taiyi_ming ' + r.status);
+      return r.json();
+    }).then(function (d) { DATA_MING = d; return d; }).catch(function () { return null; });
+  }
+  return DATA_MING_PROMISE;
+}
+function loadTaiyi() {
+  if (DATA_TAIYI) return Promise.resolve(DATA_TAIYI);
+  if (!DATA_TAIYI_PROMISE) {
+    DATA_TAIYI_PROMISE = fetch('/data/taiyi.json').then(function (r) {
+      if (!r.ok) throw new Error('taiyi ' + r.status);
+      return r.json();
+    }).then(function (d) { DATA_TAIYI = d; return d; }).catch(function () { DATA_TAIYI_FAILED = true; return null; });
+  }
+  return DATA_TAIYI_PROMISE;
+}
+function esc(s) {
+  return String(s === null || s === undefined ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function fmtJishu(x) {
+  if (Math.abs(x - Math.round(x)) < 1e-9) return String(Math.round(x));
+  return x.toFixed(2);
+}
+function pad2(n) { return (n < 10 ? '0' : '') + n; }
+function toLocalInputValue(d) {
+  return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + 'T' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+}
+function useNow() {
+  var el = document.getElementById('datetime');
+  if (el) el.value = toLocalInputValue(new Date());
+  var te = document.getElementById('time-error'); if (te) te.textContent = '';
+}
+function nayinOf(ganzhi) {
+  if (!DATA_MING || !DATA_MING.nayin) return '';
+  return DATA_MING.nayin[ganzhi] || '';
+}
+function palaceCell(n, occupants, isTaiyi, isCenter) {
+  var cls = 'palace' + (isTaiyi ? ' taiyi-here' : '') + (isCenter ? ' center' : '');
+  var occ = occupants.length ? occupants.join('') : '<span class="empty">—</span>';
+  return '<div class="' + cls + '"><div class="palace-head"><span class="palace-num">' + n + '</span>' +
+    '<span class="palace-gua">' + esc(palaceGua(n)) + ' · ' + esc(PALACE_ZHOU[n]) + '</span></div>' +
+    '<div class="palace-body">' + occ + '</div></div>';
+}
+function occSpan(label, cls) { return '<span class="occ ' + (cls || '') + '">' + esc(label) + '</span>'; }
+
+function showResult(res, isRelang) {
+  var computed = res.computed;
+  var chart = buildHourChart(computed, DATA_TAIYI);
+  var dunLabel = computed.dun === 'yang' ? t('dunYang') : t('dunYin');
+  var lunar = computed.lunar;
+  var lunarStr = lunar.getYear() + '年' + lunar.getMonthInChinese() + lunar.getDayInChinese();
+  var head = '';
+  if (res.question) head += '<div>' + esc(t('asked')) + '：<b>' + esc(res.question) + '</b></div>';
+  head += '<div>' + esc(t('solarDate')) + '：<b>' + computed.date.getFullYear() + '-' + pad2(computed.date.getMonth() + 1) + '-' + pad2(computed.date.getDate()) + ' ' + pad2(computed.date.getHours()) + ':' + pad2(computed.date.getMinutes()) + '（' + esc(computed.hourZhi) + '时）</b>　' + esc(t('lunarDate')) + '：<b>' + esc(lunarStr) + '</b></div>';
+  head += '<div>' + esc(t('bazi')) + '：<b>' + esc(computed.bazi.join(' ')) + '</b>';
+  var ny = nayinOf(computed.bazi[2]);
+  if (ny) head += '　' + esc(t('nayin')) + '：<b>' + esc(computed.bazi[2] + ny) + '</b>';
+  head += '</div>';
+  head += '<div>' + esc(t('taiyiYear')) + '：<b>' + computed.taiyiYear + '</b>　' + esc(t('jinian')) + '：<b>' + computed.jinian + '</b>　' + esc(t('yuan')) + '：<b>' + esc(computed.yuan) + '</b>　' + esc(t('dun')) + '：<b>' + esc(dunLabel) + '</b></div>';
+  document.getElementById('result-head').innerHTML = head;
+
+  var statusEl = document.getElementById('data-status');
+  if (DATA_TAIYI_FAILED) {
+    statusEl.innerHTML = '<p class="error">' + esc(t('dataFail')) + '</p>';
+  } else if (!DATA_TAIYI) {
+    statusEl.innerHTML = '<p class="note">' + esc(t('dataLoading')) + '</p>';
+  } else {
+    statusEl.innerHTML = '';
+  }
+
+  var levelKeys = {year: 'levelYear', month: 'levelMonth', day: 'levelDay', hour: 'levelHour'};
+  var juHtml = '<tr><th>' + esc(t('level')) + '</th><th>' + esc(t('jishu')) + '</th><th>' + esc(t('juNum')) + '</th><th>' + esc(t('dun')) + '</th><th>' + esc(t('palace')) + '</th><th>' + esc(t('luogua')) + '</th></tr>';
+  computed.levels.forEach(function (lv) {
+    var sym = PALACE_SYMBOL[lv.palace] || '';
+    juHtml += '<tr><td><b>' + esc(t(levelKeys[lv.key])) + '</b>' + (lv.key === 'hour' ? ' <span class="gold">' + esc(t('mainChart')) + '</span>' : '') + '</td>' +
+      '<td>' + esc(fmtJishu(lv.jishu)) + '</td><td><b>' + lv.ju + '</b></td><td>' + esc(dunLabel) + '</td>' +
+      '<td><b>' + esc(palaceName(lv.palace)) + '</b> ' + esc(palaceGua(lv.palace)) + '</td><td>' + esc(sym) + '</td></tr>';
+  });
+  document.getElementById('ju-table').innerHTML = juHtml;
+
+  var gridEl = document.getElementById('palace-grid');
+  var genEl = document.getElementById('generals-table');
+  var verdictEl = document.getElementById('verdict-wrap');
+  var gejuEl = document.getElementById('geju-wrap');
+  var cbEl = document.getElementById('chengbing-wrap');
+  var shenEl = document.getElementById('shen-list');
+  var shenNoteEl = document.getElementById('shen-note');
+
+  if (!DATA_TAIYI) {
+    gridEl.innerHTML = '';
+    genEl.innerHTML = '';
+    verdictEl.innerHTML = '';
+    gejuEl.innerHTML = '';
+    cbEl.innerHTML = '';
+    shenEl.innerHTML = '';
+    shenNoteEl.textContent = '';
+    return;
+  }
+
+  var occMap = {};
+  function put(p, html) { if (p !== null && p >= 1 && p <= 9) { (occMap[p] = occMap[p] || []).push(html); } }
+  put(chart.taiyiPalace, occSpan(t('taiyi'), 'taiyi'));
+  put(chart.zhuDajiang, occSpan(t('genZhuDajiang'), 'zhu'));
+  put(chart.zhuCanjang, occSpan(t('genZhuCanjang'), 'zhu'));
+  put(chart.keDajiang, occSpan(t('genKeDajiang'), 'ke'));
+  put(chart.keCanjang, occSpan(t('genKeCanjang'), 'ke'));
+  if (chart.tianmu) put(chart.tianmuPalace, occSpan(t('tianmu') + ' ' + chart.tianmu, 'zhu'));
+  if (chart.kemu) put(chart.kemuPalace, occSpan(t('kemu') + ' ' + chart.kemu, 'ke'));
+  if (chart.shiji) put(chart.shijiPalace, occSpan(t('shiji') + ' ' + chart.shiji, ''));
+  if (chart.jishen !== null && chart.jishen !== '') put(chart.jishenPalace, occSpan(t('jishen') + ' ' + chart.jishen, ''));
+  var order = [4, 9, 2, 3, 5, 7, 8, 1, 6];
+  gridEl.innerHTML = order.map(function (n) {
+    return palaceCell(n, occMap[n] || [], n === chart.taiyiPalace, n === 5);
+  }).join('');
+
+  function heLabel(v) { return v === '和' ? t('he') : (v === '不和' ? t('buhe') : (v || '—')); }
+  function genPalace(v) { return v === null || v === undefined ? t('buchu') : palaceName(v); }
+  function genSuan(v) { return v === null || v === undefined ? t('weizai') : String(v); }
+  function catsHtml(n) {
+    var cats = suanCategories(n, DATA_TAIYI);
+    if (!cats.length) return '—';
+    return cats.map(function (c) {
+      var txt = (DATA_TAIYI.suanhe_text && DATA_TAIYI.suanhe_text[c]) || '';
+      return esc(c) + (txt ? '（' + esc(txt) + '）' : '');
+    }).join('<br>');
+  }
+  var genHtml = '<tr><th>' + esc(t('genRole')) + '</th><th>' + esc(t('genSuan')) + '</th><th>' + esc(t('genHe')) + '</th><th>' + esc(t('genPalace')) + '</th><th>' + esc(t('genCat')) + '</th></tr>';
+  genHtml += '<tr><td><b>' + esc(t('genZhusuan')) + '</b></td><td>' + esc(genSuan(chart.zhusuan)) + '</td><td>' + esc(heLabel(chart.zhuhe)) + '</td><td>—</td><td>' + catsHtml(chart.zhusuan) + '</td></tr>';
+  genHtml += '<tr><td><b>' + esc(t('genZhuDajiang')) + '</b></td><td>—</td><td>—</td><td><b>' + esc(genPalace(chart.zhuDajiang)) + '</b></td><td>—</td></tr>';
+  genHtml += '<tr><td><b>' + esc(t('genZhuCanjang')) + '</b></td><td>—</td><td>—</td><td><b>' + esc(genPalace(chart.zhuCanjang)) + '</b></td><td>—</td></tr>';
+  genHtml += '<tr><td><b>' + esc(t('genKesuan')) + '</b></td><td>' + esc(genSuan(chart.kesuan)) + '</td><td>' + esc(heLabel(chart.kehe)) + '</td><td>—</td><td>' + catsHtml(chart.kesuan) + '</td></tr>';
+  genHtml += '<tr><td><b>' + esc(t('genKeDajiang')) + '</b></td><td>—</td><td>—</td><td><b>' + esc(genPalace(chart.keDajiang)) + '</b></td><td>—</td></tr>';
+  genHtml += '<tr><td><b>' + esc(t('genKeCanjang')) + '</b></td><td>—</td><td>—</td><td><b>' + esc(genPalace(chart.keCanjang)) + '</b></td><td>—</td></tr>';
+  genHtml += '<tr><td><b>' + esc(t('tianmu')) + '</b></td><td>—</td><td>—</td><td>' + (chart.tianmu ? esc(chart.tianmu) + ' · ' + (chart.tianmuPalace ? esc(palaceName(chart.tianmuPalace)) : t('weizai')) : t('weizai')) + '</td><td>—</td></tr>';
+  genHtml += '<tr><td><b>' + esc(t('kemu')) + '</b></td><td>—</td><td>—</td><td>' + (chart.kemu ? esc(chart.kemu) + ' · ' + (chart.kemuPalace ? esc(palaceName(chart.kemuPalace)) : t('weizai')) : t('weizai')) + '</td><td>—</td></tr>';
+  genHtml += '<tr><td><b>' + esc(t('shiji')) + '</b></td><td>—</td><td>—</td><td>' + (chart.shiji ? esc(chart.shiji) + ' · ' + (chart.shijiPalace ? esc(palaceName(chart.shijiPalace)) : t('weizai')) : t('weizai')) + '</td><td>—</td></tr>';
+  genHtml += '<tr><td><b>' + esc(t('jishen')) + '</b></td><td>—</td><td>—</td><td>' + (chart.jishen !== null && chart.jishen !== '' ? esc(chart.jishen) + ' · ' + (chart.jishenPalace ? esc(palaceName(chart.jishenPalace)) : t('weizai')) : t('weizai')) + '</td><td>—</td></tr>';
+  genEl.innerHTML = genHtml;
+
+  var vHtml = '';
+  if (chart.hasPanju && chart.duan) {
+    vHtml += '<div class="section-title" style="margin-top:2rem">' + esc(t('verdictTitle')) + '</div>';
+    vHtml += '<div class="verdict">' + esc(chart.duan);
+    if (t('classicalNote')) vHtml += '<div class="raw">' + esc(t('classicalNote')) + '</div>';
+    if (chart.raw) vHtml += '<div class="raw">' + esc(t('rawTitle')) + '：' + esc(chart.raw) + '</div>';
+    vHtml += '</div>';
+  } else if (chart.ju === 60) {
+    vHtml += '<div class="section-title" style="margin-top:2rem">' + esc(t('verdictTitle')) + '</div>';
+    vHtml += '<p class="note">' + esc(t('juMissing')) + '</p>';
+  }
+  verdictEl.innerHTML = vHtml;
+
+  var gejus = detectGeju(chart, DATA_TAIYI);
+  var gHtml = '<div class="section-title" style="margin-top:2rem">' + esc(t('gejuTitle')) + '</div>';
+  if (gejus.length) {
+    gHtml += gejus.map(function (g) {
+      return '<div class="geju-item"><h4>' + esc(g.key) + ' · ' + esc(g.who) + '</h4><p class="def">' + esc(g.def) + '</p><p>' + esc(g.duan) + '</p></div>';
+    }).join('');
+  } else {
+    gHtml += '<p class="note">' + esc(t('gejuNone')) + '</p>';
+  }
+  gejuEl.innerHTML = gHtml;
+
+  var cb = DATA_TAIYI.chengbing ? DATA_TAIYI.chengbing[String(chart.taiyiPalace)] : null;
+  if (cb) {
+    var cHtml = '<div class="section-title" style="margin-top:2rem">' + esc(t('chengbingTitle')) + '</div>';
+    cHtml += '<div class="verdict">' + esc(t('cbChu')) + '：<b>' + esc(cb.chu || '') + '</b>　' + esc(t('cbZhan')) + '：<b>' + esc(cb.zhan || '') + '</b>　' + esc(t('cbZhen')) + '：<b>' + esc(cb.zhen || '') + '</b>　' + esc(t('cbQi')) + '：<b>' + esc(cb.qi || '') + '</b>';
+    if (cb.bei) cHtml += '<div class="raw">' + esc(t('cbBei')) + '：' + esc(cb.bei) + '</div>';
+    cHtml += '</div>';
+    cbEl.innerHTML = cHtml;
+  } else {
+    cbEl.innerHTML = '';
+  }
+
+  var tianmuCanon = shenCanon(chart.tianmu);
+  shenEl.innerHTML = SHEN_RING.map(function (god) {
+    var home = SHEN_HOME[god] || '';
+    var cls = (god === tianmuCanon) ? 'shen-tianmu' : '';
+    return '<div class="' + cls + '">' + esc(god) + ' · ' + esc(home) + '</div>';
+  }).join('');
+  shenNoteEl.textContent = t('shenNote');
+}
+
+function doTaiyi() {
+  var dtEl = document.getElementById('datetime');
+  var errEl = document.getElementById('time-error');
+  var qEl = document.getElementById('question');
+  var v = dtEl ? dtEl.value : '';
+  if (!v) { if (errEl) errEl.textContent = t('errNoTime'); return; }
+  var parts = v.split('T');
+  if (parts.length !== 2) { if (errEl) errEl.textContent = t('errBadTime'); return; }
+  var dp = parts[0].split('-'), tp = parts[1].split(':');
+  var date = new Date(+dp[0], +dp[1] - 1, +dp[2], +tp[0], +tp[1], 0);
+  if (isNaN(date.getTime())) { if (errEl) errEl.textContent = t('errBadTime'); return; }
+  if (errEl) errEl.textContent = '';
+  var computed;
+  try {
+    computed = computeTaiyi(date);
+  } catch (e) {
+    if (errEl) errEl.textContent = t('errBadTime');
+    return;
+  }
+  LAST_RESULT = {date: date, question: qEl ? qEl.value.trim() : '', computed: computed};
+  document.getElementById('result-card').classList.remove('hidden');
+  showResult(LAST_RESULT, false);
+  if (!DATA_TAIYI && !DATA_TAIYI_FAILED) {
+    loadTaiyi().then(function () { if (LAST_RESULT) showResult(LAST_RESULT, true); });
+  }
+  document.getElementById('result-card').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+// ---- AI 解读 ----
+window.getJieguaSummary = function() {
+  if (!LAST_RESULT) return null;
+  var c = LAST_RESULT.computed;
+  var pn = function(n) { return (n === null || n === undefined) ? '未出' : palaceName(n); };
+  var parts = [];
+  parts.push('太乙神数');
+  parts.push('四柱：' + c.bazi.join(' ') + ' 太乙积年：' + c.taiyiYear + ' 纪年：' + c.jinian + ' 元：' + c.yuan + ' ' + (c.dun === 'yang' ? '阳遁' : '阴遁'));
+  var lvNames = {year: '年局', month: '月局', day: '日局', hour: '时局'};
+  c.levels.forEach(function(lv) {
+    parts.push(lvNames[lv.key] + '：第' + lv.ju + '局 ' + pn(lv.palace) + '宫');
+  });
+  try {
+    if (typeof DATA_TAIYI !== 'undefined' && DATA_TAIYI) {
+      var ch = buildHourChart(c, DATA_TAIYI);
+      parts.push('太乙：' + pn(ch.taiyiPalace) + '宫');
+      parts.push('主大将：' + pn(ch.zhuDajiang) + '宫 主参将：' + pn(ch.zhuCanjang) + '宫 客大将：' + pn(ch.keDajiang) + '宫 客参将：' + pn(ch.keCanjang) + '宫');
+      parts.push('主算：' + ch.zhusuan + '（' + (ch.zhuhe || '') + '） 客算：' + ch.kesuan + '（' + (ch.kehe || '') + '）');
+      if (ch.tianmu) parts.push('天目：' + ch.tianmu + ' ' + pn(ch.tianmuPalace) + '宫');
+      if (ch.kemu) parts.push('客目：' + ch.kemu + ' ' + pn(ch.kemuPalace) + '宫');
+      if (ch.shiji) parts.push('始击：' + ch.shiji + ' ' + pn(ch.shijiPalace) + '宫');
+      if (ch.jishen) parts.push('计神：' + ch.jishen + ' ' + pn(ch.jishenPalace) + '宫');
+      var gejus = detectGeju(ch, DATA_TAIYI);
+      if (gejus && gejus.length) parts.push('格局：' + gejus.map(function(g) { return g.key + '·' + g.who; }).join('、'));
+      if (ch.hasPanju && ch.duan) parts.push('断语：' + String(ch.duan).slice(0, 300));
+    }
+  } catch (e) {}
+  return parts.join('\n');
+};
+window.getJieguaQuestion = function() {
+  var el = document.getElementById('question');
+  return el ? el.value.trim() : '';
+};
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', function () {
+    applyI18n();
+    var dtEl = document.getElementById('datetime');
+    if (dtEl && !dtEl.value) dtEl.value = toLocalInputValue(new Date());
+    loadMing();
+  });
+}
+</script>
+<script src="/js/ai-jiegua.js"></script>
+<script>
+if (window.AIInterpret) window.AIInterpret.attach();
+</script>
+</body>
+</html>

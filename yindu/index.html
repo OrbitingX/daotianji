@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 印度占星</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .method-row { display: flex; gap: 2rem; }
+  .method-row > .field { flex: 1; min-width: 0; }
+  .num-row { display: flex; gap: 2rem; }
+  .num-row > .field { flex: 1; min-width: 0; }
+  .link-btn { background: none; border: none; color: #c9a962; font-size: .75rem; cursor: pointer; letter-spacing: .1em; padding: 0; margin-left: .5rem; font-family: inherit; }
+  .link-btn:hover { text-decoration: underline; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+  .hint { font-size: .78rem; color: #6f6f80; margin-top: .4rem; line-height: 1.6; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .verdict { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .level { color: #c9a962; font-weight: 700; }
+  .sub-title { font-size: .85rem; color: #c9a962; letter-spacing: .25em; margin: 1.6rem 0 .4rem; }
+  .chart-table { width: 100%; border-collapse: collapse; margin-top: .6rem; font-size: .92rem; }
+  .chart-table th { text-align: left; color: #b08d3e; font-weight: 400; letter-spacing: .12em; font-size: .78rem; padding: .5rem .4rem; border-bottom: 1px solid rgba(201,169,98,.45); }
+  .chart-table td { padding: .55rem .4rem; border-bottom: 1px solid rgba(201,169,98,.15); color: #f0ead8; }
+  .chart-table td.num { color: #c8c2ae; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .reading { margin-top: .4rem; font-size: .92rem; line-height: 1.9; color: #c8c2ae; }
+  .reading b { color: #c9a962; font-weight: 600; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .method-row, .num-row { flex-direction: column; gap: 0; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">印度占星 · 本地排盘</div>
+    </div>
+  </a>
+          <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></span>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">一生之图 · 出生信息</div>
+  <h1 class="slogan" data-i18n-html="slogan">恒星为尺，<br>命盘有据。</h1>
+  <p class="subtitle" data-i18n="subtitle">印度占星（吠陀）免费在线排盘</p>
+
+  <section class="section">
+    <div class="field">
+      <label for="question" data-i18n="labelQuestion">想问的事（可选）</label>
+      <input type="text" id="question" placeholder="例如：今年适合换工作吗？" data-i18n-ph="phQuestion">
+    </div>
+    <div class="num-row">
+      <div class="field">
+        <label for="birth-date" data-i18n="labelDate">出生日期</label>
+        <input type="date" id="birth-date">
+      </div>
+      <div class="field">
+        <label for="birth-time" data-i18n="labelTime">出生时间</label>
+        <input type="time" id="birth-time" value="12:00">
+        <div class="hint" data-i18n="noteTimeUnknown">出生时间不详可填 12:00，但月亮与升点会不准。</div>
+      </div>
+    </div>
+    <div class="num-row">
+      <div class="field">
+        <label for="utc-offset" data-i18n="labelOffset">出生地 UTC 时区偏移（小时）</label>
+        <input type="number" id="utc-offset" value="8" step="0.5" min="-12" max="14">
+      </div>
+      <div class="field">
+        <label for="latitude" data-i18n="labelLat">出生纬度（可选，升点用）</label>
+        <input type="number" id="latitude" step="0.01" min="-90" max="90" placeholder="如 31.2" data-i18n-ph="phLat">
+      </div>
+      <div class="field">
+        <label for="longitude" data-i18n="labelLon">出生经度（可选，升点用）</label>
+        <input type="number" id="longitude" step="0.01" min="-180" max="180" placeholder="如 121.5" data-i18n-ph="phLon">
+      </div>
+    </div>
+    <button class="submit-btn" onclick="doChart()" data-i18n="btnSubmit">排盘 · 观星盘</button>
+    <div class="error" id="form-error"></div>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">星盘</div>
+    <div class="result-head" id="result-head"></div>
+    <div class="sub-title" data-i18n="rasiTitle">本命盘（Rasi）· 恒星黄道</div>
+    <div id="rasi-table"></div>
+    <div class="sub-title" data-i18n="navamsaTitle">纳瓦姆萨（Navamsa · D9）</div>
+    <div id="navamsa-table"></div>
+    <div class="sub-title" data-i18n="readingsTitle">行星落座简读</div>
+    <div id="readings"></div>
+    <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="yindu" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+  </section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">印度占星：免费排盘与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">印度占星和西洋占星有什么不同？</summary>
+      <p data-i18n="faqA1">印度占星用恒星黄道：以恒星为固定参照，行星位置要从西洋占星的回归黄道位置减去岁差（Ayanamsa）。2000 年时两者相差约 23.85°，所以同一个太阳，在西洋盘里是摩羯座，在印度盘里是人马座。宫位与行星含义的用法也不同：印度占星重整宫制与纳瓦姆萨。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">岁差（Ayanamsa）是怎么算的？准吗？</summary>
+      <p data-i18n="faqA2">本页用 Lahiri 岁差的近似公式：岁差 = 23.85 +（年份 − 2000）× 0.01396 度（2000 年 1 月 1 日为 23°51′，每年约增 50.3 角秒）。真实 Lahiri 岁差的长期变化率与此略有不同，2000–2030 年间的误差小于约 0.5°；要精确到角分请用专业星历软件核对。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">罗睺、计都是怎么算出来的？</summary>
+      <p data-i18n="faqA3">罗睺是月亮轨道的升交点（平黄经），计都为其对点，相差 180°。本页用平交点公式：交点黄经 =（125.0445 − 0.0529538083 × d） mod 360°，d 为自 J2000.0（2000 年 1 月 1 日 12:00 UTC）起的天数，再减岁差得到恒星黄经。真交点会有约 ±1.5° 的周期摆动，本页未采用。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">纳瓦姆萨（D9）是怎么算的？</summary>
+      <p data-i18n="faqA4">纳瓦姆萨把每个星座九等分（每份 3°20′），看行星的内在力量，传统上也用于婚姻与配偶。本页按公式：D9 星座序号 = floor（（（恒星黄经 × 9） mod 360）/ 30）。例如恒星太阳 256.52°：256.52 × 9 mod 360 = 148.68，/30 取整为 4，即狮子座。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">升点怎么算？没有经纬度怎么办？</summary>
+      <p data-i18n="faqA5">升点需出生经纬度：先由恒星时与纬度算出回归黄道升点，再减岁差得到恒星升点；中天（MC）同理。未填经纬度时不显示升点与宫位。宫位采用整宫制（第一宫即升点所在星座），不提供 Placidus 等分宫制。本页只排盘，不作命运断言：断语为传统象征含义，仅供参考。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">印度占星属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="offlineNote">本页排盘完全在本地浏览器运行（星历计算使用同源 astronomy.browser.js），不向任何服务器发送出生信息；点击“AI 解读”才会联网调用解读服务。</span>
+  </footer>
+</div>
+</main>
+
+<script src="/js/astronomy.browser.js"></script>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。行星与星座名一律中英双语显示。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '印度占星 · 本地排盘',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '一生之图 · 出生信息',
+  slogan: '恒星为尺，<br>命盘有据。',
+  subtitle: '印度占星（吠陀）免费在线排盘',
+  labelQuestion: '想问的事（可选）',
+  phQuestion: '例如：今年适合换工作吗？',
+  labelDate: '出生日期',
+  labelTime: '出生时间',
+  noteTimeUnknown: '出生时间不详可填 12:00，但月亮与升点会不准。',
+  labelOffset: '出生地 UTC 时区偏移（小时）',
+  labelLat: '出生纬度（可选，升点用）',
+  labelLon: '出生经度（可选，升点用）',
+  phLat: '如 31.2',
+  phLon: '如 121.5',
+  btnSubmit: '排盘 · 观星盘',
+  errNoDate: '请先选择出生日期。',
+  errBadDate: '出生日期格式不正确。',
+  errBadOffset: '时区偏移须在 -12 到 +14 之间。',
+  errBadLatLon: '经纬度超出范围（纬度 -90～90，经度 -180～180）。',
+  errNoLib: '星历库未加载，请刷新页面重试。',
+  resultTitle: '星盘',
+  rasiTitle: '本命盘（Rasi）· 恒星黄道',
+  navamsaTitle: '纳瓦姆萨（Navamsa · D9）',
+  readingsTitle: '行星落座简读',
+  colPlanet: '行星',
+  colSidereal: '恒星黄经',
+  colSign: '星座',
+  colDeg: '座内度数',
+  colHouse: '宫位（整宫）',
+  colD9: 'D9 星座',
+  ascLine: '升点（恒星）',
+  mcLine: '中天（恒星）',
+  noAsc: '未填出生经纬度，不显示升点与宫位。',
+  ayanamsaLine: '岁差（Lahiri 近似）',
+  birthLine: '出生',
+  faqTitle: '印度占星：免费排盘与使用常见问题',
+  faqQ1: '印度占星和西洋占星有什么不同？',
+  faqA1: '印度占星用恒星黄道：以恒星为固定参照，行星位置要从西洋占星的回归黄道位置减去岁差（Ayanamsa）。2000 年时两者相差约 23.85°，所以同一个太阳，在西洋盘里是摩羯座，在印度盘里是人马座。宫位与行星含义的用法也不同：印度占星重整宫制与纳瓦姆萨。',
+  faqQ2: '岁差（Ayanamsa）是怎么算的？准吗？',
+  faqA2: '本页用 Lahiri 岁差的近似公式：岁差 = 23.85 +（年份 − 2000）× 0.01396 度（2000 年 1 月 1 日为 23°51′，每年约增 50.3 角秒）。真实 Lahiri 岁差的长期变化率与此略有不同，2000–2030 年间的误差小于约 0.5°；要精确到角分请用专业星历软件核对。',
+  faqQ3: '罗睺、计都是怎么算出来的？',
+  faqA3: '罗睺是月亮轨道的升交点（平黄经），计都为其对点，相差 180°。本页用平交点公式：交点黄经 =（125.0445 − 0.0529538083 × d） mod 360°，d 为自 J2000.0（2000 年 1 月 1 日 12:00 UTC）起的天数，再减岁差得到恒星黄经。真交点会有约 ±1.5° 的周期摆动，本页未采用。',
+  faqQ4: '纳瓦姆萨（D9）是怎么算的？',
+  faqA4: '纳瓦姆萨把每个星座九等分（每份 3°20′），看行星的内在力量，传统上也用于婚姻与配偶。本页按公式：D9 星座序号 = floor（（（恒星黄经 × 9） mod 360）/ 30）。例如恒星太阳 256.52°：256.52 × 9 mod 360 = 148.68，/30 取整为 4，即狮子座。',
+  faqQ5: '升点怎么算？没有经纬度怎么办？',
+  faqA5: '升点需出生经纬度：先由恒星时与纬度算出回归黄道升点，再减岁差得到恒星升点；中天（MC）同理。未填经纬度时不显示升点与宫位。宫位采用整宫制（第一宫即升点所在星座），不提供 Placidus 等分宫制。本页只排盘，不作命运断言：断语为传统象征含义，仅供参考。',
+  disclaimer: '印度占星属传统术数，仅供参考，不构成决策依据。',
+  offlineNote: '本页排盘完全在本地浏览器运行（星历计算使用同源 astronomy.browser.js），不向任何服务器发送出生信息；点击“AI 解读”才会联网调用解读服务。',
+  langLabel: '语言',
+  ai_interpret: 'AI 解读',
+  signTraits: [
+    '主动果决，宜开创先行，忌急躁冒进',
+    '稳重务实，宜守成积财，忌固执迟缓',
+    '机敏善言，宜学习沟通，忌浮躁多变',
+    '重情顾家，宜守内安宅，忌情绪起伏',
+    '光明尊贵，宜领袖担当，忌骄傲独断',
+    '细致务实，宜精进技艺，忌苛求焦虑',
+    '公平和谐，宜合作联姻，忌优柔寡断',
+    '深沉专注，宜研究转化，忌猜忌执着',
+    '理想远大，宜探索哲思，忌好高骛远',
+    '坚忍务实，宜长期经营，忌冷漠压抑',
+    '独立创新，宜变革交友，忌疏离反叛',
+    '慈悲灵感，宜艺术修行，忌逃避迷茫'
+  ],
+  planetRoles: [
+    '主自我、父亲与权威',
+    '主心性、母亲与情绪',
+    '主智力、言语与商业',
+    '主情感、婚姻与享乐',
+    '主行动、勇气与争斗',
+    '主智慧、福德与子女',
+    '主耐力、业力与磨砺',
+    '主欲望、突变与外来缘',
+    '主解脱、直觉与宿业'
+  ]
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '印度占星 · 本地排盤',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '一生之圖 · 出生資訊',
+  slogan: '恆星為尺，<br>命盤有據。',
+  subtitle: '印度占星（吠陀）免費線上排盤',
+  labelQuestion: '想問的事（可選）',
+  phQuestion: '例如：今年適合換工作嗎？',
+  labelDate: '出生日期',
+  labelTime: '出生時間',
+  noteTimeUnknown: '出生時間不詳可填 12:00，但月亮與升點會不準。',
+  labelOffset: '出生地 UTC 時區偏移（小時）',
+  labelLat: '出生緯度（可選，升點用）',
+  labelLon: '出生經度（可選，升點用）',
+  phLat: '如 31.2',
+  phLon: '如 121.5',
+  btnSubmit: '排盤 · 觀星盤',
+  errNoDate: '請先選擇出生日期。',
+  errBadDate: '出生日期格式不正確。',
+  errBadOffset: '時區偏移須在 -12 到 +14 之間。',
+  errBadLatLon: '經緯度超出範圍（緯度 -90～90，經度 -180～180）。',
+  errNoLib: '星曆庫未載入，請重新整理頁面再試。',
+  resultTitle: '星盤',
+  rasiTitle: '本命盤（Rasi）· 恆星黃道',
+  navamsaTitle: '納瓦姆薩（Navamsa · D9）',
+  readingsTitle: '行星落座簡讀',
+  colPlanet: '行星',
+  colSidereal: '恆星黃經',
+  colSign: '星座',
+  colDeg: '座內度數',
+  colHouse: '宮位（整宮）',
+  colD9: 'D9 星座',
+  ascLine: '升點（恆星）',
+  mcLine: '中天（恆星）',
+  noAsc: '未填出生經緯度，不顯示升點與宮位。',
+  ayanamsaLine: '歲差（Lahiri 近似）',
+  birthLine: '出生',
+  faqTitle: '印度占星：免費排盤與使用常見問題',
+  faqQ1: '印度占星和西洋占星有什麼不同？',
+  faqA1: '印度占星用恆星黃道：以恆星為固定參照，行星位置要從西洋占星的回歸黃道位置減去歲差（Ayanamsa）。2000 年時兩者相差約 23.85°，所以同一個太陽，在西洋盤裡是摩羯座，在印度盤裡是人馬座。宮位與行星含義的用法也不同：印度占星重整宮制與納瓦姆薩。',
+  faqQ2: '歲差（Ayanamsa）是怎麼算的？準嗎？',
+  faqA2: '本頁用 Lahiri 歲差的近似公式：歲差 = 23.85 +（年份 − 2000）× 0.01396 度（2000 年 1 月 1 日為 23°51′，每年約增 50.3 角秒）。真實 Lahiri 歲差的長期變化率與此略有不同，2000–2030 年間的誤差小於約 0.5°；要精確到角分請用專業星曆軟體核對。',
+  faqQ3: '羅睺、計都是怎麼算出來的？',
+  faqA3: '羅睺是月亮軌道的升交點（平黃經），計都為其對點，相差 180°。本頁用平交點公式：交點黃經 =（125.0445 − 0.0529538083 × d） mod 360°，d 為自 J2000.0（2000 年 1 月 1 日 12:00 UTC）起的天數，再減歲差得到恆星黃經。真交點會有約 ±1.5° 的週期擺動，本頁未採用。',
+  faqQ4: '納瓦姆薩（D9）是怎麼算的？',
+  faqA4: '納瓦姆薩把每個星座九等分（每份 3°20′），看行星的內在力量，傳統上也用於婚姻與配偶。本頁按公式：D9 星座序號 = floor（（（恆星黃經 × 9） mod 360）/ 30）。例如恆星太陽 256.52°：256.52 × 9 mod 360 = 148.68，/30 取整為 4，即獅子座。',
+  faqQ5: '升點怎麼算？沒有經緯度怎麼辦？',
+  faqA5: '升點需出生經緯度：先由恆星時與緯度算出回歸黃道升點，再減歲差得到恆星升點；中天（MC）同理。未填經緯度時不顯示升點與宮位。宮位採用整宮制（第一宮即升點所在星座），不提供 Placidus 等分宮制。本頁只排盤，不作命運斷言：斷語為傳統象徵含義，僅供參考。',
+  disclaimer: '印度占星屬傳統術數，僅供參考，不構成決策依據。',
+  offlineNote: '本頁排盤完全在本地瀏覽器運行（星曆計算使用同源 astronomy.browser.js），不向任何伺服器發送出生資訊；點擊「AI 解讀」才會聯網調用解讀服務。',
+  langLabel: '語言',
+  ai_interpret: 'AI 解讀',
+  signTraits: [
+    '主動果決，宜開創先行，忌急躁冒進',
+    '穩重務實，宜守成積財，忌固執遲緩',
+    '機敏善言，宜學習溝通，忌浮躁多變',
+    '重情顧家，宜守內安宅，忌情緒起伏',
+    '光明尊貴，宜領袖擔當，忌驕傲獨斷',
+    '細緻務實，宜精進技藝，忌苛求焦慮',
+    '公平和諧，宜合作聯姻，忌優柔寡斷',
+    '深沉專注，宜研究轉化，忌猜忌執著',
+    '理想遠大，宜探索哲思，忌好高騖遠',
+    '堅忍務實，宜長期經營，忌冷漠壓抑',
+    '獨立創新，宜變革交友，忌疏離反叛',
+    '慈悲靈感，宜藝術修行，忌逃避迷茫'
+  ],
+  planetRoles: [
+    '主自我、父親與權威',
+    '主心性、母親與情緒',
+    '主智力、言語與商業',
+    '主情感、婚姻與享樂',
+    '主行動、勇氣與爭鬥',
+    '主智慧、福德與子女',
+    '主耐力、業力與磨礪',
+    '主慾望、突變與外來緣',
+    '主解脫、直覺與宿業'
+  ]
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Vedic Astrology · Local Chart',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'Life Chart · Birth Data',
+  slogan: 'The fixed stars are the measure,<br>the chart is the evidence.',
+  subtitle: 'Free online Vedic (Indian) astrology chart',
+  labelQuestion: 'Your question (optional)',
+  phQuestion: 'e.g. Is this year a good time to change jobs?',
+  labelDate: 'Birth date',
+  labelTime: 'Birth time',
+  noteTimeUnknown: 'If the birth time is unknown, enter 12:00 — but the Moon and Ascendant will be unreliable.',
+  labelOffset: 'Birthplace UTC offset (hours)',
+  labelLat: 'Birth latitude (optional, for Ascendant)',
+  labelLon: 'Birth longitude (optional, for Ascendant)',
+  phLat: 'e.g. 31.2',
+  phLon: 'e.g. 121.5',
+  btnSubmit: 'Cast the chart',
+  errNoDate: 'Please choose a birth date first.',
+  errBadDate: 'The birth date format is invalid.',
+  errBadOffset: 'The UTC offset must be between -12 and +14.',
+  errBadLatLon: 'Latitude/longitude out of range (latitude -90 to 90, longitude -180 to 180).',
+  errNoLib: 'The ephemeris library failed to load. Please refresh the page.',
+  resultTitle: 'The Chart',
+  rasiTitle: 'Rasi Chart · Sidereal Zodiac',
+  navamsaTitle: 'Navamsa (D9)',
+  readingsTitle: 'Planets in Signs — Short Readings',
+  colPlanet: 'Planet',
+  colSidereal: 'Sidereal longitude',
+  colSign: 'Sign',
+  colDeg: 'Degrees in sign',
+  colHouse: 'House (whole-sign)',
+  colD9: 'D9 sign',
+  ascLine: 'Ascendant (sidereal)',
+  mcLine: 'Midheaven (sidereal)',
+  noAsc: 'No birth latitude/longitude given, so no Ascendant or houses are shown.',
+  ayanamsaLine: 'Ayanamsa (Lahiri approximation)',
+  birthLine: 'Birth',
+  faqTitle: 'Vedic Astrology: Free Chart & FAQ',
+  faqQ1: 'How is Vedic astrology different from Western astrology?',
+  faqA1: 'Vedic astrology uses the sidereal zodiac, fixed to the stars: a planet\'s position is its Western (tropical) longitude minus the ayanamsa. In the year 2000 the two zodiacs differed by about 23.85°, so the same Sun is Capricorn in a Western chart and Dhanus (Sagittarius) in a Vedic chart. Houses and planetary meanings are also used differently: Vedic astrology favours whole-sign houses and the navamsa.',
+  faqQ2: 'How is the ayanamsa calculated? Is it accurate?',
+  faqA2: 'This page uses a Lahiri ayanamsa approximation: ayanamsa = 23.85 + (year − 2000) × 0.01396 degrees (23°51′ on 2000-01-01, increasing about 50.3″ per year). The true Lahiri ayanamsa changes at a slightly different long-term rate, so the error is under about 0.5° for dates near 2000–2030; for arc-minute accuracy, check with professional ephemeris software.',
+  faqQ3: 'How are Rahu and Ketu calculated?',
+  faqA3: 'Rahu is the Moon\'s ascending node (mean longitude); Ketu is the opposite point, 180° away. This page uses the mean-node formula: node longitude = (125.0445 − 0.0529538083 × d) mod 360°, where d is days since J2000.0 (2000-01-01 12:00 UTC), then subtracts the ayanamsa for the sidereal longitude. The true node oscillates about ±1.5° around the mean node; this page does not use it.',
+  faqQ4: 'How is the navamsa (D9) calculated?',
+  faqA4: 'The navamsa divides each sign into nine equal parts (3°20′ each) and shows a planet\'s inner strength; traditionally it is also used for marriage and the spouse. This page uses: D9 sign index = floor(((sidereal longitude × 9) mod 360) / 30). Example: sidereal Sun 256.52° → 256.52 × 9 mod 360 = 148.68, /30 floored is 4, i.e. Simha (Leo).',
+  faqQ5: 'How is the Ascendant calculated? What if I have no coordinates?',
+  faqA5: 'The Ascendant needs birth latitude and longitude: the tropical Ascendant is computed from sidereal time and latitude, then the ayanamsa is subtracted for the sidereal Ascendant; the Midheaven (MC) likewise. Without coordinates, no Ascendant or houses are shown. Houses use the whole-sign system (house 1 is the Ascendant\'s sign); Placidus and other quadrant systems are not provided. This page only casts the chart and makes no fate claims: the readings are traditional symbolic meanings, for reference only.',
+  disclaimer: 'Vedic astrology is a traditional divination art, for reference only; it is not a basis for decisions.',
+  offlineNote: 'Chart calculation runs fully in your local browser (ephemeris from the same-origin astronomy.browser.js) and no birth data is sent to any server; only clicking “AI Reading” sends a request to the reading service.',
+  langLabel: 'Language',
+  ai_interpret: 'AI Reading',
+  signTraits: [
+    'bold and pioneering, best to lead first, avoid rash haste',
+    'steady and practical, best to preserve and accumulate, avoid stubborn slowness',
+    'quick and eloquent, best for learning and communication, avoid restless change',
+    'affectionate and home-loving, best to guard the home, avoid mood swings',
+    'bright and noble, best to lead and take charge, avoid pride and autocracy',
+    'meticulous and practical, best to refine a craft, avoid fault-finding and anxiety',
+    'fair and harmonious, best for partnership and marriage, avoid indecision',
+    'deep and focused, best for research and transformation, avoid suspicion and obsession',
+    'idealistic and far-sighted, best for exploration and philosophy, avoid overreaching',
+    'enduring and practical, best for long-term building, avoid coldness and repression',
+    'independent and innovative, best for reform and friendship, avoid aloof rebellion',
+    'compassionate and inspired, best for art and spiritual practice, avoid escapism and confusion'
+  ],
+  planetRoles: [
+    'signifies self, father and authority',
+    'signifies mind, mother and emotions',
+    'signifies intellect, speech and commerce',
+    'signifies love, marriage and pleasures',
+    'signifies action, courage and conflict',
+    'signifies wisdom, fortune and children',
+    'signifies endurance, karma and hardship',
+    'signifies desire, sudden change and foreign ties',
+    'signifies liberation, intuition and past karma'
+  ]
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: 'インド占星術 · ローカル排盤',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '一生之図 · 出生情報',
+  slogan: '恒星を尺とし、<br>命盤に拠る。',
+  subtitle: 'インド占星術（ヴェーダ）無料オンライン排盤',
+  labelQuestion: '質問（任意）',
+  phQuestion: '例：今年は転職に良い年？',
+  labelDate: '生年月日',
+  labelTime: '出生時刻',
+  noteTimeUnknown: '出生時刻が不明な場合は 12:00 と入力してください。ただし月とアセンダントは不正確になります。',
+  labelOffset: '出生地の UTC 時差（時間）',
+  labelLat: '出生緯度（任意、アセンダント用）',
+  labelLon: '出生経度（任意、アセンダント用）',
+  phLat: '例 31.2',
+  phLon: '例 121.5',
+  btnSubmit: '排盤する',
+  errNoDate: 'まず生年月日を選択してください。',
+  errBadDate: '生年月日の形式が正しくありません。',
+  errBadOffset: '時差は -12 から +14 の範囲で入力してください。',
+  errBadLatLon: '緯度・経度が範囲外です（緯度 -90～90、経度 -180～180）。',
+  errNoLib: '星暦ライブラリが読み込めませんでした。ページを再読み込みしてください。',
+  resultTitle: '星盤',
+  rasiTitle: '本命盤（ラーシ）· 恒星黄道',
+  navamsaTitle: 'ナヴァムシャ（Navamsa · D9）',
+  readingsTitle: '惑星の星座別簡易リーディング',
+  colPlanet: '惑星',
+  colSidereal: '恒星黄経',
+  colSign: '星座',
+  colDeg: '星座内の度数',
+  colHouse: 'ハウス（ whole sign ）',
+  colD9: 'D9 星座',
+  ascLine: 'アセンダント（恒星）',
+  mcLine: 'MC（恒星）',
+  noAsc: '出生緯度・経度が未入力のため、アセンダントとハウスは表示しません。',
+  ayanamsaLine: 'アヤナムシャ（Lahiri 近似）',
+  birthLine: '出生',
+  faqTitle: 'インド占星術：無料排盤とよくある質問',
+  faqQ1: 'インド占星術と西洋占星術の違いは？',
+  faqA1: 'インド占星術は恒星黄道を使います。恒星を固定の基準とし、惑星位置は西洋占星術の回帰黄道の位置からアヤナムシャを引きます。2000 年時点で両者の差は約 23.85°で、同じ太陽でも西洋盤では山羊座、インド盤では人馬座（ダヌス）になります。ハウスや惑星の意味の使い方も異なり、インド占星術は whole sign ハウスとナヴァムシャを重視します。',
+  faqQ2: 'アヤナムシャはどう計算するの？正確？',
+  faqA2: 'このページは Lahiri アヤナムシャの近似式を使います：アヤナムシャ = 23.85 +（年 − 2000）× 0.01396 度（2000 年 1 月 1 日は 23°51′、年約 50.3 秒ずつ増加）。真の Lahiri アヤナムシャの長期変化率はこれとわずかに異なるため、2000～2030 年頃の誤差は約 0.5°未満です。分単位の精度が必要な場合は専門の星暦ソフトで確認してください。',
+  faqQ3: 'ラーフとケートゥはどう計算するの？',
+  faqA3: 'ラーフは月の軌道の昇交点（平均黄経）で、ケートゥはその対点、180°離れています。このページは平均交点の式を使います：交点黄経 =（125.0445 − 0.0529538083 × d） mod 360°、d は J2000.0（2000 年 1 月 1 日 12:00 UTC）からの日数で、そこからアヤナムシャを引いて恒星黄経とします。真交点は平均交点の周りを約 ±1.5° 周期的に揺れますが、このページでは使いません。',
+  faqQ4: 'ナヴァムシャ（D9）はどう計算するの？',
+  faqA4: 'ナヴァムシャは各星座を九等分（各 3°20′）し、惑星の内的な力を示します。伝統的には婚姻や配偶にも使います。このページの式は：D9 星座番号 = floor（（（恒星黄経 × 9） mod 360）/ 30）。例：恒星太陽 256.52° → 256.52 × 9 mod 360 = 148.68、/30 の整数は 4、すなわち獅子座（シンハ）です。',
+  faqQ5: 'アセンダントはどう計算するの？経緯度がない場合は？',
+  faqA5: 'アセンダントには出生緯度・経度が必要です。恒星時と緯度から回帰黄道のアセンダントを計算し、アヤナムシャを引いて恒星アセンダントとします。MC も同様です。経緯度が未入力の場合はアセンダントとハウスを表示しません。ハウスは whole sign 方式（第 1 ハウスはアセンダントの星座）で、Placidus 等の方式は提供しません。このページは排盤のみで、運命の断定はしません。解釈は伝統的な象徴的意味で、参考までです。',
+  disclaimer: 'インド占星術は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  offlineNote: 'このページの排盤は完全にローカルのブラウザで動作します（星暦計算は同一生成元の astronomy.browser.js を使用）。出生情報は外部サーバーに送信されません。「AI 解釈」をクリックした場合のみ解釈サービスへリクエストします。',
+  langLabel: '言語',
+  ai_interpret: 'AI 解釈',
+  signTraits: [
+    '果断で開拓的、先行が吉、焦りは禁物',
+    '堅実で実際的、守成と蓄財が吉、頑固と遅滞は禁物',
+    '機敏で雄弁、学びと対話が吉、浮ついた変化は禁物',
+    '情に厚く家庭的、内を守るが吉、感情の起伏は禁物',
+    '光明で高貴、指導と責任が吉、驕りと独断は禁物',
+    '細やかで実際的、技芸の精進が吉、完璧主義と不安は禁物',
+    '公平で調和的、協力と婚姻が吉、優柔不断は禁物',
+    '深沈で集中力あり、研究と変容が吉、猜疑と執着は禁物',
+    '理想が高く遠大、探索と哲学が吉、高望みは禁物',
+    '忍耐強く実際的、長期の経営が吉、冷淡と抑圧は禁物',
+    '独立心と革新性あり、改革と交友が吉、疎外と反抗は禁物',
+    '慈悲深く霊感あり、芸術と修行が吉、逃避と迷いは禁物'
+  ],
+  planetRoles: [
+    '自己・父・権威を示す',
+    '心・母・感情を示す',
+    '知性・言葉・商業を示す',
+    '愛情・婚姻・享楽を示す',
+    '行動・勇気・争いを示す',
+    '知恵・福徳・子女を示す',
+    '忍耐・業・試練を示す',
+    '欲望・突変・異国の縁を示す',
+    '解脱・直感・宿業を示す'
+  ]
+}
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var fe = document.getElementById('form-error'); if (fe) fe.textContent = '';
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// 十二星座（恒星黄道）：中文名 + 吠陀标准英文名
+var SIGNS = [
+  { cn: '白羊座', en: 'Mesha' },
+  { cn: '金牛座', en: 'Vrishabha' },
+  { cn: '双子座', en: 'Mithuna' },
+  { cn: '巨蟹座', en: 'Kataka' },
+  { cn: '狮子座', en: 'Simha' },
+  { cn: '处女座', en: 'Kanya' },
+  { cn: '天秤座', en: 'Tula' },
+  { cn: '天蝎座', en: 'Vrishchika' },
+  { cn: '人马座', en: 'Dhanus' },
+  { cn: '摩羯座', en: 'Makara' },
+  { cn: '水瓶座', en: 'Kumbha' },
+  { cn: '双鱼座', en: 'Meena' }
+];
+// 九曜：中文名 + 英文名；body 为 Astronomy.Body 枚举（太阳单独用 SunPosition）
+var PLANETS = [
+  { cn: '太阳', en: 'Sun', body: 'Sun' },
+  { cn: '月亮', en: 'Moon', body: 'Moon' },
+  { cn: '水星', en: 'Mercury', body: 'Mercury' },
+  { cn: '金星', en: 'Venus', body: 'Venus' },
+  { cn: '火星', en: 'Mars', body: 'Mars' },
+  { cn: '木星', en: 'Jupiter', body: 'Jupiter' },
+  { cn: '土星', en: 'Saturn', body: 'Saturn' },
+  { cn: '罗睺', en: 'Rahu', body: 'Rahu' },
+  { cn: '计都', en: 'Ketu', body: 'Ketu' }
+];
+
+function norm360(x) { x = x % 360; return x < 0 ? x + 360 : x; }
+function rad(d) { return d * Math.PI / 180; }
+function deg(r) { return r * 180 / Math.PI; }
+function fmtLon(x) { return (Math.round(x * 100) / 100).toFixed(2) + '°'; }
+function signIndex(lon) { return Math.floor(norm360(lon) / 30) % 12; }
+function signLabel(idx) { var s = SIGNS[idx]; return s.cn + ' · ' + s.en; }
+function planetLabel(p) { return p.cn + ' · ' + p.en; }
+
+// Lahiri 岁差近似：2000-01-01 为 23.85°，每年约增 0.01396°（约 50.3 角秒）。
+// 真实 Lahiri 长期变化率略有不同，2000–2030 年间误差小于约 0.5°。
+function ayanamsaFor(year) { return 23.85 + (year - 2000) * 0.01396; }
+
+// 回归黄经：太阳用 SunPosition，其余行星用 GeoVector + Ecliptic（地心黄经）。
+// 注意：Astronomy.EclipticLongitude 是日心黄经且对太阳会抛错，本页不用。
+function tropicalLongitude(body, time) {
+  if (body === 'Sun') return Astronomy.SunPosition(time).elon;
+  return Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body[body], time, true)).elon;
+}
+
+// 恒星升点（回归升点减岁差）与恒星中天。公式经两路核验：
+// ① 闭式 atan2 与逐 0.5° 扫描地平线交点在 6 组日期/纬度/经度下相差恰好 180°
+//    （扫描命中点为降点，升点为其对点）；② 库内 SiderealTime 与儒略日公式 GMST
+//    相差约 0.003°。黄道倾角用 J2000 平值 23.4392911°。
+function tropicalAscMc(lstHours, latDeg) {
+  var ramc = norm360(lstHours * 15);
+  var r = rad(ramc), lat = rad(latDeg), e = rad(23.4392911);
+  var asc = norm360(deg(Math.atan2(Math.cos(r), -(Math.sin(r) * Math.cos(e) + Math.tan(lat) * Math.sin(e)))));
+  return { asc: asc, mc: ramc };
+}
+
+// 纳瓦姆萨 D9：D9 星座序号 = floor(((恒星黄经 × 9) mod 360) / 30)
+function navamsaIndex(siderealLon) { return Math.floor(norm360(siderealLon * 9) / 30) % 12; }
+
+// 主计算：y/mo/d 为出生日期，hh/mm 为当地出生时间，offset 为 UTC 时区偏移（小时），
+// lat/lon 可选（缺一则不算升点）。返回全部恒星黄经、D9、升点/中天与整宫宫位。
+function computeChart(y, mo, d, hh, mm, offset, lat, lon) {
+  var utcMs = Date.UTC(y, mo - 1, d, hh, mm) - offset * 3600000;
+  var time = new Astronomy.AstroTime(new Date(utcMs));
+  var aya = ayanamsaFor(y);
+  var out = {
+    year: y, month: mo, day: d, hour: hh, minute: mm, offset: offset,
+    utcMs: utcMs, ayanamsa: aya, lat: lat, lon: lon,
+    planets: [], ascSid: null, mcSid: null, ascSign: null
+  };
+  var trop = {};
+  var i, b, tl, sl;
+  for (i = 0; i < 7; i++) {
+    b = PLANETS[i];
+    tl = tropicalLongitude(b.body, time);
+    trop[b.body] = tl;
+    sl = norm360(tl - aya);
+    out.planets.push({ key: b.body, tropical: tl, sidereal: sl, sign: signIndex(sl), d9: navamsaIndex(sl) });
+  }
+  // 罗睺：平交点。d 为自 J2000.0（2000-01-01 12:00 UTC）起的天数。
+  var daysSinceJ2000 = (utcMs - Date.UTC(2000, 0, 1, 12, 0)) / 86400000;
+  var nodeTrop = norm360(125.0445 - 0.0529538083 * daysSinceJ2000);
+  var rahuSid = norm360(nodeTrop - aya);
+  var ketuSid = norm360(rahuSid + 180);
+  out.planets.push({ key: 'Rahu', tropical: nodeTrop, sidereal: rahuSid, sign: signIndex(rahuSid), d9: navamsaIndex(rahuSid) });
+  out.planets.push({ key: 'Ketu', tropical: nodeTrop + 180, sidereal: ketuSid, sign: signIndex(ketuSid), d9: navamsaIndex(ketuSid) });
+  // 升点 / 中天（仅当经纬度齐全）
+  if (lat !== null && lon !== null) {
+    var lstHours = Astronomy.SiderealTime(time) + lon / 15;
+    var am = tropicalAscMc(lstHours, lat);
+    out.ascSid = norm360(am.asc - aya);
+    out.mcSid = norm360(am.mc - aya);
+    out.ascSign = signIndex(out.ascSid);
+    for (i = 0; i < out.planets.length; i++) {
+      out.planets[i].house = ((out.planets[i].sign - out.ascSign + 12) % 12) + 1;
+    }
+  }
+  return out;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+function planetByKey(key) {
+  for (var i = 0; i < PLANETS.length; i++) if (PLANETS[i].body === key) return PLANETS[i];
+  return null;
+}
+
+// 一行简读：行星落星座，主星义 + 星座性情（各语言各一句）。
+function readingLine(p, lang) {
+  var dict = I18N[lang] || I18N['zh-CN'];
+  var role = (dict.planetRoles || I18N['zh-CN'].planetRoles)[p.index];
+  var trait = (dict.signTraits || I18N['zh-CN'].signTraits)[p.sign];
+  var pl = planetLabel(planetByKey(p.key));
+  var sl = signLabel(p.sign);
+  if (lang === 'en') return '<b>' + esc(pl) + '</b> in <b>' + esc(sl) + '</b>: ' + esc(role) + '; ' + esc(trait) + '.';
+  if (lang === 'ja') return '<b>' + esc(pl) + '</b>は<b>' + esc(sl) + '</b>にあり、' + esc(role) + '、' + esc(trait) + '。';
+  return '<b>' + esc(pl) + '</b>落<b>' + esc(sl) + '</b>，' + esc(role) + '，' + esc(trait) + '。';
+}
+
+function doChart() {
+  var err = document.getElementById('form-error');
+  err.textContent = '';
+  if (typeof Astronomy === 'undefined') { err.textContent = t('errNoLib'); return; }
+  var dv = document.getElementById('birth-date').value;
+  if (!dv) { err.textContent = t('errNoDate'); return; }
+  var parts = dv.split('-');
+  var y = parseInt(parts[0], 10), mo = parseInt(parts[1], 10), d = parseInt(parts[2], 10);
+  if (isNaN(y) || isNaN(mo) || isNaN(d) || mo < 1 || mo > 12 || d < 1 || d > 31) {
+    err.textContent = t('errBadDate'); return;
+  }
+  var tv = document.getElementById('birth-time').value || '12:00';
+  var tp = tv.split(':');
+  var hh = parseInt(tp[0], 10), mm = parseInt(tp[1], 10);
+  if (isNaN(hh)) hh = 12;
+  if (isNaN(mm)) mm = 0;
+  var offset = parseFloat(document.getElementById('utc-offset').value);
+  if (isNaN(offset) || offset < -12 || offset > 14) { err.textContent = t('errBadOffset'); return; }
+  var latRaw = document.getElementById('latitude').value.trim();
+  var lonRaw = document.getElementById('longitude').value.trim();
+  var lat = latRaw === '' ? null : parseFloat(latRaw);
+  var lon = lonRaw === '' ? null : parseFloat(lonRaw);
+  if ((lat === null) !== (lon === null) || (lat !== null && (isNaN(lat) || isNaN(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180))) {
+    err.textContent = t('errBadLatLon'); return;
+  }
+  var r;
+  try {
+    r = computeChart(y, mo, d, hh, mm, offset, lat, lon);
+  } catch (e) {
+    err.textContent = t('errNoLib');
+    return;
+  }
+  r.question = document.getElementById('question').value.trim();
+  showResult(r);
+}
+
+function showResult(r, noScroll) {
+  LAST_RESULT = r;
+  var q = r.question || '';
+  var head = '';
+  if (q) head += esc(q) + '<br>';
+  var offStr = (r.offset >= 0 ? '+' : '') + r.offset;
+  head += t('birthLine') + '：<b>' + r.year + '-' + pad2(r.month) + '-' + pad2(r.day) + ' ' + pad2(r.hour) + ':' + pad2(r.minute) + ' UTC' + offStr + '</b><br>';
+  head += t('ayanamsaLine') + '：<b>' + fmtLon(r.ayanamsa) + '</b><br>';
+  if (r.ascSid !== null) {
+    head += t('ascLine') + '：<b>' + signLabel(r.ascSign) + ' ' + fmtLon(r.ascSid % 30) + '</b> · ' + t('mcLine') + '：<b>' + signLabel(signIndex(r.mcSid)) + ' ' + fmtLon(r.mcSid % 30) + '</b><br>';
+  } else {
+    head += t('noAsc') + '<br>';
+  }
+  document.getElementById('result-head').innerHTML = head;
+
+  var hasHouse = r.ascSid !== null;
+  var html = '<table class="chart-table"><thead><tr><th>' + t('colPlanet') + '</th><th>' + t('colSidereal') + '</th><th>' + t('colSign') + '</th><th>' + t('colDeg') + '</th>' + (hasHouse ? '<th>' + t('colHouse') + '</th>' : '') + '</tr></thead><tbody>';
+  var i, p;
+  for (i = 0; i < r.planets.length; i++) {
+    p = r.planets[i];
+    html += '<tr><td>' + esc(planetLabel(planetByKey(p.key))) + '</td><td class="num">' + fmtLon(p.sidereal) + '</td><td>' + esc(signLabel(p.sign)) + '</td><td class="num">' + fmtLon(p.sidereal % 30) + '</td>' + (hasHouse ? '<td class="num">' + p.house + '</td>' : '') + '</tr>';
+  }
+  html += '</tbody></table>';
+  document.getElementById('rasi-table').innerHTML = html;
+
+  var nhtml = '<table class="chart-table"><thead><tr><th>' + t('colPlanet') + '</th><th>' + t('colD9') + '</th></tr></thead><tbody>';
+  for (i = 0; i < r.planets.length; i++) {
+    p = r.planets[i];
+    nhtml += '<tr><td>' + esc(planetLabel(planetByKey(p.key))) + '</td><td>' + esc(signLabel(p.d9)) + '</td></tr>';
+  }
+  nhtml += '</tbody></table>';
+  document.getElementById('navamsa-table').innerHTML = nhtml;
+
+  var rhtml = '';
+  for (i = 0; i < r.planets.length; i++) {
+    var pp = r.planets[i];
+    pp.index = i;
+    rhtml += '<div class="reading">' + readingLine(pp, LANG) + '</div>';
+  }
+  document.getElementById('readings').innerHTML = rhtml;
+
+  document.getElementById('result-card').classList.remove('hidden');
+  if (!noScroll) document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ---- AI 解读：供 /js/ai-jiegua.js 调用 ----
+// 只读 LAST_RESULT 的已算结果，不改任何排盘计算逻辑；未排盘时返回 null。
+window.getJieguaQuestion = function() {
+  var el = document.getElementById('question');
+  return el ? el.value.trim() : '';
+};
+window.getJieguaSummary = function() {
+  if (!LAST_RESULT) return null;
+  var r = LAST_RESULT;
+  var offStr = (r.offset >= 0 ? '+' : '') + r.offset;
+  var parts = [];
+  parts.push('印度占星 出生' + r.year + '-' + pad2(r.month) + '-' + pad2(r.day) + ' ' + pad2(r.hour) + ':' + pad2(r.minute) + ' UTC' + offStr + '：');
+  var bits = [];
+  var i, p;
+  for (i = 0; i < r.planets.length; i++) {
+    p = r.planets[i];
+    bits.push(planetByKey(p.key).cn + '（恒星）' + SIGNS[p.sign].cn + fmtLon(p.sidereal % 30));
+  }
+  parts.push(bits.join('、') + '。');
+  if (r.ascSid !== null) {
+    parts.push('升点（恒星）' + SIGNS[r.ascSign].cn + fmtLon(r.ascSid % 30) + '、中天（恒星）' + SIGNS[signIndex(r.mcSid)].cn + fmtLon(r.mcSid % 30) + '。');
+  }
+  var d9 = [];
+  for (i = 0; i < r.planets.length; i++) {
+    p = r.planets[i];
+    d9.push(planetByKey(p.key).cn + SIGNS[p.d9].cn);
+  }
+  parts.push('纳瓦姆萨：' + d9.join('、') + '。');
+  parts.push('岁差（Lahiri 近似）' + fmtLon(r.ayanamsa) + '；罗睺/计都为平交点，宫位为整宫制。');
+  return parts.join('');
+};
+
+// 初始化界面语言（localStorage 优先，否则按浏览器语言自动检测）
+applyI18n();
+</script>
+<script src="/js/ai-jiegua.js"></script>
+<script>
+// 共享脚本与本页主脚本都已加载后再挂接（getJieguaSummary 已定义）。
+if (window.AIInterpret) window.AIInterpret.attach();
+</script>
+</body>
+</html>

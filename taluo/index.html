@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 塔罗牌</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .submit-btn:disabled { opacity: .45; cursor: default; }
+  .submit-btn:disabled:hover { background: transparent; }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .result-note { font-size: .78rem; color: #6f6f80; margin-top: .5rem; line-height: 1.6; }
+
+  /* ---- 塔罗牌面（纯 CSS，无图片） ---- */
+  .tarot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin-top: 1.4rem; }
+  .tarot-grid.single { grid-template-columns: minmax(0, 340px); justify-content: center; }
+  .tarot-slot { min-width: 0; }
+  .slot-label { text-align: center; font-size: .85rem; color: #c9a962; letter-spacing: .35em; text-indent: .35em; margin-bottom: .8rem; }
+  .card-face {
+    border: 1px solid rgba(201,169,98,.65);
+    background: linear-gradient(160deg, #14141f 0%, #0b0b14 55%, #171322 100%);
+    border-radius: 8px;
+    padding: 1.1rem 1rem 1.2rem;
+    text-align: center;
+    min-height: 300px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    box-shadow: 0 0 0 1px rgba(11,11,20,.6), 0 8px 28px rgba(0,0,0,.45);
+  }
+  .card-face.reversed .face-inner { transform: rotate(180deg); }
+  .face-inner { display: flex; flex-direction: column; justify-content: space-between; flex: 1; min-height: 0; }
+  .face-arcana { font-size: .72rem; color: #9a9aab; letter-spacing: .28em; text-indent: .28em; }
+  .face-num { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 3rem; line-height: 1.15; color: #c9a962; margin: .6rem 0 .2rem; }
+  .face-mark { color: #c9a962; font-size: .85rem; letter-spacing: .4em; text-indent: .4em; }
+  .face-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.5rem; color: #f0ead8; letter-spacing: .12em; margin-top: .7rem; }
+  .face-en { font-size: .82rem; color: #9a9aab; letter-spacing: .08em; margin-top: .35rem; }
+  .face-meta { font-size: .78rem; color: #9a9aab; letter-spacing: .14em; margin-top: .9rem; line-height: 1.8; }
+  .card-body { margin-top: 1rem; }
+  .orient-badge {
+    display: inline-block; font-size: .78rem; color: #c9a962;
+    border: 1px solid rgba(201,169,98,.6); border-radius: 999px; padding: .15rem .8rem; letter-spacing: .25em; text-indent: .25em;
+  }
+  .orient-badge.rev { color: #d97b6c; border-color: rgba(217,123,108,.6); }
+  .card-keywords { font-size: .92rem; color: #f0ead8; line-height: 1.9; margin-top: .8rem; }
+  .card-meaning { font-size: .88rem; color: #c8c2ae; line-height: 1.8; margin-top: .5rem; }
+  .card-yesno { font-size: .85rem; color: #9a9aab; margin-top: .7rem; line-height: 1.7; }
+  .card-yesno b { color: #c9a962; font-weight: 600; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .tarot-grid { grid-template-columns: 1fr; }
+    .tarot-grid.single { grid-template-columns: minmax(0, 340px); }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">塔罗牌 · 本地占卜</div>
+    </div>
+  </a>
+                <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></span>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">第一幕 · 心有所问</div>
+  <h1 class="slogan" data-i18n-html="slogan">洗牌，切牌，<br>翻开答案。</h1>
+  <p class="subtitle" data-i18n="subtitle">塔罗牌免费在线占卜</p>
+
+  <section class="section">
+    <div class="field">
+      <label for="question" data-i18n="labelQuestion">所问之事（可选）</label>
+      <input type="text" id="question" placeholder="例如：这件事接下来会怎么发展？" data-i18n-ph="phQuestion">
+    </div>
+    <div class="field">
+      <label for="spread" data-i18n="labelSpread">牌阵</label>
+      <select id="spread">
+        <option value="1" selected data-i18n="optOne">单张牌</option>
+        <option value="3" data-i18n="optThree">三张牌（过去 · 现在 · 未来）</option>
+      </select>
+    </div>
+    <button class="submit-btn" id="draw-btn" onclick="drawTarot()" data-i18n="btnDraw">抽牌</button>
+    <div class="error" id="draw-error"></div>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">牌面</div>
+    <div class="result-head" id="result-head"></div>
+    <div class="tarot-grid" id="tarot-grid"></div>
+    <div class="result-note" id="result-note"></div>
+      <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="taluo" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+</section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">塔罗牌：免费占卜与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">塔罗牌怎么抽？</summary>
+      <p data-i18n="faqA1">先在心里想好要问的事，再选单张牌或三张牌，点击「抽牌」。牌从整副 78 张里随机抽出，每张牌出现正位或逆位的机会各一半，抽出的牌不会重复。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">正位和逆位有什么区别？</summary>
+      <p data-i18n="faqA2">正位按牌面原本的含义解读，能量顺畅；逆位表示这股能量受阻、延迟或走向反面，读法与正位相反。同一张牌正逆位的关键词完全不同，抽牌时要看清牌面上的正位 / 逆位标记。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">三张牌分别代表什么？</summary>
+      <p data-i18n="faqA3">三张牌按过去、现在、未来的顺序排开：第一张看事情的来由与背景，第二张看当下的状态与关键，第三张看事情可能的发展方向。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">每天能抽几次？</summary>
+      <p data-i18n="faqA4">没有次数限制。但同一个问题短时间内反复抽，抽到的牌只会越来越乱——问一次、认真读一次，比连抽十次更准。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">塔罗牌占卜免费吗？</summary>
+      <p data-i18n="faqA5">免费。抽牌在浏览器本地完成，不联网、不收费，也不会保存你输入的问题。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">塔罗牌属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="offlineNote">抽牌在浏览器本地完成，不保存你输入的问题；牌面数据由本站提供。</span>
+  </footer>
+</div>
+</main>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。localStorage 键为站点级 'daotianji-lang'，与各工具页共用。
+// 牌面关键词与含义取自本站数据文件 /data/tarot_cards_unified.json 的中英文字段（cn_keywords_* / keywords_*），
+// 非中文语言下关键词仍以英文原文显示（与梅花页卦辞原文保留中文的做法一致）。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '塔罗牌 · 本地占卜',
+  navGroup: '占卜',
+  nav_1: '解梦', nav_2: '六爻占卜', nav_3: '梅花易数', nav_4: '小六壬', nav_5: '塔罗牌',
+  nav_6: '雷诺曼', nav_7: '北欧卢恩符文', nav_8: '奇门遁甲', nav_9: '印度占星卜卦', nav_10: '西方卜卦占星',
+  nav_11: '大六壬', nav_12: '金口诀', nav_13: '太乙神数', nav_14: '占星骰子',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  langLabel: '语言',
+  eyebrow: '第一幕 · 心有所问',
+  slogan: '洗牌，切牌，<br>翻开答案。',
+  subtitle: '塔罗牌免费在线占卜',
+  labelQuestion: '所问之事（可选）',
+  phQuestion: '例如：这件事接下来会怎么发展？',
+  labelSpread: '牌阵',
+  optOne: '单张牌',
+  optThree: '三张牌（过去 · 现在 · 未来）',
+  btnDraw: '抽牌',
+  btnLoading: '洗牌中…',
+  errNoDeck: '牌面数据还在加载，请稍候再抽。',
+  errLoad: '牌面数据加载失败，请刷新页面再试。',
+  resultTitle: '牌面',
+  ai_interpret: 'AI 解读',
+  asked: '所问',
+  noQuestion: '（未写问题，随心一抽）',
+  spreadOne: '单张牌',
+  spreadThree: '三张牌 · 过去 · 现在 · 未来',
+  posPast: '过去', posPresent: '现在', posFuture: '未来',
+  majorArcana: '大阿卡纳', minorArcana: '小阿卡纳',
+  upright: '正位', reversed: '逆位',
+  keywordsLabel: '关键词',
+  meaningLabel: '含义',
+  yesnoLabel: '对此问题的倾向',
+  yes: '是', no: '否',
+  kwNote: '关键词与含义取自牌面数据原文。',
+  faqTitle: '塔罗牌：免费占卜与使用常见问题',
+  faqQ1: '塔罗牌怎么抽？',
+  faqA1: '先在心里想好要问的事，再选单张牌或三张牌，点击「抽牌」。牌从整副 78 张里随机抽出，每张牌出现正位或逆位的机会各一半，抽出的牌不会重复。',
+  faqQ2: '正位和逆位有什么区别？',
+  faqA2: '正位按牌面原本的含义解读，能量顺畅；逆位表示这股能量受阻、延迟或走向反面，读法与正位相反。同一张牌正逆位的关键词完全不同，抽牌时要看清牌面上的正位 / 逆位标记。',
+  faqQ3: '三张牌分别代表什么？',
+  faqA3: '三张牌按过去、现在、未来的顺序排开：第一张看事情的来由与背景，第二张看当下的状态与关键，第三张看事情可能的发展方向。',
+  faqQ4: '每天能抽几次？',
+  faqA4: '没有次数限制。但同一个问题短时间内反复抽，抽到的牌只会越来越乱——问一次、认真读一次，比连抽十次更准。',
+  faqQ5: '塔罗牌占卜免费吗？',
+  faqA5: '免费。抽牌在浏览器本地完成，不联网、不收费，也不会保存你输入的问题。',
+  disclaimer: '塔罗牌属传统术数，仅供参考，不构成决策依据。',
+  offlineNote: '抽牌在浏览器本地完成，不保存你输入的问题；牌面数据由本站提供。'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '塔羅牌 · 本地占卜',
+  navGroup: '占卜',
+  nav_1: '解夢', nav_2: '六爻占卜', nav_3: '梅花易數', nav_4: '小六壬', nav_5: '塔羅牌',
+  nav_6: '雷諾曼', nav_7: '北歐盧恩符文', nav_8: '奇門遁甲', nav_9: '印度占星卜卦', nav_10: '西方卜卦占星',
+  nav_11: '大六壬', nav_12: '金口訣', nav_13: '太乙神數', nav_14: '占星骰子',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  langLabel: '語言',
+  eyebrow: '第一幕 · 心有所問',
+  slogan: '洗牌，切牌，<br>翻開答案。',
+  subtitle: '塔羅牌免費線上占卜',
+  labelQuestion: '所問之事（可選）',
+  phQuestion: '例如：這件事接下來會怎麼發展？',
+  labelSpread: '牌陣',
+  optOne: '單張牌',
+  optThree: '三張牌（過去 · 現在 · 未來）',
+  btnDraw: '抽牌',
+  btnLoading: '洗牌中…',
+  errNoDeck: '牌面數據還在加載，請稍候再抽。',
+  errLoad: '牌面數據加載失敗，請刷新頁面再試。',
+  resultTitle: '牌面',
+  ai_interpret: 'AI 解讀',
+  asked: '所問',
+  noQuestion: '（未寫問題，隨心一抽）',
+  spreadOne: '單張牌',
+  spreadThree: '三張牌 · 過去 · 現在 · 未來',
+  posPast: '過去', posPresent: '現在', posFuture: '未來',
+  majorArcana: '大阿卡納', minorArcana: '小阿卡納',
+  upright: '正位', reversed: '逆位',
+  keywordsLabel: '關鍵詞',
+  meaningLabel: '含義',
+  yesnoLabel: '對此問題的傾向',
+  yes: '是', no: '否',
+  kwNote: '關鍵詞與含義取自牌面數據原文（簡體中文）。',
+  faqTitle: '塔羅牌：免費占卜與使用常見問題',
+  faqQ1: '塔羅牌怎麼抽？',
+  faqA1: '先在心裡想好要問的事，再選單張牌或三張牌，點擊「抽牌」。牌從整副 78 張裡隨機抽出，每張牌出現正位或逆位的機會各一半，抽出的牌不會重複。',
+  faqQ2: '正位和逆位有什麼區別？',
+  faqA2: '正位按牌面原本的含義解讀，能量順暢；逆位表示這股能量受阻、延遲或走向反面，讀法與正位相反。同一張牌正逆位的關鍵詞完全不同，抽牌時要看清牌面上的正位 / 逆位標記。',
+  faqQ3: '三張牌分別代表什麼？',
+  faqA3: '三張牌按過去、現在、未來的順序排開：第一張看事情的來由與背景，第二張看當下的狀態與關鍵，第三張看事情可能的發展方向。',
+  faqQ4: '每天能抽幾次？',
+  faqA4: '沒有限制次數。但同一個問題短時間內反覆抽，抽到的牌只會越來越亂——問一次、認真讀一次，比連抽十次更準。',
+  faqQ5: '塔羅牌占卜免費嗎？',
+  faqA5: '免費。抽牌在瀏覽器本地完成，不聯網、不收費，也不會保存你輸入的問題。',
+  disclaimer: '塔羅牌屬傳統術數，僅供參考，不構成決策依據。',
+  offlineNote: '抽牌在瀏覽器本地完成，不保存你輸入的問題；牌面數據由本站提供。'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Tarot · Local Divination',
+  navGroup: 'Divination',
+  nav_1: 'Dream Interpretation', nav_2: 'Six Lines (Liu Yao)', nav_3: 'Meihua Yishu', nav_4: 'Xiao Liuren', nav_5: 'Tarot',
+  nav_6: 'Lenormand', nav_7: 'Norse Runes', nav_8: 'Qimen Dunjia', nav_9: 'Vedic Astrology', nav_10: 'Western Horary Astrology',
+  nav_11: 'Da Liuren', nav_12: 'Jinkou Jue', nav_13: 'Taiyi Shenshu', nav_14: 'Astrology Dice',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  langLabel: 'Language',
+  eyebrow: 'Act I · A Question in Mind',
+  slogan: 'Shuffle, cut,<br>and turn over the answer.',
+  subtitle: 'Free online Tarot reading',
+  labelQuestion: 'Your question (optional)',
+  phQuestion: 'e.g. How will this turn out?',
+  labelSpread: 'Spread',
+  optOne: 'One card',
+  optThree: 'Three cards (Past · Present · Future)',
+  btnDraw: 'Draw cards',
+  btnLoading: 'Shuffling…',
+  errNoDeck: 'The deck is still loading — please try again in a moment.',
+  errLoad: 'Failed to load the deck data. Please refresh the page and try again.',
+  resultTitle: 'The Cards',
+  ai_interpret: 'AI Reading',
+  asked: 'Question',
+  noQuestion: '(no question given — a free draw)',
+  spreadOne: 'One-card spread',
+  spreadThree: 'Three-card spread · Past · Present · Future',
+  posPast: 'Past', posPresent: 'Present', posFuture: 'Future',
+  majorArcana: 'Major Arcana', minorArcana: 'Minor Arcana',
+  upright: 'Upright', reversed: 'Reversed',
+  keywordsLabel: 'Keywords',
+  meaningLabel: 'Meaning',
+  yesnoLabel: 'Lean for your question',
+  yes: 'Yes', no: 'No',
+  kwNote: 'Keywords and meanings come from the deck data.',
+  faqTitle: 'Tarot: Free Reading & FAQ',
+  faqQ1: 'How do I draw Tarot cards?',
+  faqA1: 'Hold your question in mind, choose a one-card or three-card spread, and tap “Draw cards”. Cards are drawn at random from the full 78-card deck, each with a 50/50 chance of landing upright or reversed, and no card repeats within a spread.',
+  faqQ2: 'What is the difference between upright and reversed?',
+  faqA2: 'Upright reads by the card’s original meaning, with its energy flowing freely. Reversed means that energy is blocked, delayed or turned around, so the reading flips. The same card has completely different keywords upright and reversed — check the Upright / Reversed badge on each card.',
+  faqQ3: 'What do the three cards stand for?',
+  faqA3: 'The three cards lay out in Past, Present and Future order: the first shows where the matter comes from, the second shows the present state and the key point, the third shows where things may be heading.',
+  faqQ4: 'How many times can I draw per day?',
+  faqA4: 'There is no limit. But asking the same question over and over in a short time only muddles the reading — ask once and read it carefully rather than drawing ten times in a row.',
+  faqQ5: 'Is the Tarot reading free?',
+  faqA5: 'Yes, free. The draw happens locally in your browser — no internet, no charge, and your question is never saved.',
+  disclaimer: 'Tarot is a traditional divination art, for reference only; it is not a basis for decisions.',
+  offlineNote: 'The draw is done locally in your browser and your question is never saved; card data is provided by this site.'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: 'タロット · ローカル占い',
+  navGroup: '占い',
+  nav_1: '夢占い', nav_2: '六爻占い', nav_3: '梅花易数', nav_4: '小六壬', nav_5: 'タロット',
+  nav_6: 'ルノルマン', nav_7: '北欧ルーン', nav_8: '奇門遁甲', nav_9: 'インド占星術', nav_10: '西洋ホラリー占星術',
+  nav_11: '大六壬', nav_12: '金口訣', nav_13: '太乙神数', nav_14: '占星ダイス',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  langLabel: '言語',
+  eyebrow: '第一幕 · 心に問う',
+  slogan: 'シャッフルして、カットして、<br>答えをめくる。',
+  subtitle: 'タロット 無料オンライン占い',
+  labelQuestion: '質問（任意）',
+  phQuestion: '例：この件はこの先どうなる？',
+  labelSpread: 'スプレッド',
+  optOne: '1枚引き',
+  optThree: '3枚引き（過去 · 現在 · 未来）',
+  btnDraw: 'カードを引く',
+  btnLoading: 'シャッフル中…',
+  errNoDeck: 'デッキを読み込み中です。少し待ってからもう一度引いてください。',
+  errLoad: 'デッキデータの読み込みに失敗しました。ページを更新して再試行してください。',
+  resultTitle: 'カード',
+  ai_interpret: 'AI 解釈',
+  asked: '質問',
+  noQuestion: '（質問なし・自由な一引き）',
+  spreadOne: '1枚引き',
+  spreadThree: '3枚引き · 過去 · 現在 · 未来',
+  posPast: '過去', posPresent: '現在', posFuture: '未来',
+  majorArcana: '大アルカナ', minorArcana: '小アルカナ',
+  upright: '正位置', reversed: '逆位置',
+  keywordsLabel: 'キーワード',
+  meaningLabel: '意味',
+  yesnoLabel: 'この問いへの示唆',
+  yes: 'はい', no: 'いいえ',
+  kwNote: 'キーワードと意味はデッキデータの原文（英語）です。',
+  faqTitle: 'タロット：無料占いとよくある質問',
+  faqQ1: 'タロットはどう引くのですか？',
+  faqA1: 'まず質問を心に思い浮かべ、1枚引きか3枚引きを選び、「カードを引く」を押します。78枚のフルデッキからランダムに引き、正位置・逆位置はそれぞれ50%で、同じスプレッド内でカードが重複することはありません。',
+  faqQ2: '正位置と逆位置の違いは？',
+  faqA2: '正位置はカード本来の意味で読み、エネルギーは順調に流れます。逆位置はそのエネルギーが滞ったり遅れたり反転したりすることを示し、読み方が逆になります。同じカードでも正逆でキーワードはまったく異なります。各カードの正位置 / 逆位置バッジを確認してください。',
+  faqQ3: '3枚のカードはそれぞれ何を表しますか？',
+  faqA3: '3枚は過去・現在・未来の順に並びます。1枚目は物事の由来と背景、2枚目は現在の状態と要点、3枚目は物事の今後の方向性を示します。',
+  faqQ4: '1日に何回引けますか？',
+  faqA4: '回数制限はありません。ただ同じ質問を短時間に繰り返し引くと、読みはかえって混乱します。10回連続で引くより、1回引いて丁寧に読むほうが確かです。',
+  faqQ5: 'タロット占いは無料ですか？',
+  faqA5: '無料です。抽選はブラウザ内でローカルに行われ、ネット接続も料金も不要で、入力した質問は保存されません。',
+  disclaimer: 'タロットは伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  offlineNote: '抽選はブラウザ内でローカルに行われ、質問は保存されません。カードデータは当サイトが提供しています。'
+}
+};
+
+// ---- 牌名表 ----
+// 大阿卡纳中文名（标准译名）；小阿卡纳 = 花色 + 牌阶（权杖王牌、权杖侍从……）
+var MAJOR_ZH = ['愚者','魔术师','女祭司','女皇','皇帝','教皇','恋人','战车','力量','隐士','命运之轮','正义','倒吊人','死神','节制','恶魔','塔','星星','月亮','太阳','审判','世界'];
+var MAJOR_ZH_TW = ['愚者','魔術師','女祭司','女皇','皇帝','教皇','戀人','戰車','力量','隱士','命運之輪','正義','倒吊人','死神','節制','惡魔','塔','星星','月亮','太陽','審判','世界'];
+var MAJOR_JA = ['愚者','魔術師','女教皇','女帝','皇帝','教皇','恋人','戦車','力','隠者','運命の輪','正義','吊るされた男','死神','節制','悪魔','塔','星','月','太陽','審判','世界'];
+var ROMAN = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI'];
+var SUIT = {
+  'zh-CN': { wands: '权杖', cups: '圣杯', swords: '宝剑', pentacles: '星币' },
+  'zh-TW': { wands: '權杖', cups: '聖杯', swords: '寶劍', pentacles: '星幣' },
+  'en': { wands: 'Wands', cups: 'Cups', swords: 'Swords', pentacles: 'Pentacles' },
+  'ja': { wands: 'ワンド', cups: 'カップ', swords: 'ソード', pentacles: 'ペンタクル' }
+};
+var RANK_ZH = { 1: '王牌', 2: '二', 3: '三', 4: '四', 5: '五', 6: '六', 7: '七', 8: '八', 9: '九', 10: '十', 11: '侍从', 12: '骑士', 13: '皇后', 14: '国王' };
+var RANK_ZH_TW = { 1: '王牌', 2: '二', 3: '三', 4: '四', 5: '五', 6: '六', 7: '七', 8: '八', 9: '九', 10: '十', 11: '侍從', 12: '騎士', 13: '皇后', 14: '國王' };
+var RANK_JA = { 1: 'エース', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: 'ペイジ', 12: 'ナイト', 13: 'クイーン', 14: 'キング' };
+var ELEMENT = {
+  'zh-CN': { fire: '火', water: '水', air: '风', earth: '土' },
+  'zh-TW': { fire: '火', water: '水', air: '風', earth: '土' },
+  'en': { fire: 'Fire', water: 'Water', air: 'Air', earth: 'Earth' },
+  'ja': { fire: '火', water: '水', air: '風', earth: '土' }
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var TAROT_DECK = null;
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+
+// 牌名：zh 用标准译名表；en 用数据文件的英文名；ja 用日文名表
+function cardName(card) {
+  if (card.arcana === 'major') {
+    if (LANG === 'en') return card.name;
+    if (LANG === 'ja') return MAJOR_JA[card.number];
+    if (LANG === 'zh-TW') return MAJOR_ZH_TW[card.number];
+    return MAJOR_ZH[card.number];
+  }
+  var suit = (SUIT[LANG] || SUIT['zh-CN'])[card.suit] || card.suit;
+  if (LANG === 'en') return card.name;
+  if (LANG === 'ja') return suit + 'の' + RANK_JA[card.number];
+  var rank = (LANG === 'zh-TW' ? RANK_ZH_TW : RANK_ZH)[card.number];
+  return suit + rank;
+}
+// 牌面大数字：大阿卡纳用罗马数字，小阿卡纳用牌阶简写（与语言无关）
+function cardBigGlyph(card) {
+  if (card.arcana === 'major') return ROMAN[card.number];
+  if (card.number === 1) return 'A';
+  if (card.number <= 10) return String(card.number);
+  return { 11: 'P', 12: 'Kn', 13: 'Q', 14: 'K' }[card.number];
+}
+function arcanaLabel(card) {
+  return card.arcana === 'major' ? t('majorArcana') : t('minorArcana');
+}
+function elementLabel(card) {
+  var el = String(card.element || '').toLowerCase();
+  return (ELEMENT[LANG] || ELEMENT['zh-CN'])[el] || card.element || '';
+}
+// 关键词与含义：中文用数据文件的中文译文（cn_keywords_* / cn_meaning_*，
+// 即数据关键词的中文翻译）；英文与日文用英文原文（与梅花页卦辞原文保留的做法一致）
+function cardKeywords(card, reversed) {
+  if (LANG === 'zh-CN' || LANG === 'zh-TW') {
+    return reversed ? card.cn_keywords_reversed : card.cn_keywords_upright;
+  }
+  return reversed ? card.keywords_reversed : card.keywords_upright;
+}
+function cardMeaning(card, reversed) {
+  if (LANG === 'zh-CN' || LANG === 'zh-TW') {
+    return reversed ? card.cn_meaning_reversed : card.cn_meaning_upright;
+  }
+  return reversed ? card.meaning_reversed : card.meaning_upright;
+}
+function yesNoWord(card, reversed) {
+  var v = reversed ? card.yes_no_reversed : card.yes_no_upright;
+  return v === 'yes' ? t('yes') : t('no');
+}
+
+// 抽牌：不放回随机抽 n 张，每张 50/50 正逆位
+function drawCards(deck, n) {
+  var pool = deck.slice();
+  var out = [];
+  for (var i = 0; i < n && pool.length > 0; i++) {
+    var idx = Math.floor(Math.random() * pool.length);
+    var card = pool.splice(idx, 1)[0];
+    out.push({ card: card, reversed: Math.random() < 0.5 });
+  }
+  return out;
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var e = document.getElementById('draw-error'); if (e) e.textContent = '';
+  if (LAST_RESULT) showResult(LAST_RESULT);
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function drawTarot() {
+  var err = document.getElementById('draw-error');
+  if (!TAROT_DECK) { err.textContent = t('errNoDeck'); return; }
+  err.textContent = '';
+  var n = parseInt(document.getElementById('spread').value, 10) || 1;
+  var q = document.getElementById('question').value.trim();
+  var drawn = drawCards(TAROT_DECK, n);
+  LAST_RESULT = { drawn: drawn, count: n, question: q };
+  showResult(LAST_RESULT);
+  document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function showResult(res) {
+  var card = document.getElementById('result-card');
+  card.classList.remove('hidden');
+  var spreadName = res.count === 3 ? t('spreadThree') : t('spreadOne');
+  var q = res.question ? esc(res.question) : t('noQuestion');
+  document.getElementById('result-head').innerHTML =
+    '<b>' + t('asked') + '：</b>' + q + '<br><b>' + spreadName + '</b>';
+  var grid = document.getElementById('tarot-grid');
+  grid.className = 'tarot-grid' + (res.count === 1 ? ' single' : '');
+  var posKeys = ['posPast', 'posPresent', 'posFuture'];
+  var html = '';
+  res.drawn.forEach(function (d, i) {
+    var c = d.card;
+    var rev = d.reversed;
+    var label = res.count === 3 ? '<div class="slot-label">' + t(posKeys[i]) + '</div>' : '';
+    var meta = arcanaLabel(c);
+    if (c.arcana === 'minor') {
+      meta += ' · ' + (SUIT[LANG] || SUIT['zh-CN'])[c.suit];
+    }
+    meta += ' · ' + elementLabel(c);
+    var enName = (LANG === 'en') ? '' : '<div class="face-en">' + esc(c.name) + '</div>';
+    html += '<div class="tarot-slot">' + label +
+      '<div class="card-face' + (rev ? ' reversed' : '') + '"><div class="face-inner">' +
+        '<div class="face-arcana">' + esc(meta) + '</div>' +
+        '<div><div class="face-num">' + esc(cardBigGlyph(c)) + '</div>' +
+        '<div class="face-mark">✦</div>' +
+        '<div class="face-name">' + esc(cardName(c)) + '</div>' + enName + '</div>' +
+        '<div class="face-meta">' + esc(arcanaLabel(c)) + '</div>' +
+      '</div></div>' +
+      '<div class="card-body">' +
+        '<span class="orient-badge' + (rev ? ' rev' : '') + '">' + (rev ? t('reversed') : t('upright')) + '</span>' +
+        '<div class="card-keywords"><b>' + t('keywordsLabel') + '：</b>' + esc(cardKeywords(c, rev)) + '</div>' +
+        '<div class="card-meaning"><b>' + t('meaningLabel') + '：</b>' + esc(cardMeaning(c, rev)) + '</div>' +
+        '<div class="card-yesno">' + t('yesnoLabel') + '：<b>' + esc(yesNoWord(c, rev)) + '</b></div>' +
+      '</div>' +
+    '</div>';
+  });
+  grid.innerHTML = html;
+  document.getElementById('result-note').textContent = t('kwNote');
+}
+
+// 牌面数据：本站 /data/tarot_cards_unified.json（78 张）
+applyI18n();
+var btn = document.getElementById('draw-btn');
+btn.disabled = true;
+btn.textContent = t('btnLoading');
+fetch('/data/tarot_cards_unified.json')
+  .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+  .then(function (data) {
+    if (!Array.isArray(data) || data.length !== 78) throw new Error('bad deck');
+    TAROT_DECK = data;
+    btn.disabled = false;
+    btn.textContent = t('btnDraw');
+  })
+  .catch(function () {
+    btn.disabled = false;
+    btn.textContent = t('btnDraw');
+    document.getElementById('draw-error').textContent = t('errLoad');
+  });
+
+// ==AI-INTERPRET==
+// Shared AI 解读 button (/js/ai-jiegua.js). Summary comes from this page's
+// own result state; null/'' means "no result yet" and the button only shows
+// a hint instead of calling the backend.
+function aiTrunc(s, n) { s = String(s == null ? '' : s); return s.length > n ? s.slice(0, n) + '…' : s; }
+window.getJieguaSummary = function() {
+if (!LAST_RESULT || !LAST_RESULT.drawn || !LAST_RESULT.drawn.length) return null;
+var parts = [];
+parts.push('塔罗牌阵：' + (LAST_RESULT.count === 3 ? '三张牌（过去·现在·未来）' : '单张牌'));
+var posKeys = ['posPast', 'posPresent', 'posFuture'];
+LAST_RESULT.drawn.forEach(function (d, i) {
+var c = d.card, rev = d.reversed;
+var label = LAST_RESULT.count === 3 ? t(posKeys[i]) + '：' : '';
+parts.push(label + cardName(c) + '（' + (rev ? t('reversed') : t('upright')) + '）');
+parts.push('关键词：' + cardKeywords(c, rev));
+parts.push('牌义：' + aiTrunc(cardMeaning(c, rev), 160));
+parts.push('是否：' + yesNoWord(c, rev));
+});
+return parts.join('\n');
+};
+window.getJieguaQuestion = function() { var el = document.getElementById('question'); return el ? el.value.trim() : ''; };
+if (window.AIInterpret) { window.AIInterpret.attach(); }
+else { document.addEventListener('DOMContentLoaded', function () { if (window.AIInterpret) window.AIInterpret.attach(); }); }
+</script>
+<script src="/js/ai-jiegua.js"></script>
+</body>
+</html>

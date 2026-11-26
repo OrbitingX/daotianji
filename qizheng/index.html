@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 七政四余</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input[type="date"], input[type="time"] {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .method-row { display: flex; gap: 2rem; }
+  .method-row > .field { flex: 1; min-width: 0; }
+  .num-row { display: flex; gap: 2rem; }
+  .num-row > .field { flex: 1; min-width: 0; }
+  .link-btn { background: none; border: none; color: #c9a962; font-size: .75rem; cursor: pointer; letter-spacing: .1em; padding: 0; margin-left: .5rem; font-family: inherit; }
+  .link-btn:hover { text-decoration: underline; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+  .hint { font-size: .8rem; color: #6f6f80; margin-top: .4rem; line-height: 1.6; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .star-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: .92rem; }
+  .star-table th { text-align: left; font-size: .75rem; color: #b08d3e; letter-spacing: .14em; font-weight: 400; padding: .6rem .5rem; border-bottom: 1px solid rgba(201,169,98,.45); }
+  .star-table td { padding: .6rem .5rem; border-bottom: 1px solid rgba(201,169,98,.18); color: #f0ead8; line-height: 1.6; vertical-align: top; }
+  .star-table td .sub { display: block; color: #9a9aab; font-size: .8rem; }
+  .star-table tr.extra td { color: #c8c2ae; }
+  .reading-list { margin-top: 1.4rem; }
+  .reading { font-size: .9rem; color: #c8c2ae; line-height: 1.8; padding: .45rem 0; border-bottom: 1px dashed rgba(201,169,98,.18); }
+  .reading b { color: #c9a962; font-weight: 600; }
+  .method-note { font-size: .8rem; color: #6f6f80; line-height: 1.8; margin-top: 1.2rem; }
+  .ai-interpret-btn {
+    display: block; margin: 1.6rem auto 0;
+    background: transparent; border: 1px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: .95rem; letter-spacing: .25em; text-indent: .25em;
+    padding: .6rem 1.6rem; cursor: pointer; font-family: inherit;
+  }
+  .ai-interpret-btn:hover { background: rgba(201,169,98,.08); }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .method-row, .num-row { flex-direction: column; gap: 0; }
+    .star-table { font-size: .85rem; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">七政四余 · 本地占卜</div>
+    </div>
+  </a>
+          <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></span>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">一生之图 · 出生星盘</div>
+  <h1 class="slogan" data-i18n-html="slogan">七政行天，<br>四余佐命。</h1>
+  <p class="subtitle" data-i18n="subtitle">七政四余免费在线排盘</p>
+
+  <section class="section">
+    <div class="field">
+      <label for="question" data-i18n="labelQuestion">所问之事（可选）</label>
+      <input type="text" id="question" placeholder="例如：今年适合换工作吗？" data-i18n-ph="phQuestion">
+    </div>
+    <div class="num-row">
+      <div class="field">
+        <label for="birthdate" data-i18n="labelDate">出生日期</label>
+        <input type="date" id="birthdate">
+      </div>
+      <div class="field">
+        <label for="birthtime" data-i18n="labelTime">出生时间</label>
+        <input type="time" id="birthtime" value="12:00">
+        <div class="hint" data-i18n="timeHint">不知道准确时间可填 12:00，但宫位会不准。</div>
+      </div>
+    </div>
+    <div class="num-row">
+      <div class="field">
+        <label for="utcoffset" data-i18n="labelOffset">时区（UTC 偏移，如 +8）</label>
+        <input type="number" id="utcoffset" step="0.5" min="-12" max="14" value="8">
+      </div>
+      <div class="field">
+        <label for="latitude" data-i18n="labelLat">出生地纬度（可选）</label>
+        <input type="number" id="latitude" step="any" min="-90" max="90" placeholder="如 31.23" data-i18n-ph="phLat">
+      </div>
+      <div class="field">
+        <label for="longitude" data-i18n="labelLon">出生地经度（可选）</label>
+        <input type="number" id="longitude" step="any" min="-180" max="180" placeholder="如 121.47" data-i18n-ph="phLon">
+      </div>
+    </div>
+    <div class="hint" data-i18n="latlonHint">不填出生地也可以排盘，但没有宫位：宫位需要经纬度算上升点。</div>
+    <div class="error" id="form-error"></div>
+    <button class="submit-btn" onclick="doChart()" data-i18n="btnSubmit">排盘 · 七政四余</button>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">星盘</div>
+    <div class="result-head" id="result-head"></div>
+    <div id="star-table-wrap"></div>
+    <div class="section-title" style="margin-top:1.6rem" data-i18n="readingsTitle">星曜断语</div>
+    <div class="reading-list" id="reading-list"></div>
+    <div class="method-note" id="method-note"></div>
+    <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="qizheng" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+  </section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">七政四余：免费排盘与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">七政四余是什么？</summary>
+      <p data-i18n="faqA1">七政四余又称果老星宗，是中国古代的星命体系：七政是日、月、火、水、木、金、土七颗可见星曜，四余是罗睺、计都、紫炁、月孛四颗隐曜（推算点，不是肉眼可见的行星）。排盘以出生时刻七政四余所落的星座与宫位论命。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">本页的恒星黄道经度是怎么算的？</summary>
+      <p data-i18n="faqA2">七政的位置先用天文历算得回归黄道经度，再减去岁差（Lahiri 近似值：23.85 +（年份 − 2000）× 0.01396 度）换算为恒星黄道经度。注意这只是 Lahiri 岁差的线性近似，不是完整的 Lahiri 级数，不同软件的结果会有分角级的出入。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">罗睺到底是升交点还是降交点？</summary>
+      <p data-i18n="faqA3">历史上说法不一：有的古籍以罗睺为升交点、计都为降交点，有的正好相反，牛维星 1994 年的考证认为罗睺是月球升交点、计都本义是月球远地点。本页采用现代最常见的约定：罗睺为平黄道月球升交点，计都为其对点（加 180 度）。换软件对照时请先确认对方用的是哪一种命名。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">紫炁和月孛是怎么算的？可靠吗？</summary>
+      <p data-i18n="faqA4">月孛按月球远地点算，用 Meeus《天文算法》第 47 章的平远地点公式：83.3532465 + 4069.0137287 × T 度（T 为自 J2000.0 起的儒略世纪数），这是现代软件最常见的月孛定义。紫炁没有公认的历元：古籍《张果星宗》只给了速率（二十九日行一度，二十九年一周天），与“二十八年一周天”的说法也互相冲突，且没有任何典籍给出紫炁在某一日期的位置。本页按《张果星宗》二十九年速率推算，并明确约定以 J2000.0 为零点（白羊座 0 度）；这是本站的约定，不是古籍原文，紫炁是本页最不确定的字段，不同软件的结果会差很多。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">为什么不填出生地就没有宫位？排盘免费吗？</summary>
+      <p data-i18n="faqA5">十二宫按整宫制从上升点所在星座排起，上升点要由出生时刻的恒星时与出生地纬度算出，不填经纬度就算不出上升点，只能按星座列出星曜。免费，本页排盘在本地完成，不联网、不收费；出生信息只留在你的浏览器里，只有你点了 AI 解读，摘要才会被发去解读接口。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">七政四余属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="offlineNote">本页排盘完全离线运行，行星位置使用本地 astronomy.browser.js 计算，不向任何服务器发送数据。</span>
+  </footer>
+</div>
+</main>
+
+<script src="/js/astronomy.browser.js"></script>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。星名、宫名保留中文 + 英文对照。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '七政四余 · 本地占卜',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '一生之图 · 出生星盘',
+  slogan: '七政行天，<br>四余佐命。',
+  subtitle: '七政四余免费在线排盘',
+  labelQuestion: '所问之事（可选）',
+  phQuestion: '例如：今年适合换工作吗？',
+  labelDate: '出生日期',
+  labelTime: '出生时间',
+  timeHint: '不知道准确时间可填 12:00，但宫位会不准。',
+  labelOffset: '时区（UTC 偏移，如 +8）',
+  labelLat: '出生地纬度（可选）',
+  phLat: '如 31.23',
+  labelLon: '出生地经度（可选）',
+  phLon: '如 121.47',
+  latlonHint: '不填出生地也可以排盘，但没有宫位：宫位需要经纬度算上升点。',
+  btnSubmit: '排盘 · 七政四余',
+  errNoDate: '请先选择出生日期。',
+  errNoTime: '请先填写出生时间。',
+  errOffset: '时区偏移须在 -12 到 +14 之间。',
+  errLatLon: '纬度和经度要么都填，要么都不填。',
+  errLat: '纬度须在 -90 到 90 之间。',
+  errLon: '经度须在 -180 到 180 之间。',
+  errAstro: '天文计算库未加载，排盘失败，请刷新重试。',
+  resultTitle: '星盘',
+  readingsTitle: '星曜断语',
+  colStar: '星曜',
+  colSign: '星座',
+  colDeg: '宫内度数',
+  colLon: '恒星经度',
+  colPalace: '宫位',
+  noPalace: '—',
+  ascLabel: '上升点',
+  ayaLabel: '岁差',
+  birthLabel: '出生',
+  utcLabel: 'UTC',
+  kindLuminary: '七政',
+  kindExtra: '四余',
+  methodNote: '算法说明：七政回归经度由本地 astronomy.browser.js 算得；恒星经度 = 回归经度 − Lahiri 近似岁差；罗睺为平月球升交点，计都为其对点；月孛为平月球远地点（Meeus 第 47 章）；紫炁按《张果星宗》二十九年速率、以 J2000.0 为零点推算，为本站约定（见常见问题第 4 条）。',
+  read_sun: '主名望、父缘与外在光彩，所落宫位之事易见于人前。',
+  read_moon: '主情绪、母缘与内在需求，所落宫位之事多牵动心境。',
+  read_mars: '主行动、竞争与突破，所落宫位之事宜主动进取、忌冲动行事。',
+  read_mercury: '主思维、言语与技艺，所落宫位之事利沟通学习、忌反复多变。',
+  read_jupiter: '主扩张、恩泽与生长，所落宫位之事易得助力、宜顺势把握。',
+  read_venus: '主情感、享乐与财物，所落宫位之事宜和合、忌纵情过度。',
+  read_saturn: '主责任、结构与迟滞，所落宫位之事多磨练、宜耐心守成。',
+  read_rahu: '主欲望、执念与非常之途，所落宫位之事易生波折、宜守正不贪。',
+  read_ketu: '主收束、舍离与宿业，所落宫位之事宜放下、忌执着强求。',
+  read_ziqi: '主恩庇、清贵与暗助，所落宫位之事多得贵人、宜积德行善。',
+  read_yuebei: '主隐伏、暗昧与变数，所落宫位之事宜谨慎、忌暗中谋划。',
+  faqTitle: '七政四余：免费排盘与使用常见问题',
+  faqQ1: '七政四余是什么？',
+  faqA1: '七政四余又称果老星宗，是中国古代的星命体系：七政是日、月、火、水、木、金、土七颗可见星曜，四余是罗睺、计都、紫炁、月孛四颗隐曜（推算点，不是肉眼可见的行星）。排盘以出生时刻七政四余所落的星座与宫位论命。',
+  faqQ2: '本页的恒星黄道经度是怎么算的？',
+  faqA2: '七政的位置先用天文历算得回归黄道经度，再减去岁差（Lahiri 近似值：23.85 +（年份 − 2000）× 0.01396 度）换算为恒星黄道经度。注意这只是 Lahiri 岁差的线性近似，不是完整的 Lahiri 级数，不同软件的结果会有分角级的出入。',
+  faqQ3: '罗睺到底是升交点还是降交点？',
+  faqA3: '历史上说法不一：有的古籍以罗睺为升交点、计都为降交点，有的正好相反，牛维星 1994 年的考证认为罗睺是月球升交点、计都本义是月球远地点。本页采用现代最常见的约定：罗睺为平黄道月球升交点，计都为其对点（加 180 度）。换软件对照时请先确认对方用的是哪一种命名。',
+  faqQ4: '紫炁和月孛是怎么算的？可靠吗？',
+  faqA4: '月孛按月球远地点算，用 Meeus《天文算法》第 47 章的平远地点公式：83.3532465 + 4069.0137287 × T 度（T 为自 J2000.0 起的儒略世纪数），这是现代软件最常见的月孛定义。紫炁没有公认的历元：古籍《张果星宗》只给了速率（二十九日行一度，二十九年一周天），与“二十八年一周天”的说法也互相冲突，且没有任何典籍给出紫炁在某一日期的位置。本页按《张果星宗》二十九年速率推算，并明确约定以 J2000.0 为零点（白羊座 0 度）；这是本站的约定，不是古籍原文，紫炁是本页最不确定的字段，不同软件的结果会差很多。',
+  faqQ5: '为什么不填出生地就没有宫位？排盘免费吗？',
+  faqA5: '十二宫按整宫制从上升点所在星座排起，上升点要由出生时刻的恒星时与出生地纬度算出，不填经纬度就算不出上升点，只能按星座列出星曜。免费，本页排盘在本地完成，不联网、不收费；出生信息只留在你的浏览器里，只有你点了 AI 解读，摘要才会被发去解读接口。',
+  disclaimer: '七政四余属传统术数，仅供参考，不构成决策依据。',
+  offlineNote: '本页排盘完全离线运行，行星位置使用本地 astronomy.browser.js 计算，不向任何服务器发送数据。',
+  langLabel: '语言',
+  ai_interpret: 'AI 解读'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '七政四餘 · 本地占卜',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '一生之圖 · 出生星盤',
+  slogan: '七政行天，<br>四餘佐命。',
+  subtitle: '七政四餘免費線上排盤',
+  labelQuestion: '所問之事（可選）',
+  phQuestion: '例如：今年適合換工作嗎？',
+  labelDate: '出生日期',
+  labelTime: '出生時間',
+  timeHint: '不知道準確時間可填 12:00，但宮位會不準。',
+  labelOffset: '時區（UTC 偏移，如 +8）',
+  labelLat: '出生地緯度（可選）',
+  phLat: '如 31.23',
+  labelLon: '出生地經度（可選）',
+  phLon: '如 121.47',
+  latlonHint: '不填出生地也可以排盤，但沒有宮位：宮位需要經緯度算上升點。',
+  btnSubmit: '排盤 · 七政四餘',
+  errNoDate: '請先選擇出生日期。',
+  errNoTime: '請先填寫出生時間。',
+  errOffset: '時區偏移須在 -12 到 +14 之間。',
+  errLatLon: '緯度和經度要麼都填，要麼都不填。',
+  errLat: '緯度須在 -90 到 90 之間。',
+  errLon: '經度須在 -180 到 180 之間。',
+  errAstro: '天文計算庫未載入，排盤失敗，請刷新重試。',
+  resultTitle: '星盤',
+  readingsTitle: '星曜斷語',
+  colStar: '星曜',
+  colSign: '星座',
+  colDeg: '宮內度數',
+  colLon: '恆星經度',
+  colPalace: '宮位',
+  noPalace: '—',
+  ascLabel: '上升點',
+  ayaLabel: '歲差',
+  birthLabel: '出生',
+  utcLabel: 'UTC',
+  kindLuminary: '七政',
+  kindExtra: '四餘',
+  methodNote: '算法說明：七政回歸經度由本地 astronomy.browser.js 算得；恆星經度 = 回歸經度 − Lahiri 近似歲差；羅睺為平月球升交點，計都為其對點；月孛為平月球遠地點（Meeus 第 47 章）；紫炁按《張果星宗》二十九年速率、以 J2000.0 為零點推算，為本站約定（見常見問題第 4 條）。',
+  read_sun: '主名望、父緣與外在光彩，所落宮位之事易見於人前。',
+  read_moon: '主情緒、母緣與內在需求，所落宮位之事多牽動心境。',
+  read_mars: '主行動、競爭與突破，所落宮位之事宜主動進取、忌衝動行事。',
+  read_mercury: '主思維、言語與技藝，所落宮位之事利溝通學習、忌反覆多變。',
+  read_jupiter: '主擴張、恩澤與生長，所落宮位之事易得助力、宜順勢把握。',
+  read_venus: '主情感、享樂與財物，所落宮位之事宜和合、忌縱情過度。',
+  read_saturn: '主責任、結構與遲滯，所落宮位之事多磨練、宜耐心守成。',
+  read_rahu: '主欲望、執念與非常之途，所落宮位之事易生波折、宜守正不貪。',
+  read_ketu: '主收束、捨離與宿業，所落宮位之事宜放下、忌執著強求。',
+  read_ziqi: '主恩庇、清貴與暗助，所落宮位之事多得貴人、宜積德行善。',
+  read_yuebei: '主隱伏、暗昧與變數，所落宮位之事宜謹慎、忌暗中謀劃。',
+  faqTitle: '七政四餘：免費排盤與使用常見問題',
+  faqQ1: '七政四餘是什麼？',
+  faqA1: '七政四餘又稱果老星宗，是中國古代的星命體系：七政是日、月、火、水、木、金、土七顆可見星曜，四餘是羅睺、計都、紫炁、月孛四顆隱曜（推算點，不是肉眼可見的行星）。排盤以出生時刻七政四餘所落的星座與宮位論命。',
+  faqQ2: '本頁的恆星黃道經度是怎麼算的？',
+  faqA2: '七政的位置先用天文曆算得回歸黃道經度，再減去歲差（Lahiri 近似值：23.85 +（年份 − 2000）× 0.01396 度）換算為恆星黃道經度。注意這只是 Lahiri 歲差的線性近似，不是完整的 Lahiri 級數，不同軟體的結果會有分角級的出入。',
+  faqQ3: '羅睺到底是升交點還是降交點？',
+  faqA3: '歷史上說法不一：有的古籍以羅睺為升交點、計都為降交點，有的正好相反，牛維星 1994 年的考證認為羅睺是月球升交點、計都本義是月球遠地點。本頁採用現代最常見的約定：羅睺為平黃道月球升交點，計都為其對點（加 180 度）。換軟體對照時請先確認對方用的是哪一種命名。',
+  faqQ4: '紫炁和月孛是怎麼算的？可靠嗎？',
+  faqA4: '月孛按月球遠地點算，用 Meeus《天文算法》第 47 章的平遠地點公式：83.3532465 + 4069.0137287 × T 度（T 為自 J2000.0 起的儒略世紀數），這是現代軟體最常見的月孛定義。紫炁沒有公認的曆元：古籍《張果星宗》只給了速率（二十九日行一度，二十九年一周天），與「二十八年一周天」的說法也互相衝突，且沒有任何典籍給出紫炁在某一日期的位置。本頁按《張果星宗》二十九年速率推算，並明確約定以 J2000.0 為零點（白羊座 0 度）；這是本站的約定，不是古籍原文，紫炁是本頁最不確定的欄位，不同軟體的結果會差很多。',
+  faqQ5: '為什麼不填出生地就沒有宮位？排盤免費嗎？',
+  faqA5: '十二宮按整宮制從上升點所在星座排起，上升點要由出生時刻的恆星時與出生地緯度算出，不填經緯度就算不出上升點，只能按星座列出星曜。免費，本頁排盤在本地完成，不聯網、不收費；出生資訊只留在你的瀏覽器裡，只有你點了 AI 解讀，摘要才會被發去解讀介面。',
+  disclaimer: '七政四餘屬傳統術數，僅供參考，不構成決策依據。',
+  offlineNote: '本頁排盤完全離線運行，行星位置使用本地 astronomy.browser.js 計算，不向任何伺服器發送數據。',
+  langLabel: '語言',
+  ai_interpret: 'AI 解讀'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Qizheng Siyu · Local Divination',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'Life Chart · Natal Chart',
+  slogan: 'Seven governors move across the sky,<br>four extras attend fate.',
+  subtitle: 'Free online Qizheng Siyu chart',
+  labelQuestion: 'Your question (optional)',
+  phQuestion: 'e.g. Is this a good year to change jobs?',
+  labelDate: 'Birth date',
+  labelTime: 'Birth time',
+  timeHint: 'If you do not know the exact time, use 12:00 — but the palaces will be unreliable.',
+  labelOffset: 'Time zone (UTC offset, e.g. +8)',
+  labelLat: 'Birthplace latitude (optional)',
+  phLat: 'e.g. 31.23',
+  labelLon: 'Birthplace longitude (optional)',
+  phLon: 'e.g. 121.47',
+  latlonHint: 'A chart works without a birthplace, but has no palaces: palaces need latitude and longitude to compute the Ascendant.',
+  btnSubmit: 'Cast the chart',
+  errNoDate: 'Please choose a birth date first.',
+  errNoTime: 'Please enter a birth time.',
+  errOffset: 'UTC offset must be between -12 and +14.',
+  errLatLon: 'Latitude and longitude must be given together, or both left blank.',
+  errLat: 'Latitude must be between -90 and 90.',
+  errLon: 'Longitude must be between -180 and 180.',
+  errAstro: 'The astronomy library did not load; the chart failed. Please refresh and try again.',
+  resultTitle: 'The Chart',
+  readingsTitle: 'Star Readings',
+  colStar: 'Star',
+  colSign: 'Sign',
+  colDeg: 'Degree in sign',
+  colLon: 'Sidereal longitude',
+  colPalace: 'Palace',
+  noPalace: '—',
+  ascLabel: 'Ascendant',
+  ayaLabel: 'Ayanamsa',
+  birthLabel: 'Birth',
+  utcLabel: 'UTC',
+  kindLuminary: 'Governor',
+  kindExtra: 'Extra',
+  methodNote: 'Method: tropical longitudes of the seven governors come from the local astronomy.browser.js; sidereal longitude = tropical longitude minus the Lahiri approximate ayanamsa; Rahu is the mean ascending node of the Moon, Ketu its opposite point; Yuebei is the mean lunar apogee (Meeus, ch. 47); Ziqi follows the 29-year rate of the Zhangguo Xingzong anchored at J2000.0 — a convention of this site (see FAQ 4).',
+  read_sun: 'Governs reputation, the father line and outward radiance; matters of the palace it falls in tend to show in public.',
+  read_moon: 'Governs feeling, the mother line and inner needs; matters of its palace stir the emotions.',
+  read_mars: 'Governs action, competition and breakthrough; matters of its palace call for initiative — avoid rash moves.',
+  read_mercury: 'Governs thought, speech and skill; matters of its palace favour communication and learning — avoid fickleness.',
+  read_jupiter: 'Governs expansion, grace and growth; matters of its palace readily find support — ride the momentum.',
+  read_venus: 'Governs affection, enjoyment and possessions; matters of its palace favour harmony — avoid excess.',
+  read_saturn: 'Governs duty, structure and delay; matters of its palace come through trial — patience and steadiness win.',
+  read_rahu: 'Governs desire, fixation and unconventional paths; matters of its palace breed complications — stay upright and do not grasp.',
+  read_ketu: 'Governs release, letting go and old debts; matters of its palace ask you to let go — do not cling.',
+  read_ziqi: 'Governs grace, quiet nobility and hidden help; matters of its palace often find a benefactor — build merit.',
+  read_yuebei: 'Governs what is hidden, unclear and changeable; matters of its palace call for caution — avoid secret schemes.',
+  faqTitle: 'Qizheng Siyu: Free Chart & FAQ',
+  faqQ1: 'What is Qizheng Siyu?',
+  faqA1: 'Qizheng Siyu, also called the Guolao Star School, is the ancient Chinese system of stellar astrology: the seven governors are the Sun, Moon, Mars, Mercury, Jupiter, Venus and Saturn — seven visible luminaries — and the four extras are Rahu, Ketu, Ziqi and Yuebei, four hidden points (calculated points, not planets visible to the eye). A chart is read from the signs and palaces the eleven points occupy at the moment of birth.',
+  faqQ2: 'How are the sidereal longitudes on this page calculated?',
+  faqA2: 'The seven governors are first computed as tropical longitudes with astronomical ephemeris math, then converted to sidereal longitudes by subtracting the precession (Lahiri approximation: 23.85 + (year − 2000) × 0.01396 degrees). Note this is only a linear approximation of the Lahiri ayanamsa, not the full Lahiri series, so other software may differ by arcminutes.',
+  faqQ3: 'Is Rahu the ascending node or the descending node?',
+  faqA3: 'The sources disagree: some old texts make Rahu the ascending node and Ketu the descending node, others the reverse, and the 1994 study by Niu Weixing argues Rahu is the Moon ascending node while Ketu originally meant the lunar apogee. This page follows the most common modern convention: Rahu is the mean ascending node of the Moon and Ketu is the opposite point (plus 180 degrees). When comparing with other software, check which naming it uses first.',
+  faqQ4: 'How are Ziqi and Yuebei calculated? How reliable are they?',
+  faqA4: 'Yuebei is the lunar apogee, computed with the mean apogee formula from Meeus, Astronomical Algorithms, chapter 47: 83.3532465 + 4069.0137287 × T degrees (T is Julian centuries since J2000.0) — the most common definition of Yuebei in modern software. Ziqi has no agreed epoch: the classical Zhangguo Xingzong gives only a rate (one degree per 29 days, one full cycle in 29 years), which also conflicts with the 28-year cycle account, and no classical text states the position of Ziqi on any given date. This page follows the Zhangguo 29-year rate and explicitly anchors Ziqi at 0 degrees Aries at J2000.0; that is this site convention, not a classical text, so Ziqi is the least certain field on this page and other software will differ widely.',
+  faqQ5: 'Why are there no palaces without a birth place? Is the chart free?',
+  faqA5: 'The twelve palaces are laid out whole-sign from the Ascendant sign, and the Ascendant needs the sidereal time at birth plus the birth latitude — without latitude and longitude it cannot be computed, so the page can only list the stars by sign. Yes, free: the chart is computed locally in your browser, with no internet and no charge; your birth data stays in your browser, and only if you tap AI Reading is a summary sent to the reading service.',
+  disclaimer: 'Qizheng Siyu is a traditional divination art, for reference only; it is not a basis for decisions.',
+  offlineNote: 'This page computes charts fully offline. Planetary positions use the local astronomy.browser.js and no data is sent to any server.',
+  langLabel: 'Language',
+  ai_interpret: 'AI Reading'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '七政四余 · ローカル占い',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '一生之図 · 出生星盤',
+  slogan: '七政行天、<br>四余佐命。',
+  subtitle: '七政四余 無料オンライン排盤',
+  labelQuestion: '質問（任意）',
+  phQuestion: '例：今年は転職に良い年？',
+  labelDate: '出生日',
+  labelTime: '出生時刻',
+  timeHint: '正確な時刻が分からなければ 12:00 でよいが、宮位は不確かになる。',
+  labelOffset: 'タイムゾーン（UTC オフセット、例 +8）',
+  labelLat: '出生地の緯度（任意）',
+  phLat: '例 31.23',
+  labelLon: '出生地の経度（任意）',
+  phLon: '例 121.47',
+  latlonHint: '出生地がなくても排盤できるが、宮位は出ない。宮位には経緯度から上昇点を求める必要がある。',
+  btnSubmit: '排盤する',
+  errNoDate: 'まず出生日を選択してください。',
+  errNoTime: '出生時刻を入力してください。',
+  errOffset: 'UTC オフセットは -12 から +14 の範囲で入力してください。',
+  errLatLon: '緯度と経度は両方入力するか、両方空欄にしてください。',
+  errLat: '緯度は -90 から 90 の範囲で入力してください。',
+  errLon: '経度は -180 から 180 の範囲で入力してください。',
+  errAstro: '天文計算ライブラリが読み込めませんでした。更新して再試行してください。',
+  resultTitle: '星盤',
+  readingsTitle: '星曜断語',
+  colStar: '星曜',
+  colSign: '星座',
+  colDeg: '宮内度数',
+  colLon: '恒星経度',
+  colPalace: '宮位',
+  noPalace: '—',
+  ascLabel: '上昇点',
+  ayaLabel: '歳差',
+  birthLabel: '出生',
+  utcLabel: 'UTC',
+  kindLuminary: '七政',
+  kindExtra: '四余',
+  methodNote: '算法の説明：七政の回帰経度はローカルの astronomy.browser.js で計算。恒星経度 = 回帰経度 − Lahiri 近似歳差。羅睺は平黄道上の月昇交点、計都はその対点。月孛は平月遠地点（Meeus 第 47 章）。紫炁は『張果星宗』の 29 年速度で J2000.0 を零点として推算する本サイトの約束です（FAQ 第 4 問参照）。',
+  read_sun: '名声・父縁・外に現れる輝きを司る。入った宮の事柄は人目に付きやすい。',
+  read_moon: '感情・母縁・内なる欲求を司る。入った宮の事柄は心を揺さぶりやすい。',
+  read_mars: '行動・競争・突破を司る。入った宮の事柄は能動的に進むべし、衝動は忌む。',
+  read_mercury: '思考・言葉・技芸を司る。入った宮の事柄は対話と学びに利あり、移り気を忌む。',
+  read_jupiter: '拡大・恩沢・成長を司る。入った宮の事柄は助けを得やすく、流れに乗るべし。',
+  read_venus: '愛情・楽しみ・財物を司る。入った宮の事柄は和合に利あり、耽溺を忌む。',
+  read_saturn: '責任・構造・遅滞を司る。入った宮の事柄は試練が多く、忍耐と守成が要る。',
+  read_rahu: '欲望・執念・常ならざる道を司る。入った宮の事柄は波乱を生みやすく、正を守り貪るなかれ。',
+  read_ketu: '収束・手放し・宿業を司る。入った宮の事柄は手放すべし、執着は忌む。',
+  read_ziqi: '恩庇・清貴・陰の助けを司る。入った宮の事柄は貴人に恵まれやすく、徳を積むべし。',
+  read_yuebei: '隠伏・暗昧・変数を司る。入った宮の事柄は慎重を要し、陰謀は忌む。',
+  faqTitle: '七政四余：無料排盤とよくある質問',
+  faqQ1: '七政四余とは？',
+  faqA1: '七政四余は果老星宗とも呼ばれる中国古代の星命体系です。七政は日・月・火・水・木・金・土の目に見える七曜、四余は羅睺・計都・紫炁・月孛の四つの隠曜（計算上の点で、肉眼で見える惑星ではありません）です。出生の瞬間に十一曜がどの星座・宮に入るかで読みます。',
+  faqQ2: 'このページの恒星黄道経度はどう計算していますか？',
+  faqA2: '七政はまず天文暦算で回帰黄道経度を求め、歳差（Lahiri 近似値：23.85 +（年 − 2000）× 0.01396 度）を引いて恒星黄道経度に換算します。これは Lahiri 歳差の線形近似であり、完全な Lahiri 級数ではないため、他のソフトとは分角単位の差が出ます。',
+  faqQ3: '羅睺は昇交点ですか、降交点ですか？',
+  faqA3: '史料は一致しません。羅睺を昇交点・計都を降交点とする古籍もあれば、その逆もあります。牛維星の 1994 年の考証では羅睺は月の昇交点、計都は本来月遠地点を指すとされます。本ページは現代で最も一般的な約束に従います：羅睺は平黄道上の月昇交点、計都はその対点（180 度加算）です。他のソフトと比べる際は、まず命名の約束を確認してください。',
+  faqQ4: '紫炁と月孛はどう計算していますか？信頼できますか？',
+  faqA4: '月孛は月遠地点で、Meeus『天文算法』第 47 章の平遠地点公式（83.3532465 + 4069.0137287 × T 度、T は J2000.0 からのユリウス世紀数）で計算します。これは現代ソフトで最も一般的な月孛の定義です。紫炁には合意された暦元がありません。古典『張果星宗』は速度（29 日に 1 度、29 年で一周）しか与えず、「28 年で一周」という説とも衝突し、どの日付における紫炁の位置も典籍は示していません。本ページは『張果星宗』の 29 年速度に従い、J2000.0 を白羊座 0 度とすることを明示した約束とします。これは古典の原文ではなく本サイトの約束であり、紫炁は本ページで最も不確かな項目で、他のソフトとは大きく異なります。',
+  faqQ5: '出生地を入れないと宮が出ないのはなぜですか？無料ですか？',
+  faqA5: '十二宮は上昇点の星座から整宮制で並べますが、上昇点は出生時の恒星時と出生地の緯度から求めるため、経緯度がなければ計算できず、星座だけの表示になります。無料です。排盤はブラウザ内でローカルに計算され、ネット接続も料金も不要です。出生情報はブラウザ内に留まり、AI 解釈を押したときだけ要約が解釈サービスに送られます。',
+  disclaimer: '七政四余は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  offlineNote: 'このページの排盤は完全オフラインで動作します。惑星位置はローカルの astronomy.browser.js で計算し、データは外部サーバーに送信されません。',
+  langLabel: '言語',
+  ai_interpret: 'AI 解釈'
+}
+};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var fe = document.getElementById('form-error'); if (fe) fe.textContent = '';
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// 十二星座：中文名 / 繁体 / 日文 / 英文
+var SIGNS = [
+  { zh: '白羊座', tw: '牡羊座', ja: '牡羊座', en: 'Aries' },
+  { zh: '金牛座', tw: '金牛座', ja: '牡牛座', en: 'Taurus' },
+  { zh: '双子座', tw: '雙子座', ja: '双子座', en: 'Gemini' },
+  { zh: '巨蟹座', tw: '巨蟹座', ja: '蟹座', en: 'Cancer' },
+  { zh: '狮子座', tw: '獅子座', ja: '獅子座', en: 'Leo' },
+  { zh: '处女座', tw: '處女座', ja: '乙女座', en: 'Virgo' },
+  { zh: '天秤座', tw: '天秤座', ja: '天秤座', en: 'Libra' },
+  { zh: '天蝎座', tw: '天蠍座', ja: '蠍座', en: 'Scorpio' },
+  { zh: '射手座', tw: '射手座', ja: '射手座', en: 'Sagittarius' },
+  { zh: '摩羯座', tw: '摩羯座', ja: '山羊座', en: 'Capricorn' },
+  { zh: '水瓶座', tw: '水瓶座', ja: '水瓶座', en: 'Aquarius' },
+  { zh: '双鱼座', tw: '雙魚座', ja: '魚座', en: 'Pisces' }
+];
+// 十二宫：中文名 + 英文名（整宫制，第一宫 = 上升点所在星座）
+var PALACES = [
+  { zh: '命宫', en: 'Life' },
+  { zh: '财帛', en: 'Wealth' },
+  { zh: '兄弟', en: 'Siblings' },
+  { zh: '田宅', en: 'Property' },
+  { zh: '男女', en: 'Children' },
+  { zh: '奴仆', en: 'Servants' },
+  { zh: '妻妾', en: 'Spouse' },
+  { zh: '疾厄', en: 'Health' },
+  { zh: '迁移', en: 'Travel' },
+  { zh: '官禄', en: 'Career' },
+  { zh: '福德', en: 'Fortune' },
+  { zh: '相貌', en: 'Appearance' }
+];
+// 十一曜：七政 + 四余
+var STARS = [
+  { id: 'sun', zh: '日', en: 'Sun', kind: 'luminary' },
+  { id: 'moon', zh: '月', en: 'Moon', kind: 'luminary' },
+  { id: 'mars', zh: '火', en: 'Mars', kind: 'luminary' },
+  { id: 'mercury', zh: '水', en: 'Mercury', kind: 'luminary' },
+  { id: 'jupiter', zh: '木', en: 'Jupiter', kind: 'luminary' },
+  { id: 'venus', zh: '金', en: 'Venus', kind: 'luminary' },
+  { id: 'saturn', zh: '土', en: 'Saturn', kind: 'luminary' },
+  { id: 'rahu', zh: '罗睺', en: 'Rahu', kind: 'extra' },
+  { id: 'ketu', zh: '计都', en: 'Ketu', kind: 'extra' },
+  { id: 'ziqi', zh: '紫炁', en: 'Ziqi', kind: 'extra' },
+  { id: 'yuebei', zh: '月孛', en: 'Yuebei', kind: 'extra' }
+];
+
+function mod360(x) { x = x % 360; if (x < 0) x += 360; return x; }
+function daysSinceJ2000(dateUTC) {
+  return (dateUTC.getTime() - Date.UTC(2000, 0, 1, 12, 0, 0)) / 86400000;
+}
+// Lahiri 岁差线性近似：23.85 + (年份 − 2000) × 0.01396 度
+function ayanamsa(year) { return 23.85 + (year - 2000) * 0.01396; }
+
+// 七政回归黄道经度：Sun 用 SunPosition，其余用 GeoVector + Ecliptic。
+// 注意：EclipticLongitude 是日心黄道经度、对太阳会报错，此处不用。
+function tropicalLongitudes(dateUTC) {
+  var time = new Astronomy.AstroTime(dateUTC);
+  var out = {};
+  out.sun = Astronomy.SunPosition(time).elon;
+  var bodies = [['moon', 'Moon'], ['mercury', 'Mercury'], ['venus', 'Venus'],
+                ['mars', 'Mars'], ['jupiter', 'Jupiter'], ['saturn', 'Saturn']];
+  for (var i = 0; i < bodies.length; i++) {
+    out[bodies[i][0]] = Astronomy.Ecliptic(
+      Astronomy.GeoVector(Astronomy.Body[bodies[i][1]], time, true)).elon;
+  }
+  return out;
+}
+// 罗睺 = 平月球升交点；计都 = 其对点
+function nodeLon(d) { return mod360(125.0445 - 0.0529538083 * d); }
+// 月孛 = 平月球远地点（Meeus《天文算法》第 47 章）：
+// p = 83.3532465 + 4069.0137287 × T 度，T 为自 J2000.0 起的儒略世纪数
+function yuebeiLon(d) { return mod360(83.3532465 + 4069.0137287 * (d / 36525)); }
+// 紫炁：《张果星宗》速率（二十九日行一度，二十九年一周天），
+// 本站约定以 J2000.0 为零点（白羊座 0 度）。古籍只给速率、未给历元，
+// 且“二十八年一周天”的说法与之冲突——见常见问题第 4 条。
+function ziqiLon(d) { return mod360(d / 29 / 365.25 * 360); }
+
+// 格林尼治平恒星时（度）
+function gmstDeg(d) {
+  var T = d / 36525;
+  return mod360(280.46061837 + 360.98564736629 * d + 0.000387933 * T * T - T * T * T / 38710000);
+}
+// 上升点（回归黄道经度）：标准公式
+// ASC = atan2(cos LST, −(sin LST · cos ε + tan φ · sin ε))
+function ascTropical(dateUTC, lat, lon) {
+  var d = daysSinceJ2000(dateUTC);
+  var lst = mod360(gmstDeg(d) + lon) * Math.PI / 180;
+  var eps = (23.4392911 - 3.563e-7 * d) * Math.PI / 180;
+  var phi = lat * Math.PI / 180;
+  var asc = Math.atan2(Math.cos(lst),
+    -(Math.sin(lst) * Math.cos(eps) + Math.tan(phi) * Math.sin(eps))) * 180 / Math.PI;
+  return mod360(asc);
+}
+
+function signIndex(lon) { return Math.floor(mod360(lon) / 30); }
+function degInSign(lon) { return mod360(lon) % 30; }
+function signDisplay(i) {
+  var s = SIGNS[i];
+  if (LANG === 'en') return s.en + ' ' + s.zh;
+  if (LANG === 'ja') return s.ja + ' ' + s.en;
+  if (LANG === 'zh-TW') return s.tw + ' ' + s.en;
+  return s.zh + ' ' + s.en;
+}
+function signShort(i) {
+  var s = SIGNS[i];
+  if (LANG === 'en') return s.en;
+  if (LANG === 'ja') return s.ja;
+  if (LANG === 'zh-TW') return s.tw;
+  return s.zh;
+}
+function starDisplay(st) { return st.zh + ' ' + st.en; }
+function palaceDisplay(i) { return PALACES[i].zh + ' ' + PALACES[i].en; }
+function fmtDeg(x) { return x.toFixed(1) + '°'; }
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function computeChart() {
+  var err = document.getElementById('form-error');
+  var dateVal = document.getElementById('birthdate').value;
+  var timeVal = document.getElementById('birthtime').value;
+  var offVal = parseFloat(document.getElementById('utcoffset').value);
+  var latRaw = document.getElementById('latitude').value.trim();
+  var lonRaw = document.getElementById('longitude').value.trim();
+  if (!dateVal) { err.textContent = t('errNoDate'); return null; }
+  if (!timeVal) { err.textContent = t('errNoTime'); return null; }
+  if (isNaN(offVal) || offVal < -12 || offVal > 14) { err.textContent = t('errOffset'); return null; }
+  var hasLat = latRaw !== '', hasLon = lonRaw !== '';
+  if (hasLat !== hasLon) { err.textContent = t('errLatLon'); return null; }
+  var lat = hasLat ? parseFloat(latRaw) : null;
+  var lon = hasLon ? parseFloat(lonRaw) : null;
+  if (hasLat && (isNaN(lat) || lat < -90 || lat > 90)) { err.textContent = t('errLat'); return null; }
+  if (hasLon && (isNaN(lon) || lon < -180 || lon > 180)) { err.textContent = t('errLon'); return null; }
+  if (typeof Astronomy === 'undefined') { err.textContent = t('errAstro'); return null; }
+  err.textContent = '';
+
+  var dp = dateVal.split('-');
+  var y = parseInt(dp[0], 10), m = parseInt(dp[1], 10), dd = parseInt(dp[2], 10);
+  var tp = timeVal.split(':');
+  var hh = parseInt(tp[0], 10), mm = parseInt(tp[1], 10);
+  var utcMs = Date.UTC(y, m - 1, dd, 0, 0) + (hh * 60 + mm - offVal * 60) * 60000;
+  var utcDate = new Date(utcMs);
+  var d = daysSinceJ2000(utcDate);
+  var aya = ayanamsa(y);
+
+  var trop = tropicalLongitudes(utcDate);
+  var sid = {};
+  var ids = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'];
+  for (var i = 0; i < ids.length; i++) sid[ids[i]] = mod360(trop[ids[i]] - aya);
+  var rahu = nodeLon(d);
+  sid.rahu = mod360(rahu - aya);
+  sid.ketu = mod360(rahu + 180 - aya);
+  sid.yuebei = mod360(yuebeiLon(d) - aya);
+  sid.ziqi = mod360(ziqiLon(d) - aya);
+
+  var ascSid = null;
+  if (lat !== null && lon !== null) ascSid = mod360(ascTropical(utcDate, lat, lon) - aya);
+  var ascSign = ascSid === null ? null : signIndex(ascSid);
+
+  var rows = [];
+  for (var j = 0; j < STARS.length; j++) {
+    var st = STARS[j];
+    var sLon = sid[st.id];
+    var sIdx = signIndex(sLon);
+    rows.push({
+      id: st.id, kind: st.kind, lon: sLon, sign: sIdx, deg: degInSign(sLon),
+      palace: ascSign === null ? null : (sIdx - ascSign + 12) % 12
+    });
+  }
+  return {
+    dateStr: dateVal, timeStr: timeVal, offset: offVal,
+    lat: lat, lon: lon, aya: aya, ascSid: ascSid, ascSign: ascSign,
+    rows: rows, utcDate: utcDate
+  };
+}
+
+function doChart() {
+  var c = computeChart();
+  if (c) showResult(c);
+}
+
+function showResult(c, noScroll) {
+  LAST_RESULT = c;
+  var offTxt = (c.offset >= 0 ? '+' : '') + c.offset;
+  var head = t('birthLabel') + '：<b>' + esc(c.dateStr) + ' ' + esc(c.timeStr) + ' ' + t('utcLabel') + offTxt + '</b><br>';
+  head += t('ayaLabel') + '：<b>' + c.aya.toFixed(2) + '°</b><br>';
+  if (c.ascSid !== null) {
+    head += t('ascLabel') + '：<b>' + signDisplay(c.ascSign) + ' ' + fmtDeg(degInSign(c.ascSid)) + '</b>（' + palaceDisplay(0) + '）';
+  } else {
+    head += t('ascLabel') + '：<b>' + t('noPalace') + '</b>';
+  }
+  document.getElementById('result-head').innerHTML = head;
+
+  var html = '<table class="star-table"><thead><tr><th>' + t('colStar') + '</th><th>' + t('colSign') + '</th><th>' + t('colDeg') + '</th><th>' + t('colLon') + '</th><th>' + t('colPalace') + '</th></tr></thead><tbody>';
+  for (var i = 0; i < c.rows.length; i++) {
+    var r = c.rows[i];
+    var st = STARS[i];
+    var kind = r.kind === 'luminary' ? t('kindLuminary') : t('kindExtra');
+    html += '<tr' + (r.kind === 'extra' ? ' class="extra"' : '') + '><td><b>' + starDisplay(st) + '</b><span class="sub">' + kind + '</span></td>' +
+      '<td>' + signDisplay(r.sign) + '</td>' +
+      '<td>' + fmtDeg(r.deg) + '</td>' +
+      '<td>' + fmtDeg(r.lon) + '</td>' +
+      '<td>' + (r.palace === null ? t('noPalace') : palaceDisplay(r.palace)) + '</td></tr>';
+  }
+  html += '</tbody></table>';
+  document.getElementById('star-table-wrap').innerHTML = html;
+
+  var rd = '';
+  for (var k = 0; k < c.rows.length; k++) {
+    var rk = c.rows[k];
+    rd += '<div class="reading"><b>' + starDisplay(STARS[k]) + '</b> · ' + signShort(rk.sign) + ' ' + fmtDeg(rk.deg) +
+      (rk.palace === null ? '' : ' · ' + palaceDisplay(rk.palace)) + '——' + t('read_' + rk.id) + '</div>';
+  }
+  document.getElementById('reading-list').innerHTML = rd;
+  document.getElementById('method-note').textContent = t('methodNote');
+
+  document.getElementById('result-card').classList.remove('hidden');
+  if (!noScroll) document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+// ==LOGIC-END==
+
+// ---- AI 解读：供 /js/ai-jiegua.js 调用 ----
+// 优先读 JS 状态变量 LAST_RESULT（不改任何排盘计算逻辑），
+// 未排盘时返回 null，共享脚本会提示先排盘。
+window.getJieguaQuestion = function() {
+  var el = document.getElementById('question');
+  return el ? el.value.trim() : '';
+};
+window.getJieguaSummary = function() {
+  if (!LAST_RESULT) return null;
+  var c = LAST_RESULT;
+  function part(id, zhName) {
+    var row = null;
+    for (var i = 0; i < c.rows.length; i++) if (c.rows[i].id === id) row = c.rows[i];
+    return zhName + SIGNS[row.sign].zh + fmtDeg(row.deg);
+  }
+  var offTxt = (c.offset >= 0 ? '+' : '') + c.offset;
+  var s = '七政四余 出生' + c.dateStr + ' ' + c.timeStr + ' UTC' + offTxt + '：' +
+    part('sun', '日') + '、' + part('moon', '月') + '、' + part('mars', '火') + '、' +
+    part('mercury', '水') + '、' + part('jupiter', '木') + '、' + part('venus', '金') + '、' +
+    part('saturn', '土') + '；' +
+    part('rahu', '罗睺') + '、' + part('ketu', '计都') + '、' +
+    part('ziqi', '紫炁') + '、' + part('yuebei', '月孛');
+  if (c.ascSid !== null) {
+    s += '；命宫' + SIGNS[c.ascSign].zh + fmtDeg(degInSign(c.ascSid));
+  }
+  return s;
+};
+
+// 默认填入今天日期
+(function() {
+  var d = new Date();
+  function p(n) { return (n < 10 ? '0' : '') + n; }
+  document.getElementById('birthdate').value =
+    d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+})();
+// 初始化界面语言（localStorage 优先，否则按浏览器语言自动检测）
+applyI18n();
+</script>
+<script src="/js/ai-jiegua.js"></script>
+<script>
+// 共享脚本与本页主脚本都已加载后再挂接（getJieguaSummary 已定义）。
+if (window.AIInterpret) window.AIInterpret.attach();
+</script>
+</body>
+</html>

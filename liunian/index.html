@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 流年流月</title>
+<style>
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .method-row { display: flex; gap: 2rem; }
+  .method-row > .field { flex: 1; min-width: 0; }
+  .check-row { display: flex; align-items: center; gap: .6rem; margin-bottom: 1.4rem; font-size: .9rem; color: #c8c2ae; }
+  .check-row input { accent-color: #c9a962; width: 1rem; height: 1rem; }
+  .lunar-preview { font-size: .88rem; color: #9a9aab; line-height: 1.9; margin-top: .5rem; }
+  .lunar-preview b { color: #c9a962; font-weight: 600; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+  .hint { color: #9a9aab; font-size: .85rem; line-height: 1.8; margin-bottom: 1rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .verdict { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .level { color: #c9a962; font-weight: 700; }
+  .pillar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.2rem; }
+  .pillar-card { border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1rem .7rem; text-align: center; }
+  .pillar-card.day-master { border-color: #c9a962; background: rgba(201,169,98,.06); }
+  .pillar-card h3 { font-size: .8rem; color: #b08d3e; font-weight: 400; letter-spacing: .25em; margin-bottom: .5rem; }
+  .pillar-card .gz { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.9rem; color: #f0ead8; letter-spacing: .08em; }
+  .pillar-card .gz .roman { display: block; font-size: .72rem; color: #6f6f80; letter-spacing: .12em; margin-top: .15rem; font-family: inherit; }
+  .pillar-card .tg { font-size: .92rem; color: #c9a962; margin-top: .5rem; }
+  .pillar-card .meta { font-size: .82rem; color: #9a9aab; line-height: 1.9; margin-top: .4rem; }
+  .pillar-card .hidden-stems { font-size: .82rem; color: #c8c2ae; line-height: 1.9; border-top: 1px dashed rgba(201,169,98,.35); margin-top: .6rem; padding-top: .5rem; }
+  .pillar-card .hidden-stems b { color: #f0ead8; font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin-top: 1.2rem; }
+  table.chart { width: 100%; border-collapse: collapse; font-size: .88rem; min-width: 560px; }
+  table.chart th { color: #b08d3e; font-weight: 400; letter-spacing: .18em; text-align: left; padding: .5rem .6rem; border-bottom: 1px solid rgba(201,169,98,.45); white-space: nowrap; }
+  table.chart td { padding: .55rem .6rem; border-bottom: 1px solid rgba(201,169,98,.12); color: #c8c2ae; white-space: nowrap; line-height: 1.6; }
+  table.chart tr.current td { color: #f0ead8; background: rgba(201,169,98,.06); }
+  table.chart td .flag { color: #e8c97a; font-weight: 700; }
+  .chip { display: inline-block; border: 1px solid rgba(201,169,98,.5); border-radius: 999px; padding: .15rem .7rem; margin: 0 .35rem .5rem 0; font-size: .85rem; color: #c8c2ae; }
+  .chip b { color: #c9a962; font-weight: 600; }
+  .chip.missing { border-color: rgba(217,123,108,.6); color: #d97b6c; }
+  .chip.missing b { color: #d97b6c; }
+  .duan-block { margin-top: 1.6rem; }
+  .duan-block h3 { font-size: .85rem; color: #c9a962; letter-spacing: .25em; font-weight: 400; margin-bottom: .7rem; }
+  .duan-item { padding: .7rem 0; border-bottom: 1px solid rgba(201,169,98,.12); font-size: .92rem; line-height: 1.9; color: #c8c2ae; }
+  .duan-item:last-child { border-bottom: none; }
+  .duan-item .cond { color: #c9a962; font-weight: 600; }
+  .duan-item .src { color: #6f6f80; font-size: .8rem; }
+  .duan-note { font-size: .82rem; color: #6f6f80; line-height: 1.8; margin-top: .6rem; }
+  .data-status { font-size: .82rem; color: #6f6f80; margin-top: 1rem; line-height: 1.8; }
+  .data-status.err { color: #d97b6c; }
+  details.refbox { margin-top: 1.6rem; border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1rem 1.2rem; }
+  details.refbox summary { cursor: pointer; color: #c9a962; font-size: .9rem; letter-spacing: .12em; list-style: none; }
+  details.refbox summary::-webkit-details-marker { display: none; }
+  details.refbox summary::after { content: ' +'; }
+  details.refbox[open] summary::after { content: ' −'; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .method-row { flex-direction: column; gap: 0; }
+    .pillar-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .hit-item { padding: .55rem 0; border-bottom: 1px solid rgba(201,169,98,.12); font-size: .92rem; line-height: 1.9; color: #c8c2ae; }
+  .hit-item:last-child { border-bottom: none; }
+  .hit-item b { color: #c9a962; font-weight: 600; }
+
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">流年流月 · 本地推算</div>
+    </div>
+  </a>
+      <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <a class="nav-item" href="/taixuan/"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></a>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></span>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">时机之轮 · 年度运势</div>
+  <h1 class="slogan" data-i18n-html="slogan">流年既至，<br>一岁之气自分。</h1>
+  <p class="subtitle" data-i18n="subtitle">流年流月免费在线推算</p>
+
+  <section class="section">
+    <div class="method-row">
+      <div class="field">
+        <label for="birth" data-i18n="labelBirth">出生日期与时间（公历）</label>
+        <input type="datetime-local" id="birth" onchange="updateLunarPreview()">
+        <div class="lunar-preview" id="lunar-preview"></div>
+        <div class="error" id="birth-error"></div>
+      </div>
+      <div class="field">
+        <label for="gender" data-i18n="labelGender">性别</label>
+        <select id="gender">
+          <option value="1" selected data-i18n="optMale">男</option>
+          <option value="0" data-i18n="optFemale">女</option>
+        </select>
+      </div>
+    </div>
+    <div class="method-row">
+      <div class="field">
+        <label for="target-year" data-i18n="labelTargetYear">目标年份（流年）</label>
+        <input type="number" id="target-year" min="1900" max="2100" step="1">
+        <div class="error" id="year-error"></div>
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <div class="hint" data-i18n="formHint">年柱与流年均以立春为界，流月以节气为界。输入的时间按当地太阳时理解，本页不做经度真太阳时换算。</div>
+      </div>
+    </div>
+    <label class="check-row"><input type="checkbox" id="unknown-hour" onchange="toggleUnknownHour()"> <span data-i18n="labelUnknownHour">时辰不明（只排年月日三柱）</span></label>
+    <button class="submit-btn" onclick="doLiunian()" data-i18n="btnSubmit">推算 · 流年流月</button>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">推算结果</div>
+    <div class="result-head" id="result-head"></div>
+    <div class="duan-block"><h3 data-i18n="secBirth">命局（出生四柱）</h3><div class="pillar-grid" id="pillar-grid"></div></div>
+    <div class="duan-block" id="liunian-block"></div>
+    <div class="duan-block" id="hits-block"></div>
+    <div class="duan-block" id="months-block"></div>
+    <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="liunian" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+  </section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">流年流月：免费推算与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">流年干支是怎么定的？为什么以立春为界？</summary>
+      <p data-i18n="faqA1">流年即当年的干支，与年柱同法：立春之前仍属上一年，立春之后才是新的一年。本页取目标年 6 月 15 日的年柱作为该年流年，6 月必在立春之后，故不受立春日期（2 月 3–5 日）浮动的影响。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">流月干支是怎么排的？什么是五虎遁？</summary>
+      <p data-i18n="faqA2">流月地支固定：正月寅、二月卯……十一月子、十二月丑；天干由年干按“五虎遁”推：甲己之年丙作首（正月丙寅），乙庚之年戊作首，丙辛之年庚作首，丁壬之年壬作首，戊癸之年甲作首，其后按十天干顺序顺推。流月以节气为界，如寅月为立春至惊蛰，不是按公历 1 号换月。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">合、冲、刑、害是什么意思？冲就一定不好吗？</summary>
+      <p data-i18n="faqA3">合是相合、冲是相冲、刑是相刑、害是相害，都是天干（五合）与地支之间的生克关系名。本页只列出“出现了哪一组关系”，不下吉凶定论：同一组冲合在不同命局、不同大运里应事不同，须结合日主强弱与用神看，冲也常主变动、未必是坏事。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">流月的一行断语是怎么来的？</summary>
+      <p data-i18n="faqA4">每月断语是按该月天干相对日主的十神套用的通用模板（如正官月主名声职位、偏财月主意外机遇），只作方向提示，不是针对个人的具体推断。同一十神在不同命局里轻重不同。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">为什么本页不取用神、不定格局？</summary>
+      <p data-i18n="faqA5">取用神与定格局是八字中最活的一层：子平真诠专寻月令、滴天髓主中和、穷通宝鉴重调候，各书取法互相矛盾，取错则全盘皆错，须先选流派再人工判断。本页只给出可机算的排盘与可查验的关系，不代断用神格局。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ6">流年流月推算免费吗？数据会上传吗？</summary>
+      <p data-i18n="faqA6">免费。本页推算在本地完成，不联网、不收费，也不会保存你的出生信息。农历与节气换算使用本地 lunar.js。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">流年流月属传统术数，仅供参考，不构成决策依据。</span><br>
+    <span data-i18n="offlineNote">本页推算完全离线运行，农历与节气换算使用本地 lunar.js，不向任何服务器发送数据。</span><br>
+    <span data-i18n="methodNote">方法说明：流年以立春为界；流月天干按五虎遁推算，地支固定为寅月至丑月；流月以节气为界。合冲刑害只列关系、不定吉凶；月断语为十神通用模板。</span>
+  </footer>
+</div>
+</main>
+<script src="lunar.js"></script>
+<script>
+// ==I18N==
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '四柱八字 · 本地排盘',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '一生之图 · 命盘信息',
+  slogan: '四柱既立，<br>一生之图自分。',
+  subtitle: '四柱八字免费在线排盘',
+  labelBirth: '出生日期与时间（公历）',
+  labelGender: '性别',
+  optMale: '男',
+  optFemale: '女',
+  labelUnknownHour: '时辰不明（只排年月日三柱）',
+  formHint: '年柱以立春为界，月柱以节气为界，日柱按六十甲子日夜交替，时柱按日干推算。输入的时间按当地太阳时理解，本页不做经度真太阳时换算。',
+  btnSubmit: '起盘 · 排八字',
+  errNoBirth: '请先选择出生日期与时间。',
+  errBadBirth: '出生时间格式不正确。',
+  errYearRange: '本页支持 1890–2100 年出生排盘。',
+  resultTitle: '排盘结果',
+  ai_interpret: 'AI 解读',
+  lunarLabel: '农历',
+  zodiacLabel: '生肖',
+  dayMasterIs: '日主',
+  pillarYear: '年柱',
+  pillarMonth: '月柱',
+  pillarDay: '日柱',
+  pillarHour: '时柱',
+  hourUnknown: '时辰不明',
+  colStemGod: '天干十神',
+  colHidden: '地支藏干',
+  colElement: '五行',
+  colNayin: '纳音',
+  colChangsheng: '长生',
+  secWuxing: '五行统计',
+  wuxingCount: '四柱干支五行计数',
+  wuxingMissing: '缺',
+  wuxingNoneMissing: '五行俱全，无所缺。',
+  wuxingUnknownHour: '时辰不明，五行统计仅按年月日三柱计算，缺失未必为真缺。',
+  likiNote: '以下断语来自 liki 整理层，仅就“五行缺失”这一可直接查验的条件命中：',
+  classicNote: '',
+  secDayun: '大运',
+  dayunStart: '起运',
+  dayunForward: '顺排',
+  dayunBackward: '逆排',
+  dayunCurrent: '当前大运',
+  dayunBefore: '起运前',
+  colDayun: '大运',
+  colYears: '年份',
+  colAge: '年龄（周岁）',
+  colDayunGod: '天干十神',
+  secLiunian: '流年',
+  liunianCurrent: '今年流年',
+  liunianBeyond: '今年已超出本页所列大运范围（大运列至约 106 岁）。',
+  liunianInDayun: '本步大运流年',
+  colLiunian: '流年',
+  colLiunianAge: '年龄（周岁）',
+  xiaoyunBtn: '展开小运',
+  xiaoyunNote: '小运以时柱起运，一年一步；时辰不明时不排小运。',
+  nayinBtn: '展开纳音详解',
+  secShensha: '神煞',
+  shenshaNone: '四柱中未查到本页所列神煞。',
+  shenshaNote: '本页只列其中可按规则直接查验的神煞；神煞只作参考，不定吉凶。',
+  shenshaHit: '见于',
+  secGuji: '古籍断语',
+  gujiYueling: '月令金不换',
+  gujiShishi: '日时断',
+  gujiYiji: '十干宜忌（滴天髓）',
+  gujiTiaohou: '调候宜忌（穷通宝鉴）',
+  gujiTiyao: '八字提要',
+  gujiMingli: '古籍命例',
+  gujiDtd: '滴天髓阐微命例',
+  gujiDayun: '原书大运',
+  gujiNoMatch: '古籍库中未收录与此四柱完全相同的命例。',
+  gujiSource: '出处',
+  dataLoading: '断语数据加载中……',
+  dataFail: '断语数据未能加载，仅显示排盘；可刷新后重试。',
+  dataReady: '断语数据已加载。',
+  faqTitle: '四柱八字：免费排盘与使用常见问题',
+  faqQ1: '年柱为什么以立春为界，不以春节为界？',
+  faqA1: '八字以节气定年：立春之前出生，年柱仍属上一年；立春之后出生，年柱才是新的一年。春节是农历正月初一，与立春常差几天，1 月、2 月出生的人尤其要注意。',
+  faqQ2: '月柱是怎么定的？',
+  faqA2: '月柱以节气（立春、惊蛰、清明、立夏、芒种、小暑、立秋、白露、寒露、立冬、大雪、小寒）为界，每月从节开始，到下一个节之前结束；不是按公历 1 号换月，也不是按农历初一换月。',
+  faqQ3: '时辰不明怎么办？',
+  faqA3: '时辰不明时，本页只排年月日三柱，大运与流年照常排；时柱、小运与日时断语需要时辰，暂不显示。子时是 23:00 至次日 1:00，夜子时（23:00–24:00）仍属当日的日柱、早子时（0:00–1:00）属次日。',
+  faqQ4: '大运顺排还是逆排？起运怎么算？',
+  faqA4: '阳年出生的男性与阴年出生的女性顺排，阴年出生的男性与阳年出生的女性逆排（阳年指年干为甲丙戊庚壬）。起运按传统“三天折一年”法：顺排数到下一个节，逆排数回上一个节，三天折一岁。不同排盘软件因节气时刻表与折算口径不同，起运月龄可差一两个月，大运干支与交运年份一致为准。',
+  faqQ5: '为什么本页不取用神、不定格局？',
+  faqA5: '取用神与定格局是八字中最活的一层：子平真诠专寻月令、滴天髓主中和、穷通宝鉴重调候，各书取法互相矛盾，取错则全盘皆错，须先选流派再人工判断。本页只给出可机算的排盘与可查验的断语原文，不代断用神格局。',
+  faqQ6: '四柱八字排盘免费吗？数据从哪里来？',
+  faqA6: '免费。本页排盘在本地完成，不联网、不收费，也不会保存你的出生信息。断语数据来自 comprehensive-shushu-engine（GPL-3.0）所收的三命通会、渊海子平、滴天髓阐微、子平真诠等古典命理文献，五行缺失类断语来自 liki 整理层（MIT）。',
+  disclaimer: '四柱八字属传统术数，仅供参考，不构成决策依据。',
+  attrLine: '断语数据：comprehensive-shushu-engine（GPL-3.0），三命通会 · 渊海子平 · 滴天髓阐微 · 子平真诠；五行断语：liki（MIT）。',
+  offlineNote: '本页排盘完全离线运行，农历与节气换算使用本地 lunar.js，不向任何服务器发送数据；断语文本按需从本站数据文件加载。',
+  langLabel: '语言',
+  seasonSpring: '春', seasonSummer: '夏', seasonAutumn: '秋', seasonWinter: '冬',
+  yearsOld: '岁', monthsOld: '个月', daysOld: '天'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '四柱八字 · 本地排盤',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '一生之圖 · 命盤資訊',
+  slogan: '四柱既立，<br>一生之圖自分。',
+  subtitle: '四柱八字免費線上排盤',
+  labelBirth: '出生日期與時間（公曆）',
+  labelGender: '性別',
+  optMale: '男',
+  optFemale: '女',
+  labelUnknownHour: '時辰不明（只排年月日三柱）',
+  formHint: '年柱以立春為界，月柱以節氣為界，日柱按六十甲子日夜交替，時柱按日干推算。輸入的時間按當地太陽時理解，本頁不做經度真太陽時換算。',
+  btnSubmit: '起盤 · 排八字',
+  errNoBirth: '請先選擇出生日期與時間。',
+  errBadBirth: '出生時間格式不正確。',
+  errYearRange: '本頁支援 1890–2100 年出生排盤。',
+  resultTitle: '排盤結果',
+  ai_interpret: 'AI 解讀',
+  lunarLabel: '農曆',
+  zodiacLabel: '生肖',
+  dayMasterIs: '日主',
+  pillarYear: '年柱',
+  pillarMonth: '月柱',
+  pillarDay: '日柱',
+  pillarHour: '時柱',
+  hourUnknown: '時辰不明',
+  colStemGod: '天干十神',
+  colHidden: '地支藏干',
+  colElement: '五行',
+  colNayin: '納音',
+  colChangsheng: '長生',
+  secWuxing: '五行統計',
+  wuxingCount: '四柱干支五行計數',
+  wuxingMissing: '缺',
+  wuxingNoneMissing: '五行俱全，無所缺。',
+  wuxingUnknownHour: '時辰不明，五行統計僅按年月日三柱計算，缺失未必為真缺。',
+  likiNote: '以下斷語來自 liki 整理層，僅就「五行缺失」這一可直接查驗的條件命中：',
+  classicNote: '',
+  secDayun: '大運',
+  dayunStart: '起運',
+  dayunForward: '順排',
+  dayunBackward: '逆排',
+  dayunCurrent: '當前大運',
+  dayunBefore: '起運前',
+  colDayun: '大運',
+  colYears: '年份',
+  colAge: '年齡（週歲）',
+  colDayunGod: '天干十神',
+  secLiunian: '流年',
+  liunianCurrent: '今年流年',
+  liunianBeyond: '今年已超出本頁所列大運範圍（大運列至約 106 歲）。',
+  liunianInDayun: '本步大運流年',
+  colLiunian: '流年',
+  colLiunianAge: '年齡（週歲）',
+  xiaoyunBtn: '展開小運',
+  xiaoyunNote: '小運以時柱起運，一年一步；時辰不明時不排小運。',
+  nayinBtn: '展開納音詳解',
+  secShensha: '神煞',
+  shenshaNone: '四柱中未查到本頁所列神煞。',
+  shenshaNote: '本頁只列其中可按規則直接查驗的神煞；神煞只作參考，不定吉凶。',
+  shenshaHit: '見於',
+  secGuji: '古籍斷語',
+  gujiYueling: '月令金不換',
+  gujiShishi: '日時斷',
+  gujiYiji: '十干宜忌（滴天髓）',
+  gujiTiaohou: '調候宜忌（窮通寶鑑）',
+  gujiTiyao: '八字提要',
+  gujiMingli: '古籍命例',
+  gujiDtd: '滴天髓闡微命例',
+  gujiDayun: '原書大運',
+  gujiNoMatch: '古籍庫中未收錄與此四柱完全相同的命例。',
+  gujiSource: '出處',
+  dataLoading: '斷語數據加載中……',
+  dataFail: '斷語數據未能加載，僅顯示排盤；可刷新後重試。',
+  dataReady: '斷語數據已加載。',
+  faqTitle: '四柱八字：免費排盤與使用常見問題',
+  faqQ1: '年柱為什麼以立春為界，不以春節為界？',
+  faqA1: '八字以節氣定年：立春之前出生，年柱仍屬上一年；立春之後出生，年柱才是新的一年。春節是農曆正月初一，與立春常差幾天，1 月、2 月出生的人尤其要注意。',
+  faqQ2: '月柱是怎麼定的？',
+  faqA2: '月柱以節氣（立春、驚蟄、清明、立夏、芒種、小暑、立秋、白露、寒露、立冬、大雪、小寒）為界，每月從節開始，到下一個節之前結束；不是按公曆 1 號換月，也不是按農曆初一換月。',
+  faqQ3: '時辰不明怎麼辦？',
+  faqA3: '時辰不明時，本頁只排年月日三柱，大運與流年照常排；時柱、小運與日時斷語需要時辰，暫不顯示。子時是 23:00 至次日 1:00，夜子時（23:00–24:00）仍屬當日的日柱、早子時（0:00–1:00）屬次日。',
+  faqQ4: '大運順排還是逆排？起運怎麼算？',
+  faqA4: '陽年出生的男性與陰年出生的女性順排，陰年出生的男性與陽年出生的女性逆排（陽年指年干為甲丙戊庚壬）。起運按傳統「三天折一年」法：順排數到下一個節，逆排數回上一個節，三天折一歲。不同排盤軟體因節氣時刻表與折算口徑不同，起運月齡可差一兩個月，大運干支與交運年份一致為準。',
+  faqQ5: '為什麼本頁不取用神、不定格局？',
+  faqA5: '取用神與定格局是八字中最活的一層：子平真詮專尋月令、滴天髓主中和、窮通寶鑑重調候，各書取法互相矛盾，取錯則全盤皆錯，須先選流派再人工判斷。本頁只給出可機算的排盤與可查驗的斷語原文，不代斷用神格局。',
+  faqQ6: '四柱八字排盤免費嗎？數據從哪裡來？',
+  faqA6: '免費。本頁排盤在本地完成，不聯網、不收費，也不會保存你的出生資訊。斷語數據來自 comprehensive-shushu-engine（GPL-3.0）所收的三命通會、淵海子平、滴天髓闡微、子平真詮等古典命理文獻，五行缺失類斷語來自 liki 整理層（MIT）。',
+  disclaimer: '四柱八字屬傳統術數，僅供參考，不構成決策依據。',
+  attrLine: '斷語數據：comprehensive-shushu-engine（GPL-3.0），三命通會 · 淵海子平 · 滴天髓闡微 · 子平真詮；五行斷語：liki（MIT）。',
+  offlineNote: '本頁排盤完全離線運行，農曆與節氣換算使用本地 lunar.js，不向任何伺服器發送數據；斷語文本按需從本站數據文件加載。',
+  langLabel: '語言',
+  seasonSpring: '春', seasonSummer: '夏', seasonAutumn: '秋', seasonWinter: '冬',
+  yearsOld: '歲', monthsOld: '個月', daysOld: '天'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Four Pillars · Local Chart',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'Life Chart · Birth Information',
+  slogan: 'Once the four pillars stand,<br>the chart of a life draws itself.',
+  subtitle: 'Free online Four Pillars (Bazi) chart',
+  labelBirth: 'Date and time of birth (Gregorian)',
+  labelGender: 'Gender',
+  optMale: 'Male',
+  optFemale: 'Female',
+  labelUnknownHour: 'Birth hour unknown (chart only year, month and day)',
+  formHint: 'The year pillar changes at Lichun (Start of Spring), the month pillar at each solar term, the day pillar follows the 60-day cycle, and the hour pillar is derived from the day stem. The time you enter is taken as local solar time; no longitude-based true-solar-time correction is applied.',
+  btnSubmit: 'Cast the chart',
+  errNoBirth: 'Please choose a date and time of birth first.',
+  errBadBirth: 'The birth time format is invalid.',
+  errYearRange: 'This page charts births from 1890 to 2100.',
+  resultTitle: 'The Chart',
+  ai_interpret: 'AI Reading',
+  lunarLabel: 'Lunar date',
+  zodiacLabel: 'Zodiac',
+  dayMasterIs: 'Day Master',
+  pillarYear: 'Year Pillar',
+  pillarMonth: 'Month Pillar',
+  pillarDay: 'Day Pillar',
+  pillarHour: 'Hour Pillar',
+  hourUnknown: 'Hour unknown',
+  colStemGod: 'Stem: Ten God',
+  colHidden: 'Hidden stems',
+  colElement: 'Element',
+  colNayin: 'Nayin',
+  colChangsheng: 'Stage',
+  secWuxing: 'Five Elements',
+  wuxingCount: 'Element counts across the eight stem-branch characters',
+  wuxingMissing: 'Missing',
+  wuxingNoneMissing: 'All five elements are present.',
+  wuxingUnknownHour: 'The birth hour is unknown, so the counts use only the year, month and day pillars; a “missing” element may not truly be missing.',
+  likiNote: 'The readings below come from the liki layer and match only the directly checkable condition of a missing element:',
+  classicNote: 'Classical texts are shown in Chinese.',
+  secDayun: 'Luck Cycles (Dayun)',
+  dayunStart: 'Luck begins',
+  dayunForward: 'Forward',
+  dayunBackward: 'Backward',
+  dayunCurrent: 'Current cycle',
+  dayunBefore: 'Before luck begins',
+  colDayun: 'Luck cycle',
+  colYears: 'Years',
+  colAge: 'Age',
+  colDayunGod: 'Stem: Ten God',
+  secLiunian: 'Annual Luck (Liunian)',
+  liunianCurrent: 'This year',
+  liunianBeyond: 'This year falls beyond the luck cycles listed here (shown to about age 106).',
+  liunianInDayun: 'Years within this luck cycle',
+  colLiunian: 'Year',
+  colLiunianAge: 'Age',
+  xiaoyunBtn: 'Show minor luck cycles (Xiaoyun)',
+  xiaoyunNote: 'Minor luck starts from the hour pillar, one step per year; it is not shown when the birth hour is unknown.',
+  nayinBtn: 'Show Nayin details',
+  secShensha: 'Symbolic Stars (Shensha)',
+  shenshaNone: 'None of the stars listed on this page appear in these four pillars.',
+  shenshaNote: 'Only stars whose rules can be checked directly are listed here; stars are for reference only and do not decide fortune.',
+  shenshaHit: 'Found in',
+  secGuji: 'Classical Readings',
+  gujiYueling: 'Monthly command (Jin Bu Huan)',
+  gujiShishi: 'Day-hour reading',
+  gujiYiji: 'Ten stems: likes and dislikes (Di Tian Sui)',
+  gujiTiaohou: 'Seasonal balance (Qiong Tong Bao Jian)',
+  gujiTiyao: 'Bazi outline',
+  gujiMingli: 'Classical case with the same pillars',
+  gujiDtd: 'Di Tian Sui case with the same pillars',
+  gujiDayun: 'Luck cycles in the book',
+  gujiNoMatch: 'No case with exactly these four pillars was found in the classical library.',
+  gujiSource: 'Source',
+  dataLoading: 'Loading the readings data…',
+  dataFail: 'The readings data could not be loaded; only the chart is shown. Please refresh and try again.',
+  dataReady: 'Readings data loaded.',
+  faqTitle: 'Four Pillars (Bazi): Free Chart & FAQ',
+  faqQ1: 'Why does the year pillar change at Lichun rather than Chinese New Year?',
+  faqA1: 'Bazi counts the year by solar terms: before Lichun the year pillar still belongs to the previous year, and only after Lichun does it become the new year. Chinese New Year is the first day of the lunar year and often falls days away from Lichun, which matters most for people born in January or February.',
+  faqQ2: 'How is the month pillar set?',
+  faqA2: 'The month pillar changes at the solar terms (Lichun, Jingzhe, Qingming, Lixia, Mangzhong, Xiaoshu, Liqiu, Bailu, Hanlu, Lidong, Daxue, Xiaohan). Each month runs from one term to the next — not from the 1st of the Gregorian month, and not from the 1st of the lunar month.',
+  faqQ3: 'What if I do not know my birth hour?',
+  faqA3: 'When the hour is unknown, this page charts only the year, month and day pillars; luck cycles and annual luck still work. The hour pillar, minor luck cycles and day-hour readings need the hour, so they are left out. The Zi hour runs 23:00–01:00; the late Zi hour (23:00–24:00) still belongs to the current day pillar, while the early Zi hour (00:00–01:00) belongs to the next day.',
+  faqQ4: 'Do luck cycles run forward or backward? How is the starting age found?',
+  faqA4: 'Men born in a yang year and women born in a yin year run forward; men born in a yin year and women born in a yang year run backward (a yang year is one whose year stem is Jia, Bing, Wu, Geng or Ren). The starting age uses the traditional “three days count as one year” rule: forward counts to the next solar term, backward counts back to the previous one. Different calculators use different solar-term tables and rounding, so the starting age in months can differ by a month or two; the cycle stems and the changeover years are what to go by.',
+  faqQ5: 'Why does this page not pick a Useful God (Yongshen) or a chart pattern?',
+  faqA5: 'Choosing a Useful God and a pattern is the most judgment-based layer of Bazi: Zi Ping Zhen Quan looks to the month command, Di Tian Sui aims at balance, and Qiong Tong Bao Jian stresses seasonal adjustment, and the schools contradict each other — a wrong pick spoils the whole reading, so it needs a chosen school and a human reading. This page gives only what can be computed and the classical texts that can be checked, and does not decide Yongshen or pattern for you.',
+  faqQ6: 'Is the Bazi chart free? Where does the data come from?',
+  faqA6: 'Yes, free. The chart is computed locally in your browser — no internet, no charge, and your birth information is never saved. The readings come from the comprehensive-shushu-engine collection (GPL-3.0) of classical texts — San Ming Tong Hui, Yuan Hai Zi Ping, Di Tian Sui Chan Wei, Zi Ping Zhen Quan and others — and the missing-element readings come from the liki layer (MIT).',
+  disclaimer: 'Four Pillars (Bazi) is a traditional divination art, for reference only; it is not a basis for decisions.',
+  attrLine: 'Readings data: comprehensive-shushu-engine (GPL-3.0) — San Ming Tong Hui · Yuan Hai Zi Ping · Di Tian Sui Chan Wei · Zi Ping Zhen Quan; element readings: liki (MIT).',
+  offlineNote: 'Charting runs fully offline. Lunar and solar-term conversion uses the local lunar.js and no data is sent to any server; reading texts are loaded on demand from this site’s data files.',
+  langLabel: 'Language',
+  seasonSpring: 'Spring', seasonSummer: 'Summer', seasonAutumn: 'Autumn', seasonWinter: 'Winter',
+  yearsOld: 'y', monthsOld: 'm', daysOld: 'd'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '四柱八字 · ローカル排盤',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '一生之図 · 命盤情報',
+  slogan: '四柱既に立てば、<br>一生の図自ずと分つ。',
+  subtitle: '四柱八字 無料オンライン排盤',
+  labelBirth: '生年月日と時刻（西暦）',
+  labelGender: '性別',
+  optMale: '男',
+  optFemale: '女',
+  labelUnknownHour: '出生時刻不明（年月日の三柱のみ）',
+  formHint: '年柱は立春を境に、月柱は節気を境に、日柱は六十甲子の日替わりで、時柱は日干から推します。入力した時刻は現地の太陽時として扱い、経度による真太陽時の補正は行いません。',
+  btnSubmit: '起盤する',
+  errNoBirth: 'まず生年月日と時刻を選択してください。',
+  errBadBirth: '出生時刻の形式が正しくありません。',
+  errYearRange: 'このページは1890～2100年生まれの排盤に対応しています。',
+  resultTitle: '排盤結果',
+  ai_interpret: 'AI 解釈',
+  lunarLabel: '旧暦',
+  zodiacLabel: '干支',
+  dayMasterIs: '日主',
+  pillarYear: '年柱',
+  pillarMonth: '月柱',
+  pillarDay: '日柱',
+  pillarHour: '時柱',
+  hourUnknown: '時刻不明',
+  colStemGod: '天干十神',
+  colHidden: '地支蔵干',
+  colElement: '五行',
+  colNayin: '納音',
+  colChangsheng: '長生',
+  secWuxing: '五行統計',
+  wuxingCount: '四柱干支の五行カウント',
+  wuxingMissing: '欠',
+  wuxingNoneMissing: '五行はすべて揃っています。',
+  wuxingUnknownHour: '出生時刻が不明のため、五行統計は年月日の三柱のみで計算しています。「欠」は真の欠如とは限りません。',
+  likiNote: '以下の断語はliki整理層のもので、「五行の欠如」という直接確認できる条件でのみ命中したものです：',
+  classicNote: '古典の文章は中国語原文のまま表示しています。',
+  secDayun: '大運',
+  dayunStart: '起運',
+  dayunForward: '順行',
+  dayunBackward: '逆行',
+  dayunCurrent: '現在の大運',
+  dayunBefore: '起運前',
+  colDayun: '大運',
+  colYears: '年份',
+  colAge: '年齢（満年齢）',
+  colDayunGod: '天干十神',
+  secLiunian: '流年',
+  liunianCurrent: '今年の流年',
+  liunianBeyond: '今年は本ページ掲載の大運の範囲を超えています（約106歳まで掲載）。',
+  liunianInDayun: 'この大運の流年',
+  colLiunian: '流年',
+  colLiunianAge: '年齢（満年齢）',
+  xiaoyunBtn: '小運を展開',
+  xiaoyunNote: '小運は時柱から起運し、一年一步です。出生時刻が不明の場合は表示しません。',
+  nayinBtn: '納音の詳解を展開',
+  secShensha: '神煞',
+  shenshaNone: 'この四柱に本ページ掲載の神煞は見当たりません。',
+  shenshaNote: '規則で直接確認できる神煞のみ掲載しています。神煞は参考までとし、吉凶を決めるものではありません。',
+  shenshaHit: '見られる柱',
+  secGuji: '古籍断語',
+  gujiYueling: '月令金不換',
+  gujiShishi: '日時断',
+  gujiYiji: '十干宜忌（滴天髄）',
+  gujiTiaohou: '調候宜忌（窮通宝鑑）',
+  gujiTiyao: '八字提要',
+  gujiMingli: '同じ四柱の古籍命例',
+  gujiDtd: '同じ四柱の滴天髄闡微命例',
+  gujiDayun: '原書の大運',
+  gujiNoMatch: '古籍ライブラリにこの四柱と完全に一致する命例はありませんでした。',
+  gujiSource: '出典',
+  dataLoading: '断語データを読み込んでいます…',
+  dataFail: '断語データを読み込めませんでした。排盤のみ表示します。更新して再試行してください。',
+  dataReady: '断語データを読み込みました。',
+  faqTitle: '四柱八字：無料排盤とよくある質問',
+  faqQ1: '年柱はなぜ春節ではなく立春で変わるのですか？',
+  faqA1: '八字は節気で年を数えます。立春より前に生まれたら年柱は前年のままで、立春を過ぎて初めて新しい年になります。春節は旧暦正月一日で、立春とは数日ずれることがあり、1月・2月生まれの人は特に注意が必要です。',
+  faqQ2: '月柱はどう決まりますか？',
+  faqA2: '月柱は節気（立春・驚蟄・清明・立夏・芒種・小暑・立秋・白露・寒露・立冬・大雪・小寒）で変わります。各月は節から次の節の前までで、西暦の1日でも旧暦の1日でも変わりません。',
+  faqQ3: '出生時刻が分からない場合は？',
+  faqA3: '時刻が不明の場合、本ページは年月日の三柱のみを排盤し、大運と流年は通常通り表示します。時柱・小運・日時断には時刻が必要なため表示しません。子時は23:00～翌1:00で、夜子時（23:00～24:00）は当日の日柱、早子時（0:00～1:00）は翌日の日柱です。',
+  faqQ4: '大運は順行と逆行のどちらですか？起運はどう計算しますか？',
+  faqA4: '陽年生まれの男性と陰年生まれの女性は順行、陰年生まれの男性と陽年生まれの女性は逆行です（陽年とは年干が甲・丙・戊・庚・壬の年）。起運は伝統の「三日を一年とする」方法で、順行は次の節まで、逆行は前の節まで数えます。節気の時刻表や換算方法がソフトによって異なるため、起運の月数は1～2か月ずれることがあります。大運の干支と交運の年を基準にしてください。',
+  faqQ5: 'なぜこのページは用神を取らず、格局を定めないのですか？',
+  faqA5: '用神を取ることと格局を定めることは八字で最も判断に委ねられる部分です。子平真詮は月令を尋ね、滴天髄は中和を主とし、窮通宝鑑は調候を重んじ、各書の取り方は互いに矛盾し、間違えれば全体が誤ります。流派を選んで人が判断する必要があるため、本ページは計算できる排盤と確認できる断語の原文のみを示し、用神・格局の断定はしません。',
+  faqQ6: '四柱八字の排盤は無料ですか？データはどこから来ていますか？',
+  faqA6: '無料です。このページの排盤はローカルで計算され、ネット接続も料金も不要で、出生情報は保存されません。断語データは comprehensive-shushu-engine（GPL-3.0）所収の三命通会・淵海子平・滴天髄闡微・子平真詮などの古典命理文献で、五行欠如の断語はliki整理層（MIT）によるものです。',
+  disclaimer: '四柱八字は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  attrLine: '断語データ：comprehensive-shushu-engine（GPL-3.0）、三命通会 · 淵海子平 · 滴天髄闡微 · 子平真詮；五行断語：liki（MIT）。',
+  offlineNote: 'このページの排盤は完全オフラインで動作します。旧暦と節気の換算はローカルの lunar.js を使い、データは外部サーバーに送信されません。断語テキストは必要に応じて本サイトのデータファイルから読み込みます。',
+  langLabel: '言語',
+  seasonSpring: '春', seasonSummer: '夏', seasonAutumn: '秋', seasonWinter: '冬',
+  yearsOld: '歳', monthsOld: 'か月', daysOld: '日'
+}
+};
+var LIUNIAN_I18N = {
+'zh-CN': {
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  'navSoon': '即将上线',
+  brandSub: '流年流月 · 本地推算',
+  eyebrow: '时机之轮 · 年度运势',
+  slogan: '流年既至，<br>一岁之气自分。',
+  subtitle: '流年流月免费在线推算',
+  formHint: '年柱与流年均以立春为界，流月以节气为界。输入的时间按当地太阳时理解，本页不做经度真太阳时换算。',
+  btnSubmit: '推算 · 流年流月',
+  resultTitle: '推算结果',
+  labelTargetYear: '目标年份（流年）',
+  errTargetYear: '目标年份须为 1900–2100 的整数。',
+  secBirth: '命局（出生四柱）',
+  secLiunian: '流年',
+  secHits: '流年与命局的合冲刑害',
+  secMonths: '十二流月',
+  liunianYear: '流年',
+  liunianNayin: '纳音',
+  ageAtLichun: '立春时周岁',
+  hitsNote: '以下只列出流年与四柱之间的关系，不定吉凶；同一关系在不同命局里应事不同。',
+  colMonth: '流月',
+  colMonthGz: '干支',
+  colMonthGod: '月干十神',
+  colMonthNote: '提示',
+  colTerm: '节气范围',
+  monthNames: ['正月（寅月）','二月（卯月）','三月（辰月）','四月（巳月）','五月（午月）','六月（未月）','七月（申月）','八月（酉月）','九月（戌月）','十月（亥月）','十一月·冬月（子月）','十二月·腊月（丑月）'],
+  termRanges: ['立春至惊蛰','惊蛰至清明','清明至立夏','立夏至芒种','芒种至小暑','小暑至立秋','立秋至白露','白露至寒露','寒露至立冬','立冬至大雪','大雪至小寒','小寒至立春'],
+  'txt_比肩': '同辈助力、合作分利之月，宜守成、不宜独断。',
+  'txt_劫财': '开支、竞争之月，防破财与口舌，财物宜收紧。',
+  'txt_食神': '口福、才艺、安逸之月，宜展示才华、调养身心。',
+  'txt_伤官': '才思锐、口舌亦多之月，言行宜慎，忌顶撞上司。',
+  'txt_偏财': '偏财、机遇之月，有意外之财或新机会，但见好就收。',
+  'txt_正财': '正财稳进之月，宜守正业、理账目，细水长流。',
+  'txt_七杀': '压力、挑战之月，宜迎难而上，忌冲动行事。',
+  'txt_正官': '名声、职位之月，宜守规矩、立信誉，利求职升迁。',
+  'txt_偏印': '偏门、学习之月，宜钻研冷门、忌多疑多虑。',
+  'txt_正印': '贵人、文书之月，利考试、签约、得长辈助力。',
+  hitStemHe: '流年天干{0}与{1}{2}相合（{3}）',
+  hitBranchHe: '流年地支{0}与{1}{2}六合（{3}）',
+  hitBranchChong: '流年地支{0}冲{1}{2}（{3}）',
+  hitBranchXing: '流年地支{0}与{1}{2}相刑（{3}）',
+  hitBranchHai: '流年地支{0}害{1}{2}（{3}）',
+  hitSanhe: '流年地支{0}与{1}{2}、{3}{4}三合（{5}）',
+  hitFuyin: '流年干支与{0}相同（伏吟）',
+  hitTianke: '流年与日柱天克地冲（{0}克{1}，{2}冲{3}）',
+  hitsNone: '本年流年与四柱未见合、冲、刑、害。',
+  monthCurrent: '本月',
+  faqTitle: '流年流月：免费推算与使用常见问题',
+  faqQ1: '流年干支是怎么定的？为什么以立春为界？',
+  faqA1: '流年即当年的干支，与年柱同法：立春之前仍属上一年，立春之后才是新的一年。本页取目标年 6 月 15 日的年柱作为该年流年，6 月必在立春之后，故不受立春日期（2 月 3–5 日）浮动的影响。',
+  faqQ2: '流月干支是怎么排的？什么是五虎遁？',
+  faqA2: '流月地支固定：正月寅、二月卯……十一月子、十二月丑；天干由年干按“五虎遁”推：甲己之年丙作首（正月丙寅），乙庚之年戊作首，丙辛之年庚作首，丁壬之年壬作首，戊癸之年甲作首，其后按十天干顺序顺推。流月以节气为界，如寅月为立春至惊蛰，不是按公历 1 号换月。',
+  faqQ3: '合、冲、刑、害是什么意思？冲就一定不好吗？',
+  faqA3: '合是相合、冲是相冲、刑是相刑、害是相害，都是天干（五合）与地支之间的生克关系名。本页只列出“出现了哪一组关系”，不下吉凶定论：同一组冲合在不同命局、不同大运里应事不同，须结合日主强弱与用神看，冲也常主变动、未必是坏事。',
+  faqQ4: '流月的一行断语是怎么来的？',
+  faqA4: '每月断语是按该月天干相对日主的十神套用的通用模板（如正官月主名声职位、偏财月主意外机遇），只作方向提示，不是针对个人的具体推断。同一十神在不同命局里轻重不同。',
+  faqQ5: '为什么本页不取用神、不定格局？',
+  faqA5: '取用神与定格局是八字中最活的一层：子平真诠专寻月令、滴天髓主中和、穷通宝鉴重调候，各书取法互相矛盾，取错则全盘皆错，须先选流派再人工判断。本页只给出可机算的排盘与可查验的关系，不代断用神格局。',
+  faqQ6: '流年流月推算免费吗？数据会上传吗？',
+  faqA6: '免费。本页推算在本地完成，不联网、不收费，也不会保存你的出生信息。农历与节气换算使用本地 lunar.js。',
+  disclaimer: '流年流月属传统术数，仅供参考，不构成决策依据。',
+  offlineNote: '本页推算完全离线运行，农历与节气换算使用本地 lunar.js，不向任何服务器发送数据。',
+  methodNote: '方法说明：流年以立春为界；流月天干按五虎遁推算，地支固定为寅月至丑月；流月以节气为界。合冲刑害只列关系、不定吉凶；月断语为十神通用模板。'
+},
+'zh-TW': {
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  'navSoon': '即將上線',
+  brandSub: '流年流月 · 本地推算',
+  eyebrow: '時機之輪 · 年度運勢',
+  slogan: '流年既至，<br>一歲之氣自分。',
+  subtitle: '流年流月免費線上推算',
+  formHint: '年柱與流年均以立春為界，流月以節氣為界。輸入的時間按當地太陽時理解，本頁不做經度真太陽時換算。',
+  btnSubmit: '推算 · 流年流月',
+  resultTitle: '推算結果',
+  labelTargetYear: '目標年份（流年）',
+  errTargetYear: '目標年份須為 1900–2100 的整數。',
+  secBirth: '命局（出生四柱）',
+  secLiunian: '流年',
+  secHits: '流年與命局的合沖刑害',
+  secMonths: '十二流月',
+  liunianYear: '流年',
+  liunianNayin: '納音',
+  ageAtLichun: '立春時週歲',
+  hitsNote: '以下只列出流年與四柱之間的關係，不定吉凶；同一關係在不同命局裡應事不同。',
+  colMonth: '流月',
+  colMonthGz: '干支',
+  colMonthGod: '月干十神',
+  colMonthNote: '提示',
+  colTerm: '節氣範圍',
+  monthNames: ['正月（寅月）','二月（卯月）','三月（辰月）','四月（巳月）','五月（午月）','六月（未月）','七月（申月）','八月（酉月）','九月（戌月）','十月（亥月）','十一月·冬月（子月）','十二月·臘月（丑月）'],
+  termRanges: ['立春至驚蟄','驚蟄至清明','清明至立夏','立夏至芒種','芒種至小暑','小暑至立秋','立秋至白露','白露至寒露','寒露至立冬','立冬至大雪','大雪至小寒','小寒至立春'],
+  'txt_比肩': '同輩助力、合作分利之月，宜守成、不宜獨斷。',
+  'txt_劫财': '開支、競爭之月，防破財與口舌，財物宜收緊。',
+  'txt_食神': '口福、才藝、安逸之月，宜展示才華、調養身心。',
+  'txt_伤官': '才思銳、口舌亦多之月，言行宜慎，忌頂撞上司。',
+  'txt_偏财': '偏財、機遇之月，有意外之財或新機會，但見好就收。',
+  'txt_正财': '正財穩進之月，宜守正業、理賬目，細水長流。',
+  'txt_七杀': '壓力、挑戰之月，宜迎難而上，忌衝動行事。',
+  'txt_正官': '名聲、職位之月，宜守規矩、立信譽，利求職升遷。',
+  'txt_偏印': '偏門、學習之月，宜鑽研冷門、忌多疑多慮。',
+  'txt_正印': '貴人、文書之月，利考試、簽約、得長輩助力。',
+  hitStemHe: '流年天干{0}與{1}{2}相合（{3}）',
+  hitBranchHe: '流年地支{0}與{1}{2}六合（{3}）',
+  hitBranchChong: '流年地支{0}衝{1}{2}（{3}）',
+  hitBranchXing: '流年地支{0}與{1}{2}相刑（{3}）',
+  hitBranchHai: '流年地支{0}害{1}{2}（{3}）',
+  hitSanhe: '流年地支{0}與{1}{2}、{3}{4}三合（{5}）',
+  hitFuyin: '流年干支與{0}相同（伏吟）',
+  hitTianke: '流年與日柱天克地沖（{0}剋{1}，{2}衝{3}）',
+  hitsNone: '本年流年與四柱未見合、沖、刑、害。',
+  monthCurrent: '本月',
+  faqTitle: '流年流月：免費推算與使用常見問題',
+  faqQ1: '流年干支是怎麼定的？為什麼以立春為界？',
+  faqA1: '流年即當年的干支，與年柱同法：立春之前仍屬上一年，立春之後才是新的一年。本頁取目標年 6 月 15 日的年柱作為該年流年，6 月必在立春之後，故不受立春日期（2 月 3–5 日）浮動的影響。',
+  faqQ2: '流月干支是怎麼排的？什麼是五虎遁？',
+  faqA2: '流月地支固定：正月寅、二月卯……十一月子、十二月丑；天干由年干按「五虎遁」推：甲己之年丙作首（正月丙寅），乙庚之年戊作首，丙辛之年庚作首，丁壬之年壬作首，戊癸之年甲作首，其後按十天干順序順推。流月以節氣為界，如寅月為立春至驚蟄，不是按公曆 1 號換月。',
+  faqQ3: '合、沖、刑、害是什麼意思？沖就一定不好嗎？',
+  faqA3: '合是相合、沖是相沖、刑是相刑、害是相害，都是天干（五合）與地支之間的生剋關係名。本頁只列出「出現了哪一組關係」，不下吉凶定論：同一組沖合在不同命局、不同大運裡應事不同，須結合日主強弱與用神看，沖也常主變動、未必是壞事。',
+  faqQ4: '流月的一行斷語是怎麼來的？',
+  faqA4: '每月斷語是按該月天干相對日主的十神套用的通用模板（如正官月主名聲職位、偏財月主意外機遇），只作方向提示，不是針對個人的具體推斷。同一十神在不同命局裡輕重不同。',
+  faqQ5: '為什麼本頁不取用神、不定格局？',
+  faqA5: '取用神與定格局是八字中最活的一層：子平真詮專尋月令、滴天髓主中和、窮通寶鑑重調候，各書取法互相矛盾，取錯則全盤皆錯，須先選流派再人工判斷。本頁只給出可機算的排盤與可查驗的關係，不代斷用神格局。',
+  faqQ6: '流年流月推算免費嗎？數據會上傳嗎？',
+  faqA6: '免費。本頁推算在本地完成，不聯網、不收費，也不會保存你的出生資訊。農曆與節氣換算使用本地 lunar.js。',
+  disclaimer: '流年流月屬傳統術數，僅供參考，不構成決策依據。',
+  offlineNote: '本頁推算完全離線運行，農曆與節氣換算使用本地 lunar.js，不向任何伺服器發送數據。',
+  methodNote: '方法說明：流年以立春為界；流月天干按五虎遁推算，地支固定為寅月至丑月；流月以節氣為界。合沖刑害只列關係、不定吉凶；月斷語為十神通用模板。'
+},
+'en': {
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  'navSoon': 'Soon',
+  brandSub: 'Annual Fortune · Local Calculation',
+  eyebrow: 'Wheel of Time · Annual Fortune',
+  slogan: 'When the annual pillar arrives,<br>the qi of the year reveals itself.',
+  subtitle: 'Free online annual & monthly fortune (Liunian)',
+  formHint: 'The year pillar and the annual pillar both change at Lichun (Start of Spring); month pillars change at the solar terms. The time you enter is taken as local solar time; no longitude-based true-solar-time correction is applied.',
+  btnSubmit: 'Calculate · Annual Fortune',
+  resultTitle: 'Result',
+  labelTargetYear: 'Target year (annual pillar)',
+  errTargetYear: 'The target year must be an integer from 1900 to 2100.',
+  secBirth: 'Birth chart (four pillars)',
+  secLiunian: 'Annual pillar (Liunian)',
+  secHits: 'Annual pillar vs. birth chart: combinations, clashes, penalties & harms',
+  secMonths: 'The twelve months (Liuyue)',
+  liunianYear: 'Annual pillar',
+  liunianNayin: 'Nayin',
+  ageAtLichun: 'Age at Lichun',
+  hitsNote: 'Only the relationships found are listed below; no fortune is decided here. The same relationship plays out differently in different charts.',
+  colMonth: 'Month',
+  colMonthGz: 'Stem-branch',
+  colMonthGod: 'Month stem: Ten God',
+  colMonthNote: 'Note',
+  colTerm: 'Solar-term span',
+  monthNames: ['1st month (Yin)','2nd month (Mao)','3rd month (Chen)','4th month (Si)','5th month (Wu)','6th month (Wei)','7th month (Shen)','8th month (You)','9th month (Xu)','10th month (Hai)','11th month (Zi)','12th month (Chou)'],
+  termRanges: ['Lichun–Jingzhe','Jingzhe–Qingming','Qingming–Lixia','Lixia–Mangzhong','Mangzhong–Xiaoshu','Xiaoshu–Liqiu','Liqiu–Bailu','Bailu–Hanlu','Hanlu–Lidong','Lidong–Daxue','Daxue–Xiaohan','Xiaohan–Lichun'],
+  'txt_比肩': 'Peers bring help; share the work and don’t go it alone.',
+  'txt_劫财': 'Spending and rivalry rise; guard money and words.',
+  'txt_食神': 'Ease and talent shine; a good month to show skill and rest.',
+  'txt_伤官': 'Sharp ideas, sharp words; be careful what you say, especially to superiors.',
+  'txt_偏财': 'Windfalls and new openings may appear; take profits while they last.',
+  'txt_正财': 'Steady income month; tend your main work and accounts.',
+  'txt_七杀': 'Pressure and challenge; face it head-on, don’t act rashly.',
+  'txt_正官': 'Reputation and rank; keep the rules, build trust — good for career moves.',
+  'txt_偏印': 'Study and niche learning; good for research, bad for overthinking.',
+  'txt_正印': 'Helpful elders and paperwork; good for exams, contracts and support.',
+  hitStemHe: 'Annual stem {0} combines with {1} stem {2} ({3} combination)',
+  hitBranchHe: 'Annual branch {0} combines with {1} branch {2} ({3} harmony)',
+  hitBranchChong: 'Annual branch {0} clashes with {1} branch {2} ({3} clash)',
+  hitBranchXing: 'Annual branch {0} penalises {1} branch {2} ({3} penalty)',
+  hitBranchHai: 'Annual branch {0} harms {1} branch {2} ({3} harm)',
+  hitSanhe: 'Annual branch {0} forms a triple harmony with {1} {2} and {3} {4} ({5})',
+  hitFuyin: 'Annual pillar repeats the {0} pillar (Fuyin)',
+  hitTianke: 'Annual pillar clashes with the day pillar on both stem and branch ({0} controls {1}; {2} clashes {3})',
+  hitsNone: 'No combinations, clashes, penalties or harms were found between this year and the four pillars.',
+  monthCurrent: 'This month',
+  faqTitle: 'Annual & Monthly Fortune: Free Calculation & FAQ',
+  faqQ1: 'How is the annual stem-branch fixed, and why does it change at Lichun?',
+  faqA1: 'The annual pillar follows the same rule as the year pillar: before Lichun it still belongs to the previous year, and only after Lichun does it become the new year. This page takes the year pillar of 15 June of the target year as that year’s annual pillar; June is always after Lichun, so the result is unaffected by the yearly drift of the Lichun date (3–5 February).',
+  faqQ2: 'How are the twelve month pillars fixed? What is Wuhudun?',
+  faqA2: 'Month branches are fixed: the 1st month is Yin, the 2nd Mao … the 11th Zi and the 12th Chou. Month stems follow the year stem by the Wuhudun rule: in Jia or Ji years the 1st month is Bingyin, in Yi or Geng years Wuyin, in Bing or Xin years Gengyin, in Ding or Ren years Renyin, in Wu or Gui years Jiayin, then the ten stems run in order. Months change at the solar terms — e.g. the Yin month runs from Lichun to Jingzhe — not on the 1st of the Gregorian month.',
+  faqQ3: 'What do combination, clash, penalty and harm mean? Is a clash always bad?',
+  faqA3: 'He (combination), Chong (clash), Xing (penalty) and Hai (harm) are names for the relationships between stems (five combinations) and branches. This page only lists which relationships occur and makes no judgment of good or bad: the same clash means different things in different charts and luck cycles, and depends on the strength of the Day Master and the Useful God. A clash often means change, not necessarily misfortune.',
+  faqQ4: 'Where do the one-line monthly notes come from?',
+  faqA4: 'Each month’s note is a generic template keyed to the Ten God of that month’s stem against the Day Master (e.g. a Direct Officer month points to reputation and rank, an Indirect Wealth month to windfalls). It is only a direction, not a personal prediction; the same Ten God weighs differently in different charts.',
+  faqQ5: 'Why does this page not pick a Useful God (Yongshen) or a chart pattern?',
+  faqA5: 'Choosing a Useful God and a pattern is the most judgment-based layer of Bazi: Zi Ping Zhen Quan looks to the month command, Di Tian Sui aims at balance, and Qiong Tong Bao Jian stresses seasonal adjustment, and the schools contradict each other — a wrong pick spoils the whole reading, so it needs a chosen school and a human reading. This page gives only what can be computed and the relationships that can be checked, and does not decide Yongshen or pattern for you.',
+  faqQ6: 'Is the calculation free? Is my data uploaded?',
+  faqA6: 'Yes, free. The calculation runs locally in your browser — no internet, no charge, and your birth information is never saved. Lunar and solar-term conversion uses the local lunar.js.',
+  disclaimer: 'Annual & monthly fortune (Liunian) is a traditional divination art, for reference only; it is not a basis for decisions.',
+  offlineNote: 'This page calculates fully offline. Lunar and solar-term conversion uses the local lunar.js and no data is sent to any server.',
+  methodNote: 'Method: the annual pillar changes at Lichun; month stems follow Wuhudun, month branches are fixed from Yin to Chou; months change at the solar terms. Combinations, clashes, penalties and harms are listed as relationships only, without a verdict; monthly notes are generic Ten-God templates.'
+},
+'ja': {
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  'navSoon': '近日公開',
+  brandSub: '流年流月 · ローカル推算',
+  eyebrow: '時の輪 · 年度運勢',
+  slogan: '流年既に至れば、<br>一歳の気自ずと分つ。',
+  subtitle: '流年流月 無料オンライン推算',
+  formHint: '年柱と流年はともに立春を境に、流月は節気を境に変わります。入力した時刻は現地の太陽時として扱い、経度による真太陽時の補正は行いません。',
+  btnSubmit: '推算する',
+  resultTitle: '推算結果',
+  labelTargetYear: '目標年（流年）',
+  errTargetYear: '目標年は1900～2100の整数で入力してください。',
+  secBirth: '命局（出生四柱）',
+  secLiunian: '流年',
+  secHits: '流年と命局の合・沖・刑・害',
+  secMonths: '十二流月',
+  liunianYear: '流年',
+  liunianNayin: '納音',
+  ageAtLichun: '立春時の年齢',
+  hitsNote: '以下は流年と四柱の間に見られた関係のみを列挙したもので、吉凶の判定はしません。同じ関係でも命局によって現れ方は異なります。',
+  colMonth: '流月',
+  colMonthGz: '干支',
+  colMonthGod: '月干十神',
+  colMonthNote: '一言',
+  colTerm: '節気の範囲',
+  monthNames: ['正月（寅）','二月（卯）','三月（辰）','四月（巳）','五月（午）','六月（未）','七月（申）','八月（酉）','九月（戌）','十月（亥）','十一月（子）','十二月（丑）'],
+  termRanges: ['立春〜驚蟄','驚蟄〜清明','清明〜立夏','立夏〜芒種','芒種〜小暑','小暑〜立秋','立秋〜白露','白露〜寒露','寒露〜立冬','立冬〜大雪','大雪〜小寒','小寒〜立春'],
+  'txt_比肩': '仲間の助けがある月。独断せず協力して進むとよい。',
+  'txt_劫财': '出費や競争が増す月。財布と口を引き締めて。',
+  'txt_食神': '才能と安らぎの月。技を披露し、心身を整えるとよい。',
+  'txt_伤官': '才気が鋭く口も立つ月。言葉に注意し、上司との衝突を避けて。',
+  'txt_偏财': '臨時収入や新しい機会のある月。欲張らずほどほどに。',
+  'txt_正财': '正財が安定する月。本業を大切にし、収支を整えて。',
+  'txt_七杀': '圧力と試練の月。正面から向き合い、衝動を抑えて。',
+  'txt_正官': '名声と地位の月。規律を守り信頼を積むと、昇進や就職に吉。',
+  'txt_偏印': '学びと専門の月。研究に吉、疑いすぎには注意。',
+  'txt_正印': '貴人と文書の月。試験・契約・目上の助けに吉。',
+  hitStemHe: '流年天干{0}と{1}{2}が相合する（{3}）',
+  hitBranchHe: '流年地支{0}と{1}{2}が六合する（{3}）',
+  hitBranchChong: '流年地支{0}が{1}{2}を沖する（{3}）',
+  hitBranchXing: '流年地支{0}と{1}{2}が相刑する（{3}）',
+  hitBranchHai: '流年地支{0}が{1}{2}を害する（{3}）',
+  hitSanhe: '流年地支{0}が{1}{2}・{3}{4}と三合する（{5}）',
+  hitFuyin: '流年干支が{0}と重なる（伏吟）',
+  hitTianke: '流年が日柱と天剋地沖する（{0}が{1}を剋し、{2}が{3}を沖する）',
+  hitsNone: '本年の流年と四柱の間に合・沖・刑・害は見られませんでした。',
+  monthCurrent: '今月',
+  faqTitle: '流年流月：無料推算とよくある質問',
+  faqQ1: '流年干支はどう決まりますか？なぜ立春で変わるのですか？',
+  faqA1: '流年はその年の干支で、年柱と同じ規則です。立春より前に生まれたら前年のままで、立春を過ぎて初めて新しい年になります。本ページは目標年6月15日の年柱をその年の流年としています。6月は必ず立春の後なので、立春の日付（2月3〜5日）の年によるずれの影響を受けません。',
+  faqQ2: '流月干支はどう排しますか？五虎遁とは何ですか？',
+  faqA2: '流月の地支は固定です。正月が寅、二月が卯……十一月が子、十二月が丑です。天干は年干から「五虎遁」で推します。甲・己の年は丙を首とし（正月は丙寅）、乙・庚の年は戊、丙・辛の年は庚、丁・壬の年は壬、戊・癸の年は甲を首とし、以後は十干の順に進みます。流月は節気で変わります。たとえば寅月は立春から驚蟄までで、西暦の1日で変わるのではありません。',
+  faqQ3: '合・沖・刑・害とは何ですか？沖は必ず悪いのでしょうか？',
+  faqA3: '合は相合、沖は相沖、刑は相刑、害は相害で、天干（五合）と地支の間の生剋関係の名前です。本ページは「どの関係が現れたか」だけを列挙し、吉凶の判定はしません。同じ沖合でも命局や大運によって現れ方は異なり、日主の強弱や用神と合わせて見る必要があります。沖は変化を主とすることも多く、必ずしも悪いことではありません。',
+  faqQ4: '流月の一行の言葉はどこから来たものですか？',
+  faqA4: '毎月の言葉は、その月の天干を日主に対する十神に当てはめた汎用テンプレートです（たとえば正官の月は名声・地位、偏財の月は臨時収入を主とします）。方向の目安であり、個人への具体的な断定ではありません。同じ十神でも命局によって重みは異なります。',
+  faqQ5: 'なぜこのページは用神を取らず、格局を定めないのですか？',
+  faqA5: '用神を取ることと格局を定めることは八字で最も判断に委ねられる部分です。子平真詮は月令を尋ね、滴天髄は中和を主とし、窮通宝鑑は調候を重んじ、各書の取り方は互いに矛盾し、間違えれば全体が誤ります。流派を選んで人が判断する必要があるため、本ページは計算できる排盤と確認できる関係のみを示し、用神・格局の断定はしません。',
+  faqQ6: '流年流月の推算は無料ですか？データは送信されますか？',
+  faqA6: '無料です。このページの推算はローカルで計算され、ネット接続も料金も不要で、出生情報は保存されません。旧暦と節気の換算はローカルの lunar.js を使います。',
+  disclaimer: '流年流月は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  offlineNote: 'このページの推算は完全オフラインで動作します。旧暦と節気の換算はローカルの lunar.js を使い、データは外部サーバーに送信されません。',
+  methodNote: '方法の説明：流年は立春を境に変わります。流月の天干は五虎遁で推し、地支は寅月から丑月まで固定です。流月は節気で変わります。合・沖・刑・害は関係のみを列挙し吉凶は判定しません。月の一言は十神の汎用テンプレートです。'
+}
+};
+// 十神译名
+var TG_I18N = {
+  'zh-CN': {'比肩':'比肩','劫财':'劫财','食神':'食神','伤官':'伤官','偏财':'偏财','正财':'正财','七杀':'七杀','正官':'正官','偏印':'偏印','正印':'正印'},
+  'zh-TW': {'比肩':'比肩','劫财':'劫財','食神':'食神','伤官':'傷官','偏财':'偏財','正财':'正財','七杀':'七殺','正官':'正官','偏印':'偏印','正印':'正印'},
+  'en': {'比肩':'Friend','劫财':'Robber Wealth','食神':'Eating God','伤官':'Hurting Officer','偏财':'Indirect Wealth','正财':'Direct Wealth','七杀':'Seven Killings','正官':'Direct Officer','偏印':'Indirect Resource','正印':'Direct Resource'},
+  'ja': {'比肩':'比肩','劫财':'劫財','食神':'食神','伤官':'傷官','偏财':'偏財','正财':'正財','七杀':'七殺','正官':'正官','偏印':'偏印','正印':'正印'}
+};
+var ELEMENT_I18N = {
+  'zh-CN': {'木':'木','火':'火','土':'土','金':'金','水':'水'},
+  'zh-TW': {'木':'木','火':'火','土':'土','金':'金','水':'水'},
+  'en': {'木':'Wood','火':'Fire','土':'Earth','金':'Metal','水':'Water'},
+  'ja': {'木':'木','火':'火','土':'土','金':'金','水':'水'}
+};
+var STEM_EN = ['Jia','Yi','Bing','Ding','Wu','Ji','Geng','Xin','Ren','Gui'];
+var BRANCH_EN = ['Zi','Chou','Yin','Mao','Chen','Si','Wu','Wei','Shen','You','Xu','Hai'];
+var ZODIAC_EN = ['Rat','Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat','Monkey','Rooster','Dog','Pig'];
+var ZODIAC_JA = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function tgName(cn) {
+  if (!cn) return '';
+  if (LANG === 'zh-TW') return (TG_I18N['zh-TW'][cn] || cn);
+  var m = TG_I18N[LANG] || TG_I18N['zh-CN'];
+  return m[cn] || cn;
+}
+function elementName(el) { var m = ELEMENT_I18N[LANG] || ELEMENT_I18N['zh-CN']; return m[el] || el; }
+function stemName(s) {
+  if (LANG === 'en') return STEM_EN[['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'].indexOf(s)];
+  return s;
+}
+function branchName(b) {
+  if (LANG === 'en') return BRANCH_EN[['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'].indexOf(b)];
+  return b;
+}
+function gzName(gz) {
+  if (!gz) return '';
+  if (LANG === 'en') return stemName(gz.charAt(0)) + branchName(gz.charAt(1));
+  return gz;
+}
+function zodiacName(idx) {
+  if (LANG === 'en') return ZODIAC_EN[idx];
+  return ZODIAC_JA[idx];
+}
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var be = document.getElementById('birth-error'); if (be) be.textContent = '';
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+for (var __L in LIUNIAN_I18N) { if (!I18N[__L]) I18N[__L] = {}; for (var __k in LIUNIAN_I18N[__L]) I18N[__L][__k] = LIUNIAN_I18N[__L][__k]; }
+applyI18n();
+
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+var GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var GAN_ELEM = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+var ZHI_ELEM = {'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+var GAN_YANG = {'甲':1,'乙':0,'丙':1,'丁':0,'戊':1,'己':0,'庚':1,'辛':0,'壬':1,'癸':0};
+var ELEM_GEN = {'木':'火','火':'土','土':'金','金':'水','水':'木'};
+var ELEM_CTRL = {'木':'土','土':'水','水':'火','火':'金','金':'木'};
+var ELEM_LIST = ['木','火','土','金','水'];
+var ZODIAC_ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+
+// 纳音六十甲子（每两柱同名），按甲子序排列
+var NAYIN = ['海中金','炉中火','大林木','路旁土','剑锋金','山头火','涧下水','城头土','白蜡金','杨柳木','泉中水','屋上土','霹雳火','松柏木','长流水','沙中金','山下火','平地木','壁上土','金箔金','覆灯火','天河水','大驿土','钗钏金','桑柘木','大溪水','沙中土','天上火','石榴木','大海水'];
+var NAYIN_ELEM = ['金','火','木','土','金','火','水','土','金','木','水','土','火','木','水','金','火','木','土','金','火','水','土','金','木','水','土','火','木','水'];
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// 十神：以日干为我，看目标天干与我的生克与阴阳
+function tenGod(dayGan, g) {
+  if (!g || !dayGan) return '';
+  var de = GAN_ELEM[dayGan], ge = GAN_ELEM[g];
+  if (ge === de) return GAN_YANG[g] === GAN_YANG[dayGan] ? '比肩' : '劫财';
+  if (ELEM_GEN[ge] === de) return GAN_YANG[g] === GAN_YANG[dayGan] ? '偏印' : '正印';
+  if (ELEM_GEN[de] === ge) return GAN_YANG[g] === GAN_YANG[dayGan] ? '食神' : '伤官';
+  if (ELEM_CTRL[ge] === de) return GAN_YANG[g] === GAN_YANG[dayGan] ? '七杀' : '正官';
+  if (ELEM_CTRL[de] === ge) return GAN_YANG[g] === GAN_YANG[dayGan] ? '偏财' : '正财';
+  return '';
+}
+function jiaziIndex(gz) {
+  if (!gz || gz.length < 2) return -1;
+  var gi = GAN.indexOf(gz.charAt(0)), zi = ZHI.indexOf(gz.charAt(1));
+  if (gi < 0 || zi < 0) return -1;
+  for (var i = 0; i < 60; i++) { if (i % 10 === gi && i % 12 === zi) return i; }
+  return -1;
+}
+function nayinOf(gz) {
+  var i = jiaziIndex(gz);
+  if (i < 0) return { name: '', elem: '' };
+  var n = Math.floor(i / 2);
+  return { name: NAYIN[n], elem: NAYIN_ELEM[n] };
+}
+
+// ==LIUNIAN-LOGIC-BEGIN==
+// 五虎遁：年干 -> 正月（寅月）天干
+var WUHUDUN = {'甲':'丙','乙':'戊','丙':'庚','丁':'壬','戊':'甲','己':'丙','庚':'戊','辛':'庚','壬':'壬','癸':'甲'};
+var MONTH_ZHI = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
+// 天干五合：甲己、乙庚、丙辛、丁壬、戊癸（表中所列为与 key 相合之干）
+var STEM_HE = {'甲':'己','乙':'庚','丙':'辛','丁':'壬','戊':'癸','己':'甲','庚':'乙','辛':'丙','壬':'丁','癸':'戊'};
+var BRANCH_HE = {'子':'丑','丑':'子','寅':'亥','亥':'寅','卯':'戌','戌':'卯','辰':'酉','酉':'辰','巳':'申','申':'巳','午':'未','未':'午'};
+var BRANCH_CHONG = {'子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅','卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳'};
+var BRANCH_HAI = {'子':'未','未':'子','丑':'午','午':'丑','寅':'巳','巳':'寅','卯':'辰','辰':'卯','申':'亥','亥':'申','酉':'戌','戌':'酉'};
+var SANHE = [['申','子','辰'],['寅','午','戌'],['巳','酉','丑'],['亥','卯','未']];
+var SANHE_NAME = {'申子辰':'申子辰','寅午戌':'寅午戌','巳酉丑':'巳酉丑','亥卯未':'亥卯未'};
+
+function fmt(s) {
+  var args = arguments;
+  return String(s).replace(/\{(\d)\}/g, function (m, i) { var v = args[+i + 1]; return v == null ? '' : v; });
+}
+// 流年干支：取目标年 6 月 15 日的年柱（6 月必在立春之后，与年柱同法）
+function yearPillarOf(year) {
+  try {
+    var solar = Solar.fromYmdHms(year, 6, 15, 12, 0, 0);
+    return solar.getLunar().getEightChar().getYear();
+  } catch (e) { return ''; }
+}
+// 十二流月干支：地支固定寅->丑，天干由年干按五虎遁顺推
+function monthPillarsOf(yearGan) {
+  var first = WUHUDUN[yearGan];
+  var fi = GAN.indexOf(first);
+  var out = [];
+  for (var i = 0; i < 12; i++) out.push(GAN[(fi + i) % 10] + MONTH_ZHI[i]);
+  return out;
+}
+function xingLabel(a, b) {
+  if (!a || !b || a === b) return '';
+  var g1 = ['寅','巳','申'], g2 = ['丑','戌','未'];
+  if (g1.indexOf(a) >= 0 && g1.indexOf(b) >= 0) return '寅巳申';
+  if (g2.indexOf(a) >= 0 && g2.indexOf(b) >= 0) return '丑戌未';
+  if ((a === '子' && b === '卯') || (a === '卯' && b === '子')) return '子卯';
+  return '';
+}
+function isSelfXing(z) { return ['辰','午','酉','亥'].indexOf(z) >= 0; }
+function sanheGroupOf(z) {
+  for (var i = 0; i < SANHE.length; i++) { if (SANHE[i].indexOf(z) >= 0) return SANHE[i]; }
+  return null;
+}
+function pillarLabel(key) {
+  return key === 'year' ? t('pillarYear') : key === 'month' ? t('pillarMonth') : key === 'day' ? t('pillarDay') : t('pillarHour');
+}
+// 流年与四柱的合/冲/刑/害/三合/伏吟/天克地冲，只列关系，不定吉凶
+function computeHits(r, lnGz) {
+  var lnGan = lnGz.charAt(0), lnZhi = lnGz.charAt(1);
+  var hits = [];
+  var i, j, p, gz, g, z;
+  for (i = 0; i < r.pillars.length; i++) {
+    p = r.pillars[i]; gz = p.gz; if (!gz) continue;
+    g = gz.charAt(0); z = gz.charAt(1);
+    if (STEM_HE[lnGan] === g) hits.push(fmt(t('hitStemHe'), stemName(lnGan), pillarLabel(p.key), stemName(g), lnGan + g + '合'));
+    if (BRANCH_HE[lnZhi] === z) hits.push(fmt(t('hitBranchHe'), branchName(lnZhi), pillarLabel(p.key), branchName(z), lnZhi + z + '合'));
+    if (BRANCH_CHONG[lnZhi] === z) hits.push(fmt(t('hitBranchChong'), branchName(lnZhi), pillarLabel(p.key), branchName(z), lnZhi + z + '冲'));
+    var xl = xingLabel(lnZhi, z);
+    if (xl) hits.push(fmt(t('hitBranchXing'), branchName(lnZhi), pillarLabel(p.key), branchName(z), xl + '刑'));
+    if (lnZhi === z && isSelfXing(lnZhi)) hits.push(fmt(t('hitBranchXing'), branchName(lnZhi), pillarLabel(p.key), branchName(z), lnZhi + lnZhi + '自刑'));
+    if (BRANCH_HAI[lnZhi] === z) hits.push(fmt(t('hitBranchHai'), branchName(lnZhi), pillarLabel(p.key), branchName(z), lnZhi + z + '害'));
+    if (lnGz === gz) hits.push(fmt(t('hitFuyin'), pillarLabel(p.key)));
+  }
+  // 三合局：流年支 + 任意两柱地支构成三合
+  var seen = {};
+  for (i = 0; i < r.pillars.length; i++) {
+    for (j = i + 1; j < r.pillars.length; j++) {
+      var z1 = r.pillars[i].gz ? r.pillars[i].gz.charAt(1) : '';
+      var z2 = r.pillars[j].gz ? r.pillars[j].gz.charAt(1) : '';
+      if (!z1 || !z2) continue;
+      var grp = sanheGroupOf(lnZhi);
+      if (grp && grp.indexOf(z1) >= 0 && grp.indexOf(z2) >= 0 && z1 !== z2) {
+        var key = grp.join('');
+        if (!seen[key]) {
+          seen[key] = 1;
+          hits.push(fmt(t('hitSanhe'), branchName(lnZhi), pillarLabel(r.pillars[i].key), branchName(z1), pillarLabel(r.pillars[j].key), branchName(z2), SANHE_NAME[key] + '局'));
+        }
+      }
+    }
+  }
+  // 天克地冲（只看日柱）：天干相克 + 地支相冲
+  var dayGan = r.dayGan, dayZhi = r.dayZhi;
+  var stemClash = (ELEM_CTRL[GAN_ELEM[lnGan]] === GAN_ELEM[dayGan]) || (ELEM_CTRL[GAN_ELEM[dayGan]] === GAN_ELEM[lnGan]);
+  if (stemClash && BRANCH_CHONG[lnZhi] === dayZhi) {
+    hits.push(fmt(t('hitTianke'), stemName(lnGan), stemName(dayGan), branchName(lnZhi), branchName(dayZhi)));
+  }
+  return hits;
+}
+// 立春时周岁（立春约 2 月 4 日；2 月 4 日当日出生按已过生日计，误差至多由立春日期浮动所致）
+function ageAtLichun(birth, year) {
+  var m = birth.getMonth() + 1, d = birth.getDate();
+  var after = (m > 2) || (m === 2 && d > 4);
+  return year - birth.getFullYear() - (after ? 1 : 0);
+}
+// ==LIUNIAN-LOGIC-END==
+
+// ---- 表单 ----
+function toggleUnknownHour() {
+  var u = document.getElementById('unknown-hour').checked;
+  var b = document.getElementById('birth');
+  if (u && b.value) {
+    var parts = b.value.split('T');
+    b.value = parts[0] + 'T12:00';
+  }
+  updateLunarPreview();
+}
+function updateLunarPreview() {
+  var el = document.getElementById('lunar-preview');
+  if (!el) return;
+  var v = document.getElementById('birth').value;
+  el.innerHTML = '';
+  if (!v) return;
+  try {
+    var d = new Date(v);
+    if (isNaN(d.getTime())) return;
+    var solar = Solar.fromYmdHms(d.getFullYear(), d.getMonth() + 1, d.getDate(), d.getHours(), d.getMinutes(), 0);
+    var lunar = solar.getLunar();
+    var zx = ZODIAC_ZHI.indexOf(lunar.getYearShengXiaoExact());
+    el.innerHTML = esc(t('lunarLabel')) + ' <b>' + esc(lunar.toString()) + '</b> · ' + esc(t('zodiacLabel')) + ' <b>' + esc(lunar.getYearShengXiaoExact()) + (LANG === 'en' && zx >= 0 ? ' (' + ZODIAC_EN[zx] + ')' : '') + '</b>';
+  } catch (e) { el.innerHTML = ''; }
+}
+
+function doLiunian() {
+  var err = document.getElementById('birth-error');
+  var yerr = document.getElementById('year-error');
+  err.textContent = ''; yerr.textContent = '';
+  var v = document.getElementById('birth').value;
+  if (!v) { err.textContent = t('errNoBirth'); return; }
+  var d = new Date(v);
+  if (isNaN(d.getTime())) { err.textContent = t('errBadBirth'); return; }
+  if (d.getFullYear() < 1890 || d.getFullYear() > 2100) { err.textContent = t('errYearRange'); return; }
+  var yv = document.getElementById('target-year').value;
+  var ty = parseInt(yv, 10);
+  if (isNaN(ty) || String(ty) !== String(yv).trim() || ty < 1900 || ty > 2100) { yerr.textContent = t('errTargetYear'); return; }
+  var unknownHour = document.getElementById('unknown-hour').checked;
+  var gender = parseInt(document.getElementById('gender').value, 10);
+  var solar, lunar, ec;
+  try {
+    solar = Solar.fromYmdHms(d.getFullYear(), d.getMonth() + 1, d.getDate(), d.getHours(), d.getMinutes(), 0);
+    lunar = solar.getLunar();
+    ec = lunar.getEightChar();
+  } catch (e) {
+    err.textContent = t('errBadBirth');
+    return;
+  }
+  var pillars = [
+    { key: 'year', gz: ec.getYear() },
+    { key: 'month', gz: ec.getMonth() },
+    { key: 'day', gz: ec.getDay() },
+    { key: 'hour', gz: unknownHour ? '' : ec.getTime() }
+  ];
+  var lnGz = yearPillarOf(ty);
+  if (!lnGz) { yerr.textContent = t('errTargetYear'); return; }
+  var r = {
+    birth: d, unknownHour: unknownHour, gender: gender,
+    solar: solar, lunar: lunar, ec: ec,
+    pillars: pillars,
+    dayGan: ec.getDay().charAt(0),
+    dayZhi: ec.getDay().charAt(1),
+    targetYear: ty, lnGz: lnGz,
+    months: monthPillarsOf(lnGz.charAt(0))
+  };
+  r.hits = computeHits(r, lnGz);
+  LAST_RESULT = r;
+  showResult(r, false);
+}
+
+// ---- 渲染 ----
+function renderBirthCard(p, isDayMaster) {
+  var gan = p.gz ? p.gz.charAt(0) : '';
+  var zhi = p.gz ? p.gz.charAt(1) : '';
+  var tg = (p.key === 'day') ? t('dayMasterIs') : tgName(tenGod(LAST_RESULT.dayGan, gan));
+  var roman = (LANG === 'en' && p.gz) ? '<span class="roman">' + esc(gzName(p.gz)) + '</span>' : '';
+  var gzHtml = p.gz ? esc(p.gz) + roman : '<span style="color:#6f6f80">' + esc(t('hourUnknown')) + '</span>';
+  var ny = p.gz ? nayinOf(p.gz) : { name: '', elem: '' };
+  var meta = '';
+  if (p.gz) {
+    meta = esc(elementName(GAN_ELEM[gan])) + ' · ' + esc(elementName(ZHI_ELEM[zhi])) + '<br>' +
+      esc(t('colNayin')) + ' ' + esc(ny.name) + (LANG === 'en' && ny.elem ? ' (' + esc(elementName(ny.elem)) + ')' : '') + '';
+  }
+  return '<div class="pillar-card' + (isDayMaster ? ' day-master' : '') + '"><h3>' + esc(pillarLabel(p.key)) + '</h3>' +
+    '<div class="gz">' + gzHtml + '</div>' +
+    '<div class="tg">' + esc(tg) + '</div>' +
+    '<div class="meta">' + meta + '</div></div>';
+}
+
+function showResult(r, isRelang) {
+  document.getElementById('result-card').classList.remove('hidden');
+  var head = document.getElementById('result-head');
+  var lunarStr = r.lunar.toString();
+  var zx = ZODIAC_ZHI.indexOf(r.lunar.getYearShengXiaoExact());
+  var g = r.gender === 1 ? t('optMale') : t('optFemale');
+  head.innerHTML = esc(t('lunarLabel')) + ' <b>' + esc(lunarStr) + '</b> · ' + esc(t('zodiacLabel')) + ' <b>' + esc(r.lunar.getYearShengXiaoExact()) + (LANG === 'en' && zx >= 0 ? ' (' + ZODIAC_EN[zx] + ')' : '') + '</b><br>' +
+    esc(t('dayMasterIs')) + ' <b>' + esc(r.dayGan) + esc(GAN_ELEM[r.dayGan]) + (LANG === 'en' ? ' (' + esc(stemName(r.dayGan)) + ' ' + esc(elementName(GAN_ELEM[r.dayGan])) + ')' : '') + '</b> · ' + esc(g);
+
+  var grid = document.getElementById('pillar-grid');
+  var html = '';
+  for (var i = 0; i < r.pillars.length; i++) html += renderBirthCard(r.pillars[i], r.pillars[i].key === 'day');
+  grid.innerHTML = html;
+
+  var lnGan = r.lnGz.charAt(0), lnZhi = r.lnGz.charAt(1);
+  var ny = nayinOf(r.lnGz);
+  var lnBlock = document.getElementById('liunian-block');
+  lnBlock.innerHTML = '<h3>' + esc(t('secLiunian')) + '</h3>' +
+    '<div class="verdict">' + esc(t('liunianYear')) + ' <span class="level">' + r.targetYear + ' · ' + esc(LANG === 'en' ? gzName(r.lnGz) : r.lnGz) + '</span> · ' +
+    esc(tgName(tenGod(r.dayGan, lnGan))) + ' · ' + esc(t('liunianNayin')) + ' ' + esc(ny.name) + '<br>' +
+    esc(t('ageAtLichun')) + ' <b>' + ageAtLichun(r.birth, r.targetYear) + '</b> · ' + esc(t('dayMasterIs')) + ' <b>' + esc(r.dayGan) + '</b></div>';
+
+  var hitsBlock = document.getElementById('hits-block');
+  var hh = '<h3>' + esc(t('secHits')) + '</h3><div class="duan-note">' + esc(t('hitsNote')) + '</div>';
+  if (!r.hits.length) {
+    hh += '<div class="duan-item">' + esc(t('hitsNone')) + '</div>';
+  } else {
+    for (var k = 0; k < r.hits.length; k++) hh += '<div class="hit-item">' + esc(r.hits[k]) + '</div>';
+  }
+  hitsBlock.innerHTML = hh;
+
+  var monthsBlock = document.getElementById('months-block');
+  var names = t('monthNames'), terms = t('termRanges');
+  var curMonthGz = '';
+  try {
+    var now = new Date();
+    if (r.targetYear === now.getFullYear()) {
+      curMonthGz = Solar.fromYmdHms(now.getFullYear(), now.getMonth() + 1, now.getDate(), now.getHours(), now.getMinutes(), 0).getLunar().getEightChar().getMonth();
+    }
+  } catch (e) { curMonthGz = ''; }
+  var mh = '<h3>' + esc(t('secMonths')) + '</h3>' +
+    '<div class="table-wrap"><table class="chart"><thead><tr><th>' + esc(t('colMonth')) + '</th><th>' + esc(t('colMonthGz')) + '</th><th>' + esc(t('colMonthGod')) + '</th><th>' + esc(t('colMonthNote')) + '</th></tr></thead><tbody>';
+  for (var m = 0; m < 12; m++) {
+    var mgz = r.months[m];
+    var mgod = tenGod(r.dayGan, mgz.charAt(0));
+    var isCur = curMonthGz && curMonthGz === mgz;
+    mh += '<tr' + (isCur ? ' class="current"' : '') + '><td><b>' + esc(names[m]) + '</b><br><span style="color:#6f6f80;font-size:.8rem">' + esc(terms[m]) + '</span>' + (isCur ? ' <span class="flag">● ' + esc(t('monthCurrent')) + '</span>' : '') + '</td>' +
+      '<td><b>' + esc(LANG === 'en' ? gzName(mgz) : mgz) + '</b></td>' +
+      '<td>' + esc(tgName(mgod)) + '</td>' +
+      '<td style="white-space:normal;min-width:220px">' + esc(t('txt_' + mgod)) + '</td></tr>';
+  }
+  mh += '</tbody></table></div>';
+  monthsBlock.innerHTML = mh;
+
+  if (!isRelang) {
+    var card = document.getElementById('result-card');
+    if (card && card.scrollIntoView) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+// 语言切换时重渲染（setLang 已在 I18N 段定义，重渲染靠 LAST_RESULT）
+var _origSetLang = setLang;
+setLang = function (lang) {
+  _origSetLang(lang);
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+};
+
+document.getElementById('target-year').value = new Date().getFullYear();
+
+// ==AI-INTERPRET==
+window.getJieguaSummary = function() {
+  if (!LAST_RESULT) return null;
+  var r = LAST_RESULT;
+  var lines = [];
+  lines.push('【流年流月】目标年 ' + r.targetYear + ' 年');
+  lines.push('出生农历 ' + r.lunar.toString());
+  lines.push('四柱：' + r.pillars.map(function (p) { return p.gz || '时辰未知'; }).join(' ') + '；日主 ' + r.dayGan + GAN_ELEM[r.dayGan]);
+  var ny = nayinOf(r.lnGz);
+  lines.push('流年：' + r.targetYear + ' 年 ' + r.lnGz + '（' + tenGod(r.dayGan, r.lnGz.charAt(0)) + ' · 纳音' + ny.name + '）');
+  if (r.hits.length) lines.push('流年与命局：' + r.hits.join('；'));
+  else lines.push('流年与命局：未见合、冲、刑、害。');
+  var mparts = [];
+  for (var i = 0; i < 12; i++) mparts.push(r.months[i] + '（' + tenGod(r.dayGan, r.months[i].charAt(0)) + '）');
+  lines.push('十二流月：' + mparts.join('、'));
+  return lines.join('\n');
+};
+
+if (window.AIInterpret) { window.AIInterpret.attach(); }
+else { document.addEventListener('DOMContentLoaded', function () { if (window.AIInterpret) window.AIInterpret.attach(); }); }
+</script>
+<script src="/js/ai-jiegua.js"></script>
+<script>
+if (window.AIInterpret) window.AIInterpret.attach();
+</script>
+</body>
+</html>

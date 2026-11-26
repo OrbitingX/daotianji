@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盗天机 · 太玄经</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: dark; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #0b0b14;
+    background-image:
+      radial-gradient(1px 1px at 24px 36px, rgba(201,169,98,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 96px, rgba(201,169,98,.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 76px 170px, rgba(240,234,216,.38) 50%, transparent 51%),
+      radial-gradient(1px 1px at 210px 44px, rgba(201,169,98,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 280px 150px, rgba(240,234,216,.28) 50%, transparent 51%),
+      radial-gradient(1px 1px at 90px 210px, rgba(201,169,98,.22) 50%, transparent 51%);
+    background-size: 340px 240px;
+    background-attachment: fixed;
+    color: #f0ead8;
+    min-height: 100vh;
+  }
+
+  /* ---- 侧边栏 ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 288px;
+    background: rgba(11,11,20,.92);
+    border-right: 1px solid rgba(201,169,98,.22);
+    display: flex; flex-direction: column;
+    padding: 2rem 1.6rem 1.4rem;
+    z-index: 10;
+  }
+  .brand { text-decoration: none; display: flex; align-items: center; gap: .9rem; padding-bottom: 1.6rem; border-bottom: 1px solid rgba(201,169,98,.22); }
+  .brand-mark { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid #c9a962; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+  .brand-mark span { transform: rotate(-45deg); color: #c9a962; font-size: 19px; line-height: 1; }
+  .brand-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.35rem; color: #f0ead8; letter-spacing: .18em; }
+  .brand-sub { font-size: .75rem; color: #9a9aab; letter-spacing: .3em; margin-top: .25rem; }
+  .nav { flex: 1; overflow-y: auto; padding: 1.4rem 0; }
+  .nav-group { font-size: .78rem; color: #c9a962; letter-spacing: .3em; margin-bottom: .9rem; }
+  .nav-list { list-style: none; }
+  .nav-item { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .6rem; font-size: .92rem; color: #9a9aab; border-bottom: 1px solid rgba(201,169,98,.12); cursor: default; text-decoration: none; }
+  a.nav-item:hover { color: #c9a962; }
+  .nav-item.current { color: #c9a962; background: rgba(201,169,98,.08); border-bottom: 1px solid #c9a962; }
+  .nav-tag { font-size: .65rem; color: #6f6f80; border: 1px solid rgba(154,154,171,.35); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; }
+  .sidebar-foot { font-size: .75rem; color: #6f6f80; letter-spacing: .15em; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(201,169,98,.22); }
+  .lang-switch { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: 1rem 0 .4rem; border-top: 1px solid rgba(201,169,98,.22); margin-top: 1rem; }
+  .lang-switch label { font-size: .8rem; color: #c9a962; letter-spacing: .3em; margin: 0; white-space: nowrap; }
+  .lang-switch select { width: auto; flex: 1; min-width: 0; font-size: .9rem; padding: .3rem .1rem; }
+  .gua-name-cn { display: block; font-size: .85rem; color: #9a9aab; font-weight: 400; margin-top: .2rem; letter-spacing: .05em; }
+  .guaci-note { font-size: .78rem; color: #6f6f80; margin-top: .5rem; line-height: 1.6; }
+
+  /* ---- 主内容 ---- */
+  .main { margin-left: 288px; min-width: 0; }
+  .content { max-width: 800px; margin: 0 auto; padding: 3.2rem 2rem 4rem; }
+  .eyebrow { display: flex; align-items: center; justify-content: center; gap: 1.1rem; color: #c9a962; font-size: .85rem; letter-spacing: .3em; margin-bottom: 1.6rem; }
+  .eyebrow::before, .eyebrow::after { content: ''; height: 1px; width: 72px; background: linear-gradient(90deg, transparent, #c9a962); }
+  .eyebrow::after { background: linear-gradient(90deg, #c9a962, transparent); }
+  .slogan { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 2.1rem; line-height: 1.6; color: #f0ead8; text-align: center; letter-spacing: .08em; font-weight: 400; }
+  .subtitle { text-align: center; color: #9a9aab; font-size: .95rem; margin-top: 1rem; letter-spacing: .12em; }
+  .section { padding: 2.2rem 0; border-bottom: 1px solid rgba(201,169,98,.25); }
+  .section-title { font-size: .85rem; color: #c9a962; letter-spacing: .3em; margin-bottom: 1.2rem; }
+
+  /* ---- 表单 ---- */
+  .field { margin-bottom: 1.4rem; }
+  label { display: block; font-size: .8rem; color: #b08d3e; letter-spacing: .14em; margin-bottom: .15rem; }
+  input[type="text"], input[type="number"], input[type="datetime-local"], select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(201,169,98,.45);
+    color: #f0ead8; font-size: 1.05rem; padding: .55rem .1rem; outline: none; border-radius: 0;
+    font-family: inherit;
+  }
+  input::placeholder { color: #9a9aab; font-style: italic; }
+  input:focus, select:focus { border-bottom-color: #c9a962; }
+  select { cursor: pointer; }
+  .method-row { display: flex; gap: 2rem; }
+  .method-row > .field { flex: 1; min-width: 0; }
+  .num-row { display: flex; gap: 2rem; }
+  .num-row > .field { flex: 1; min-width: 0; }
+  .link-btn { background: none; border: none; color: #c9a962; font-size: .75rem; cursor: pointer; letter-spacing: .1em; padding: 0; margin-left: .5rem; font-family: inherit; }
+  .link-btn:hover { text-decoration: underline; }
+  .submit-btn {
+    display: block; width: min(420px, 100%); margin: 2.2rem auto 0;
+    background: transparent; border: 2px solid #c9a962; border-radius: 999px;
+    color: #c9a962; font-size: 1.05rem; letter-spacing: .3em; text-indent: .3em;
+    padding: .9rem 2rem; cursor: pointer; font-family: inherit;
+  }
+  .submit-btn:hover { background: rgba(201,169,98,.08); }
+  .submit-btn:disabled { opacity: .45; cursor: default; }
+  .hidden { display: none !important; }
+  .error { color: #d97b6c; font-size: .85rem; margin-top: .5rem; }
+  .hint { color: #9a9aab; font-size: .85rem; line-height: 1.8; margin-bottom: 1rem; }
+
+  /* ---- 结果 ---- */
+  .result-head { font-size: .95rem; line-height: 2; color: #c8c2ae; }
+  .result-head b { color: #c9a962; font-weight: 600; }
+  .verdict { margin-top: 1rem; padding: .9rem 1.1rem; border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); color: #f0ead8; font-size: .95rem; line-height: 1.8; }
+  .verdict .level { color: #c9a962; font-weight: 700; }
+  .hex-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-top: 1.4rem; }
+  .hex-card { background: transparent; border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1.1rem 1.2rem; }
+  .hex-card h3 { font-size: .8rem; color: #b08d3e; font-weight: 400; letter-spacing: .25em; margin-bottom: .6rem; }
+  .hex-card .gua-name { font-family: "Noto Serif SC","Songti SC","SimSun",serif; font-size: 1.25rem; font-weight: 700; color: #f0ead8; }
+  .hex-card .tri-info { font-size: .85rem; color: #9a9aab; margin: .4rem 0 .8rem; line-height: 1.7; }
+  .hex-card .tri-info b { color: #f0ead8; font-weight: 600; }
+  .hex-card .guaci { font-size: .88rem; color: #c8c2ae; line-height: 1.7; border-top: 1px dashed rgba(201,169,98,.35); padding-top: .7rem; margin-top: .7rem; }
+
+  /* ---- 玄图（方州部家四行，每行一/二/三画） ---- */
+  .xuan-diagram { width: min(420px, 100%); margin: .2rem auto .7rem; }
+  .xuan-row { display: flex; align-items: center; gap: .7rem; margin: 9px 0; }
+  .xuan-row .xlbl { width: 2.4em; color: #6f6f80; font-size: .8rem; flex-shrink: 0; }
+  .xuan-row .xbar { flex: 1; display: flex; gap: 10px; height: 12px; }
+  .xuan-row .xbar .seg { flex: 1; background: #c9a962; border-radius: 2px; }
+  .xuan-row .xnum { width: 4.5em; text-align: right; color: #c9a962; font-size: .85rem; flex-shrink: 0; }
+  .xuan-key { text-align: center; color: #6f6f80; font-size: .8rem; letter-spacing: .2em; margin-top: .4rem; }
+
+  /* ---- 赞辞 ---- */
+  .duan-block { margin-top: 1.6rem; }
+  .duan-block h3 { font-size: .85rem; color: #c9a962; letter-spacing: .25em; font-weight: 400; margin-bottom: .7rem; }
+  .duan-item { padding: .7rem 0; border-bottom: 1px solid rgba(201,169,98,.12); font-size: .92rem; line-height: 1.9; color: #c8c2ae; }
+  .duan-item:last-child { border-bottom: none; }
+  .duan-item .cond { color: #c9a962; font-weight: 600; }
+  .duan-item.hl { border: 1px solid rgba(201,169,98,.6); background: rgba(201,169,98,.05); border-radius: 6px; padding: .9rem 1.1rem; margin-bottom: .4rem; }
+  .duan-note { font-size: .82rem; color: #6f6f80; line-height: 1.8; margin-top: .6rem; }
+  .data-status { font-size: .82rem; color: #6f6f80; margin-top: 1rem; line-height: 1.8; }
+  .data-status.err { color: #d97b6c; }
+  details.refbox { margin-top: 1.6rem; border: 1px solid rgba(201,169,98,.3); border-radius: 6px; padding: 1rem 1.2rem; }
+  details.refbox summary { cursor: pointer; color: #c9a962; font-size: .9rem; letter-spacing: .12em; list-style: none; }
+  details.refbox summary::-webkit-details-marker { display: none; }
+  details.refbox summary::after { content: ' +'; }
+  details.refbox[open] summary::after { content: ' −'; }
+
+  /* ---- FAQ ---- */
+  .faq h2 { font-size: 1.1rem; color: #f0ead8; font-weight: 600; margin-bottom: 1.2rem; text-align: left; letter-spacing: .05em; }
+  .faq details { border-bottom: 1px solid rgba(201,169,98,.22); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem .1rem; font-size: .95rem; color: #f0ead8; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: #c9a962; font-size: 1.2rem; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { color: #9a9aab; font-size: .9rem; line-height: 1.8; padding: 0 .1rem 1.1rem; }
+
+  footer { text-align: center; color: #6f6f80; font-size: .8rem; line-height: 1.9; padding: 2rem 0 0; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: static; width: auto; border-right: none; border-bottom: 1px solid rgba(201,169,98,.22); padding: 1rem 1.2rem .8rem; }
+    .brand { padding-bottom: .9rem; }
+    .nav { padding: .8rem 0 0; overflow: visible; }
+    .nav-group { display: none; }
+    .nav-list { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; }
+    .nav-item { white-space: nowrap; border-bottom: none; border: 1px solid rgba(201,169,98,.18); border-radius: 999px; padding: .35rem .8rem; font-size: .85rem; }
+    .nav-item.current { border-color: #c9a962; }
+    .sidebar-foot { display: none; }
+    .lang-switch { padding: .7rem 0 0; margin-top: .6rem; }
+    .main { margin-left: 0; }
+    .content { padding: 2.2rem 1.2rem 3rem; }
+    .slogan { font-size: 1.6rem; }
+    .eyebrow::before, .eyebrow::after { width: 36px; }
+    .method-row, .num-row { flex-direction: column; gap: 0; }
+  }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">
+    <div class="brand-mark"><span>☰</span></div>
+    <div>
+      <div class="brand-name">盗天机</div>
+      <div class="brand-sub" data-i18n="brandSub">太玄经 · 本地占卜</div>
+    </div>
+  </a>
+                <nav class="nav">
+    <div class="nav-group" data-i18n="navGroup1">一事一问</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/jiemeng/"><span class="nav-name" data-i18n="nav_jiemeng">解梦</span></a>
+      <a class="nav-item" href="/liuyao/"><span class="nav-name" data-i18n="nav_liuyao">六爻占卜</span></a>
+      <a class="nav-item" href="/meihua/"><span class="nav-name" data-i18n="nav_meihua">梅花易数</span></a>
+      <a class="nav-item" href="/xiaoliuren/"><span class="nav-name" data-i18n="nav_xiaoliuren">小六壬</span></a>
+      <a class="nav-item" href="/taluo/"><span class="nav-name" data-i18n="nav_taluo">塔罗牌</span></a>
+      <a class="nav-item" href="/leinuoman/"><span class="nav-name" data-i18n="nav_leinuoman">雷诺曼</span></a>
+      <a class="nav-item" href="/lunen/"><span class="nav-name" data-i18n="nav_lunen">北欧卢恩符文</span></a>
+      <a class="nav-item" href="/qimen/"><span class="nav-name" data-i18n="nav_qimen">奇门遁甲</span></a>
+      <a class="nav-item" href="/daliuren/"><span class="nav-name" data-i18n="nav_daliuren">大六壬</span></a>
+      <a class="nav-item" href="/jinkoujue/"><span class="nav-name" data-i18n="nav_jinkoujue">金口诀</span></a>
+      <a class="nav-item" href="/taiyi/"><span class="nav-name" data-i18n="nav_taiyi">太乙神数</span></a>
+      <a class="nav-item" href="/zhanxing/"><span class="nav-name" data-i18n="nav_zhanxing">占星骰子</span></a>
+      <a class="nav-item" href="/zhuge/"><span class="nav-name" data-i18n="nav_zhuge">诸葛神数</span></a>
+      <a class="nav-item" href="/lingqi/"><span class="nav-name" data-i18n="nav_lingqi">灵棋经</span></a>
+      <a class="nav-item" href="/cezi/"><span class="nav-name" data-i18n="nav_cezi">测字</span></a>
+      <a class="nav-item" href="/zhouyi/"><span class="nav-name" data-i18n="nav_zhouyi">周易占卜</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup2">一生之图</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/bazi/"><span class="nav-name" data-i18n="nav_bazi">四柱八字</span></a>
+      <a class="nav-item" href="/ziwei/"><span class="nav-name" data-i18n="nav_ziwei">紫微斗数</span></a>
+      <a class="nav-item" href="/tieban/"><span class="nav-name" data-i18n="nav_tieban">铁板神数</span></a>
+      <a class="nav-item" href="/yilin/"><span class="nav-name" data-i18n="nav_yilin">焦氏易林</span></a>
+      <a class="nav-item" href="/jingfang/"><span class="nav-name" data-i18n="nav_jingfang">京房易</span></a>
+      <span class="nav-item current"><span class="nav-name" data-i18n="nav_taixuan">太玄经</span></span>
+      <a class="nav-item" href="/huangji/"><span class="nav-name" data-i18n="nav_huangji">皇极经世</span></a>
+      <a class="nav-item" href="/shengminglingshu/"><span class="nav-name" data-i18n="nav_shengminglingshu">生命灵数</span></a>
+      <a class="nav-item" href="/chenggu/"><span class="nav-name" data-i18n="nav_chenggu">称骨算命</span></a>
+      <a class="nav-item" href="/xiyang/"><span class="nav-name" data-i18n="nav_xiyang">西洋占星</span></a>
+      <a class="nav-item" href="/yindu/"><span class="nav-name" data-i18n="nav_yindu">印度占星</span></a>
+      <a class="nav-item" href="/qizheng/"><span class="nav-name" data-i18n="nav_qizheng">七政四余</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup3">两人之间</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/xiyang-hepan/"><span class="nav-name" data-i18n="nav_xiyang-hepan">西方占星合盘</span></a>
+      <a class="nav-item" href="/bazi-hepan/"><span class="nav-name" data-i18n="nav_bazi-hepan">八字合盘</span></a>
+      <a class="nav-item" href="/ziwei-hepan/"><span class="nav-name" data-i18n="nav_ziwei-hepan">紫微合盘</span></a>
+      <a class="nav-item" href="/yindu-hepan/"><span class="nav-name" data-i18n="nav_yindu-hepan">印度合盘</span></a>
+    </div>
+    <div class="nav-group" data-i18n="navGroup4">时机之轮</div>
+    <div class="nav-list">
+      <a class="nav-item" href="/liunian/"><span class="nav-name" data-i18n="nav_liunian">流年流月</span></a>
+      <a class="nav-item" href="/maya/"><span class="nav-name" data-i18n="nav_maya">玛雅历法</span></a>
+    </div>
+  </nav>
+  <div class="lang-switch">
+    <label for="lang-select" data-i18n="langLabel">语言</label>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  <div class="sidebar-foot" data-i18n="footNote">本地运行 · 无需联网</div>
+</aside>
+
+<main class="main">
+<div class="content">
+  <div class="eyebrow" data-i18n="eyebrow">第一幕 · 问事信息</div>
+  <h1 class="slogan" data-i18n-html="slogan">玄首既得，<br>九赞自分。</h1>
+  <p class="subtitle" data-i18n="subtitle">太玄经免费在线起首</p>
+
+  <section class="section">
+    <div class="field">
+      <label for="question" data-i18n="labelQuestion">所问之事（可选）</label>
+      <input type="text" id="question" placeholder="例如：这个机会要不要接？" data-i18n-ph="phQuestion">
+    </div>
+    <div class="method-row">
+      <div class="field">
+        <label for="method" data-i18n="labelMethod">起首方式</label>
+        <select id="method" onchange="switchMethod(this.value)">
+          <option value="pick" selected data-i18n="optPick">直取首 · 按序号或首名</option>
+          <option value="number" data-i18n="optNumber">数字起首 · 三数蓍法</option>
+          <option value="time" data-i18n="optTime">时间起首 · 农历年月日时</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="panel-pick">
+      <div class="num-row">
+        <div class="field">
+          <label for="pick-num" data-i18n="labelPickNum">首序（1–81）</label>
+          <input type="number" id="pick-num" min="1" max="81" step="1" placeholder="如 1" data-i18n-ph="phPickNum" onchange="syncPickNum()">
+        </div>
+        <div class="field">
+          <label for="pick-name" data-i18n="labelPickName">首名</label>
+          <select id="pick-name" onchange="syncPickName()"></select>
+        </div>
+      </div>
+      <div class="error" id="pick-error"></div>
+    </div>
+
+    <div id="panel-number" class="hidden">
+      <p class="hint" data-i18n="numHint">古法蓍策四揲，每揲得一、二、三，定方、州、部、家而得首。本页简化为三数：前三数各定方、州、部，第四数（家）取三数之和；每数以三除取余化为一、二、三。</p>
+      <div class="num-row">
+        <div class="field">
+          <label for="num1" data-i18n="labelNum1">数字一（方）</label>
+          <input type="number" id="num1" min="1" step="1" placeholder="如 8" data-i18n-ph="phNum1">
+        </div>
+        <div class="field">
+          <label for="num2" data-i18n="labelNum2">数字二（州）</label>
+          <input type="number" id="num2" min="1" step="1" placeholder="如 3" data-i18n-ph="phNum2">
+        </div>
+        <div class="field">
+          <label for="num3" data-i18n="labelNum3">数字三（部）</label>
+          <input type="number" id="num3" min="1" step="1" placeholder="如 5" data-i18n-ph="phNum3">
+        </div>
+      </div>
+      <div class="error" id="number-error"></div>
+    </div>
+
+    <div id="panel-time" class="hidden">
+      <div class="field">
+        <label for="datetime"><span data-i18n="labelTime">时间</span> <button type="button" class="link-btn" onclick="useNow()" data-i18n="btnNow">用当前时间</button></label>
+        <input type="datetime-local" id="datetime">
+        <div class="error" id="time-error"></div>
+      </div>
+      <p class="hint" data-i18n="timeHint">取农历年支序、月、日与时支序四数之和，以八十一除取余得首，以九除取余得赞位。</p>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="doCast()" data-i18n="btnSubmit">揲蓍 · 得首</button>
+  </section>
+
+  <section class="section hidden" id="result-card">
+    <div class="section-title" data-i18n="resultTitle">所得之首</div>
+    <div class="result-head" id="result-head"></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="hex-grid" id="hex-grid"></div>
+    <div class="duan-block" id="zan-block"></div>
+    <details class="refbox" id="allzan-ref">
+      <summary data-i18n="allZanBtn">展开九赞全文</summary>
+      <div id="allzan-list"></div>
+    </details>
+    <div class="duan-block hidden" id="daynight-block"></div>
+    <div class="data-status" id="data-status"></div>
+      <button id="ai-interpret-btn" class="ai-interpret-btn" data-tool="taixuan" data-i18n="ai_interpret">AI 解读</button>
+    <div id="ai-interpret-output"></div>
+</section>
+
+  <section class="section faq">
+    <h2 data-i18n="faqTitle">太玄经：免费起首与使用常见问题</h2>
+    <details>
+      <summary data-i18n="faqQ1">太玄经与周易有什么不同？</summary>
+      <p data-i18n="faqA1">周易六十四卦，每卦六爻，爻分阴阳；太玄经八十一首，每首四位——方、州、部、家，每位一、二、三画，共九赞。太玄以三数起首，首辞言大势，九赞言人事进退，测辞再断吉凶。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">三种起首方式有什么区别？</summary>
+      <p data-i18n="faqA2">直取首是按序号或首名直接取一首，用来查首辞；数字起首是简化的蓍法，三数化为方州部家四位而得首；时间起首取问事当下的农历年月日时四数之和而得首。三种方式得首之后，首辞与九赞的读法完全相同。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">赞位是怎么定的？直取首为什么没有主赞？</summary>
+      <p data-i18n="faqA3">每首有九赞，从初一到上九。数字起首以三数之和定赞位，时间起首以四数之和定赞位，得出的那一赞为主赞，配测辞同读；其余八赞见九赞全文。直取首没有起首数可定赞位，所以九赞并列、不设主赞。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">玄图四行、一画二画三画怎么读？</summary>
+      <p data-i18n="faqA4">玄图自上而下是方、州、部、家四位，每位一画为一、二画为二、三画为三。首序即四位三进制之数：中首为一一一一，养首为三三三三，其余依次而推。图中金色短横的段数就是该位的画数。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">昼夜占断是什么意思？</summary>
+      <p data-i18n="faqA5">太玄筮法按占时分旦、日中、夕、夜中四段，每段各有三赞为当令之赞；再配首的阴阳家，得昼夜占断，如「始中休终咎」。本页时间起首时附列此条作参考，时段按简化四分（夜中 23–5 时、旦 5–11 时、日中 11–17 时、夕 17–23 时）划分。</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ6">数据从哪里来？免费吗？版本差异怎么处理？</summary>
+      <p data-i18n="faqA6">免费。本页起首在本地完成，不联网、不收费，也不会保存你输入的问题。首辞与赞辞数据来自 comprehensive-shushu-engine（GPL-3.0）所收的太玄经与太玄筮法。两份数据文件在六处首名用字上为异体字（如强／彊、阙／𫔵），所指为同一首；强首首辞「纯刚／统刚」为版本异文，本页以太玄经数据为准。另有一处录入串行：晬首首辞误串入强首上九赞辞，本页已剔除串入部分，只示通行本首辞。</p>
+    </details>
+  </section>
+
+  <footer>
+    <span data-i18n="disclaimer">太玄经属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
+    <span data-i18n="attrLine">首辞与赞辞数据：comprehensive-shushu-engine（GPL-3.0），扬雄《太玄经》· 太玄筮法。</span><br>
+    <span data-i18n="offlineNote">本页起首完全离线运行，农历换算使用本地 lunar.js，不向任何服务器发送数据；首辞文本按需从本站数据文件加载。</span>
+  </footer>
+</div>
+</main>
+<script src="lunar.js"></script>
+<script>
+// ==I18N==
+// 四语词典：zh-CN（默认）、zh-TW、en、ja。首辞、赞辞、测辞原文一律保留中文，见 guaciNote。
+var I18N = {
+'zh-CN': {
+  'licenseLink': '数据与出处',
+  'navGroup1': '一事一问',
+  'navGroup2': '一生之图',
+  'navGroup3': '两人之间',
+  'navGroup4': '时机之轮',
+  'nav_jiemeng': '解梦',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔罗牌',
+  'nav_leinuoman': '雷诺曼',
+  'nav_lunen': '北欧卢恩符文',
+  'nav_qimen': '奇门遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口诀',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '诸葛神数',
+  'nav_lingqi': '灵棋经',
+  'nav_cezi': '测字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '铁板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄经',
+  'nav_huangji': '皇极经世',
+  'nav_shengminglingshu': '生命灵数',
+  'nav_chenggu': '称骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西方占星合盘',
+  'nav_bazi-hepan': '八字合盘',
+  'nav_ziwei-hepan': '紫微合盘',
+  'nav_yindu-hepan': '印度合盘',
+  'nav_liunian': '流年流月',
+  'nav_maya': '玛雅历法',
+  brandSub: '太玄经 · 本地占卜',
+  navSoon: '即将上线',
+  footNote: '本地运行 · 无需联网',
+  eyebrow: '第一幕 · 问事信息',
+  slogan: '玄首既得，<br>九赞自分。',
+  subtitle: '太玄经免费在线起首',
+  labelQuestion: '所问之事（可选）',
+  phQuestion: '例如：这个机会要不要接？',
+  labelMethod: '起首方式',
+  optPick: '直取首 · 按序号或首名',
+  optNumber: '数字起首 · 三数蓍法',
+  optTime: '时间起首 · 农历年月日时',
+  labelPickNum: '首序（1–81）',
+  phPickNum: '如 1',
+  labelPickName: '首名',
+  numHint: '古法蓍策四揲，每揲得一、二、三，定方、州、部、家而得首。本页简化为三数：前三数各定方、州、部，第四数（家）取三数之和；每数以三除取余化为一、二、三。',
+  labelNum1: '数字一（方）',
+  phNum1: '如 8',
+  labelNum2: '数字二（州）',
+  phNum2: '如 3',
+  labelNum3: '数字三（部）',
+  phNum3: '如 5',
+  labelTime: '时间',
+  btnNow: '用当前时间',
+  timeHint: '取农历年支序、月、日与时支序四数之和，以八十一除取余得首，以九除取余得赞位。',
+  btnSubmit: '揲蓍 · 得首',
+  errPickNum: '首序须为 1–81 的整数。',
+  errNum: '三个数字均为必填正整数。',
+  errNoTime: '请先选择时间。',
+  errBadTime: '时间格式不正确。',
+  errData: '首辞数据未能加载，可刷新后重试。',
+  resultTitle: '所得之首',
+  ai_interpret: 'AI 解读',
+  shouOf: '第 {n} 首',
+  fzbLabel: '方州部家',
+  fzbKey: '四位',
+  tianLabel: '天',
+  posLabel: '位',
+  yinyangLabel: '家',
+  wuxingLabel: '五行',
+  shouciLabel: '首辞：',
+  zanLabel: '赞',
+  ceLabel: '测曰：',
+  mainZanTitle: '主赞',
+  noZanNote: '直取首未起赞位，九赞并列，见下方九赞全文。',
+  allZanBtn: '展开九赞全文',
+  daynightTitle: '昼夜占断（参考）',
+  daynightPeriod: '时段',
+  daynightZan: '当令之赞',
+  daynightDivine: '占断',
+  guaciNote: '',
+  asked: '所问',
+  lunar: '农历',
+  castNums: '起首数',
+  castMethod: '起首方式',
+  methodPick: '直取首',
+  methodNumber: '数字起首',
+  methodTime: '时间起首',
+  fzbNums: '方州部家',
+  zanPos: '赞位',
+  year: '年', month: '月', day: '日', hour: '时',
+  dataLoading: '首辞数据加载中……',
+  dataFail: '首辞数据未能加载，仅显示序号与首名；可刷新后重试。',
+  dataReady: '首辞数据已加载。',
+  faqTitle: '太玄经：免费起首与使用常见问题',
+  faqQ1: '太玄经与周易有什么不同？',
+  faqA1: '周易六十四卦，每卦六爻，爻分阴阳；太玄经八十一首，每首四位——方、州、部、家，每位一、二、三画，共九赞。太玄以三数起首，首辞言大势，九赞言人事进退，测辞再断吉凶。',
+  faqQ2: '三种起首方式有什么区别？',
+  faqA2: '直取首是按序号或首名直接取一首，用来查首辞；数字起首是简化的蓍法，三数化为方州部家四位而得首；时间起首取问事当下的农历年月日时四数之和而得首。三种方式得首之后，首辞与九赞的读法完全相同。',
+  faqQ3: '赞位是怎么定的？直取首为什么没有主赞？',
+  faqA3: '每首有九赞，从初一到上九。数字起首以三数之和定赞位，时间起首以四数之和定赞位，得出的那一赞为主赞，配测辞同读；其余八赞见九赞全文。直取首没有起首数可定赞位，所以九赞并列、不设主赞。',
+  faqQ4: '玄图四行、一画二画三画怎么读？',
+  faqA4: '玄图自上而下是方、州、部、家四位，每位一画为一、二画为二、三画为三。首序即四位三进制之数：中首为一一一一，养首为三三三三，其余依次而推。图中金色短横的段数就是该位的画数。',
+  faqQ5: '昼夜占断是什么意思？',
+  faqA5: '太玄筮法按占时分旦、日中、夕、夜中四段，每段各有三赞为当令之赞；再配首的阴阳家，得昼夜占断，如「始中休终咎」。本页时间起首时附列此条作参考，时段按简化四分（夜中 23–5 时、旦 5–11 时、日中 11–17 时、夕 17–23 时）划分。',
+  faqQ6: '数据从哪里来？免费吗？版本差异怎么处理？',
+  faqA6: '免费。本页起首在本地完成，不联网、不收费，也不会保存你输入的问题。首辞与赞辞数据来自 comprehensive-shushu-engine（GPL-3.0）所收的太玄经与太玄筮法。两份数据文件在六处首名用字上为异体字（如强／彊、阙／𫔵），所指为同一首；强首首辞「纯刚／统刚」为版本异文，本页以太玄经数据为准。另有一处录入串行：晬首首辞误串入强首上九赞辞，本页已剔除串入部分，只示通行本首辞。',
+  disclaimer: '太玄经属传统术数，仅供参考，不构成决策依据。',
+  attrLine: '首辞与赞辞数据：comprehensive-shushu-engine（GPL-3.0），扬雄《太玄经》· 太玄筮法。',
+  offlineNote: '本页起首完全离线运行，农历换算使用本地 lunar.js，不向任何服务器发送数据；首辞文本按需从本站数据文件加载。',
+  langLabel: '语言'
+},
+'zh-TW': {
+  'licenseLink': '數據與出處',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之圖',
+  'navGroup3': '兩人之間',
+  'navGroup4': '時機之輪',
+  'nav_jiemeng': '解夢',
+  'nav_liuyao': '六爻占卜',
+  'nav_meihua': '梅花易數',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': '塔羅牌',
+  'nav_leinuoman': '雷諾曼',
+  'nav_lunen': '北歐盧恩符文',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神數',
+  'nav_zhanxing': '占星骰子',
+  'nav_zhuge': '諸葛神數',
+  'nav_lingqi': '靈棋經',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占卜',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗數',
+  'nav_tieban': '鐵板神數',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄經',
+  'nav_huangji': '皇極經世',
+  'nav_shengminglingshu': '生命靈數',
+  'nav_chenggu': '稱骨算命',
+  'nav_xiyang': '西洋占星',
+  'nav_yindu': '印度占星',
+  'nav_qizheng': '七政四餘',
+  'nav_xiyang-hepan': '西方占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': '印度合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': '瑪雅曆法',
+  brandSub: '太玄經 · 本地占卜',
+  navSoon: '即將上線',
+  footNote: '本地運行 · 無需聯網',
+  eyebrow: '第一幕 · 問事資訊',
+  slogan: '玄首既得，<br>九贊自分。',
+  subtitle: '太玄經免費線上起首',
+  labelQuestion: '所問之事（可選）',
+  phQuestion: '例如：這個機會要不要接？',
+  labelMethod: '起首方式',
+  optPick: '直取首 · 按序號或首名',
+  optNumber: '數字起首 · 三數蓍法',
+  optTime: '時間起首 · 農曆年月日時',
+  labelPickNum: '首序（1–81）',
+  phPickNum: '如 1',
+  labelPickName: '首名',
+  numHint: '古法蓍策四揲，每揲得一、二、三，定方、州、部、家而得首。本頁簡化為三數：前三數各定方、州、部，第四數（家）取三數之和；每數以三除取餘化為一、二、三。',
+  labelNum1: '數字一（方）',
+  phNum1: '如 8',
+  labelNum2: '數字二（州）',
+  phNum2: '如 3',
+  labelNum3: '數字三（部）',
+  phNum3: '如 5',
+  labelTime: '時間',
+  btnNow: '用當前時間',
+  timeHint: '取農曆年支序、月、日與時支序四數之和，以八十一除取餘得首，以九除取餘得贊位。',
+  btnSubmit: '揲蓍 · 得首',
+  errPickNum: '首序須為 1–81 的整數。',
+  errNum: '三個數字均為必填正整數。',
+  errNoTime: '請先選擇時間。',
+  errBadTime: '時間格式不正確。',
+  errData: '首辭數據未能加載，可刷新後重試。',
+  resultTitle: '所得之首',
+  ai_interpret: 'AI 解讀',
+  shouOf: '第 {n} 首',
+  fzbLabel: '方州部家',
+  fzbKey: '四位',
+  tianLabel: '天',
+  posLabel: '位',
+  yinyangLabel: '家',
+  wuxingLabel: '五行',
+  shouciLabel: '首辭：',
+  zanLabel: '贊',
+  ceLabel: '測曰：',
+  mainZanTitle: '主贊',
+  noZanNote: '直取首未起贊位，九贊並列，見下方九贊全文。',
+  allZanBtn: '展開九贊全文',
+  daynightTitle: '晝夜占斷（參考）',
+  daynightPeriod: '時段',
+  daynightZan: '當令之贊',
+  daynightDivine: '占斷',
+  guaciNote: '',
+  asked: '所問',
+  lunar: '農曆',
+  castNums: '起首數',
+  castMethod: '起首方式',
+  methodPick: '直取首',
+  methodNumber: '數字起首',
+  methodTime: '時間起首',
+  fzbNums: '方州部家',
+  zanPos: '贊位',
+  year: '年', month: '月', day: '日', hour: '時',
+  dataLoading: '首辭數據加載中……',
+  dataFail: '首辭數據未能加載，僅顯示序號與首名；可刷新後重試。',
+  dataReady: '首辭數據已加載。',
+  faqTitle: '太玄經：免費起首與使用常見問題',
+  faqQ1: '太玄經與周易有什麼不同？',
+  faqA1: '周易六十四卦，每卦六爻，爻分陰陽；太玄經八十一首，每首四位——方、州、部、家，每位一、二、三畫，共九贊。太玄以三數起首，首辭言大勢，九贊言人事進退，測辭再斷吉凶。',
+  faqQ2: '三種起首方式有什麼區別？',
+  faqA2: '直取首是按序號或首名直接取一首，用來查首辭；數字起首是簡化的蓍法，三數化為方州部家四位而得首；時間起首取問事當下的農曆年月日時四數之和而得首。三種方式得首之後，首辭與九贊的讀法完全相同。',
+  faqQ3: '贊位是怎麼定的？直取首為什麼沒有主贊？',
+  faqA3: '每首有九贊，從初一到上九。數字起首以三數之和定贊位，時間起首以四數之和定贊位，得出的那一贊為主贊，配測辭同讀；其餘八贊見九贊全文。直取首沒有起首數可定贊位，所以九贊並列、不設主贊。',
+  faqQ4: '玄圖四行、一畫二畫三畫怎麼讀？',
+  faqA4: '玄圖自上而下是方、州、部、家四位，每位一畫為一、二畫為二、三畫為三。首序即四位三進制之數：中首為一一一一，養首為三三三三，其餘依次而推。圖中金色短橫的段數就是該位的畫數。',
+  faqQ5: '晝夜占斷是什麼意思？',
+  faqA5: '太玄筮法按占時分旦、日中、夕、夜中四段，每段各有三贊為當令之贊；再配首的陰陽家，得晝夜占斷，如「始中休終咎」。本頁時間起首時附列此條作參考，時段按簡化四分（夜中 23–5 時、旦 5–11 時、日中 11–17 時、夕 17–23 時）劃分。',
+  faqQ6: '數據從哪裡來？免費嗎？版本差異怎麼處理？',
+  faqA6: '免費。本頁起首在本地完成，不聯網、不收費，也不會保存你輸入的問題。首辭與贊辭數據來自 comprehensive-shushu-engine（GPL-3.0）所收的太玄經與太玄筮法。兩份數據文件在六處首名用字上為異體字（如強／彊、闕／𫔵），所指為同一首；強首首辭「純剛／統剛」為版本異文，本頁以太玄經數據為準。另有一處錄入串行：晬首首辭誤串入強首上九贊辭，本頁已剔除串入部分，只示通行本首辭。',
+  disclaimer: '太玄經屬傳統術數，僅供參考，不構成決策依據。',
+  attrLine: '首辭與贊辭數據：comprehensive-shushu-engine（GPL-3.0），揚雄《太玄經》· 太玄筮法。',
+  offlineNote: '本頁起首完全離線運行，農曆換算使用本地 lunar.js，不向任何伺服器發送數據；首辭文本按需從本站數據文件加載。',
+  langLabel: '語言'
+},
+'en': {
+  'licenseLink': 'Data & Sources',
+  'navGroup1': 'One Question',
+  'navGroup2': 'Life Chart',
+  'navGroup3': 'Between Two',
+  'navGroup4': 'Wheel of Time',
+  'nav_jiemeng': 'Dream Interpretation',
+  'nav_liuyao': 'Six Lines Divination',
+  'nav_meihua': 'Meihua Yishu',
+  'nav_xiaoliuren': 'Xiao Liuren',
+  'nav_taluo': 'Tarot',
+  'nav_leinuoman': 'Lenormand',
+  'nav_lunen': 'Norse Runes',
+  'nav_qimen': 'Qimen Dunjia',
+  'nav_daliuren': 'Da Liuren',
+  'nav_jinkoujue': 'Jinkou Jue',
+  'nav_taiyi': 'Taiyi Shenshu',
+  'nav_zhanxing': 'Astrology Dice',
+  'nav_zhuge': 'Zhuge\'s Oracles',
+  'nav_lingqi': 'Lingqi Jing',
+  'nav_cezi': 'Character Divination',
+  'nav_zhouyi': 'Zhouyi Divination',
+  'nav_bazi': 'Four Pillars (Bazi)',
+  'nav_ziwei': 'Ziwei Doushu',
+  'nav_tieban': 'Tieban Shenshu',
+  'nav_yilin': 'Jiaoshi Yilin',
+  'nav_jingfang': 'Jingfang Yi',
+  'nav_taixuan': 'Taixuan Jing',
+  'nav_huangji': 'Huangji Jingshi',
+  'nav_shengminglingshu': 'Life Path Number',
+  'nav_chenggu': 'Bone Weighing',
+  'nav_xiyang': 'Western Astrology',
+  'nav_yindu': 'Vedic Astrology',
+  'nav_qizheng': 'Qizheng Siyu',
+  'nav_xiyang-hepan': 'Western Synastry',
+  'nav_bazi-hepan': 'Bazi Compatibility',
+  'nav_ziwei-hepan': 'Ziwei Compatibility',
+  'nav_yindu-hepan': 'Vedic Compatibility',
+  'nav_liunian': 'Annual & Monthly Fortune',
+  'nav_maya': 'Maya Calendar',
+  brandSub: 'Taixuan Jing · Local Divination',
+  navSoon: 'Soon',
+  footNote: 'Runs locally · No internet needed',
+  eyebrow: 'Act I · Your Question',
+  slogan: 'One Head cast,<br>the nine Appraisals decide.',
+  subtitle: 'Free online Taixuan Jing Head casting',
+  labelQuestion: 'Your question (optional)',
+  phQuestion: 'e.g. Should I take this opportunity?',
+  labelMethod: 'Casting method',
+  optPick: 'Pick a Head · by number or name',
+  optNumber: 'Number casting · three-number yarrow method',
+  optTime: 'Time casting · lunar year, month, day & hour',
+  labelPickNum: 'Head number (1–81)',
+  phPickNum: 'e.g. 1',
+  labelPickName: 'Head name',
+  numHint: 'The old yarrow method casts four times, each giving 1, 2 or 3, fixing Fang, Zhou, Bu and Jia to find the Head. This page simplifies it to three numbers: the first three set Fang, Zhou and Bu, and the fourth (Jia) comes from their sum; each number is reduced modulo 3 to 1, 2 or 3.',
+  labelNum1: 'Number 1 (Fang)',
+  phNum1: 'e.g. 8',
+  labelNum2: 'Number 2 (Zhou)',
+  phNum2: 'e.g. 3',
+  labelNum3: 'Number 3 (Bu)',
+  phNum3: 'e.g. 5',
+  labelTime: 'Time',
+  btnNow: 'Use now',
+  timeHint: 'Adds the lunar year-branch index, month, day and hour-branch index, then takes the remainder modulo 81 for the Head and modulo 9 for the Appraisal.',
+  btnSubmit: 'Cast the Head',
+  errPickNum: 'The Head number must be an integer from 1 to 81.',
+  errNum: 'All three numbers are required positive integers.',
+  errNoTime: 'Please choose a time first.',
+  errBadTime: 'The time format is invalid.',
+  errData: 'The Head texts could not be loaded. Please refresh and try again.',
+  resultTitle: 'The Head',
+  ai_interpret: 'AI Reading',
+  shouOf: 'Head {n}',
+  fzbLabel: 'Fang · Zhou · Bu · Jia',
+  fzbKey: 'Four positions',
+  tianLabel: 'Heaven',
+  posLabel: 'Position',
+  yinyangLabel: 'Family',
+  wuxingLabel: 'Element',
+  shouciLabel: 'Head text: ',
+  zanLabel: 'Appraisal',
+  ceLabel: 'Assessment: ',
+  mainZanTitle: 'Principal Appraisal',
+  noZanNote: 'Picking a Head directly sets no Appraisal position, so all nine Appraisals are listed equally below.',
+  allZanBtn: 'Show all nine Appraisals',
+  daynightTitle: 'Day–Night Reading (reference)',
+  daynightPeriod: 'Period',
+  daynightZan: 'Appraisals in effect',
+  daynightDivine: 'Reading',
+  guaciNote: 'Head and Appraisal texts shown in classical Chinese.',
+  asked: 'Question',
+  lunar: 'Lunar date',
+  castNums: 'Casting numbers',
+  castMethod: 'Casting method',
+  methodPick: 'Picked directly',
+  methodNumber: 'Number casting',
+  methodTime: 'Time casting',
+  fzbNums: 'Fang · Zhou · Bu · Jia',
+  zanPos: 'Appraisal position',
+  year: 'Year', month: 'Month', day: 'Day', hour: 'Hour',
+  dataLoading: 'Loading the Head texts…',
+  dataFail: 'The Head texts could not be loaded; only the number and name are shown. Please refresh and try again.',
+  dataReady: 'Head texts loaded.',
+  faqTitle: 'Taixuan Jing: Free Casting & FAQ',
+  faqQ1: 'How is the Taixuan Jing different from the Zhouyi?',
+  faqA1: 'The Zhouyi has 64 hexagrams of six yin or yang lines each. The Taixuan Jing has 81 Heads, each with four positions — Fang, Zhou, Bu and Jia — each drawn with one, two or three strokes, and nine Appraisals. It casts by threes: the Head text speaks of the broad trend, the nine Appraisals speak of human advance and retreat, and the Assessments judge fortune.',
+  faqQ2: 'What is the difference between the three casting methods?',
+  faqA2: 'Picking a Head takes one directly by number or name, for looking up its text. Number casting is the simplified yarrow method: three numbers become the four Fang-Zhou-Bu-Jia positions and give the Head. Time casting sums the lunar year, month, day and hour numbers of the moment you ask. Once the Head is found, the Head text and the nine Appraisals are read the same way for all three methods.',
+  faqQ3: 'How is the Appraisal position fixed? Why does a picked Head have no principal Appraisal?',
+  faqA3: 'Each Head has nine Appraisals, from the first line to the top line. Number casting fixes the Appraisal from the sum of the three numbers, time casting from the sum of the four time numbers; that Appraisal is the principal one and is read together with its Assessment, and the other eight are listed in full below. Picking a Head gives no casting numbers to fix an Appraisal, so all nine stand equally and there is no principal one.',
+  faqQ4: 'How do I read the tetragram — four rows of one, two or three strokes?',
+  faqA4: 'Read top to bottom: Fang, Zhou, Bu, Jia. One stroke means 1, two strokes 2, three strokes 3. The Head number is the four positions read as a base-3 number: the Head Zhong is 1111, the Head Yang is 3333, and the rest follow in order. The number of gold segments in a row is the stroke count of that position.',
+  faqQ5: 'What is the day–night reading?',
+  faqA5: 'Taixuan divination divides the time of casting into four periods — dawn, midday, dusk and midnight — each with three Appraisals in effect; combined with the Head’s yin or yang family this gives a day–night reading such as “rest at start and middle, blame at end”. This page shows it as a reference for time casting, with the periods split by a simplified four-way division (midnight 23–5, dawn 5–11, midday 11–17, dusk 17–23).',
+  faqQ6: 'Where does the data come from? Is it free? How are edition differences handled?',
+  faqA6: 'Yes, free. Casting runs locally in your browser — no internet, no charge, and your question is never saved. The Head and Appraisal texts come from the Taixuan Jing and Taixuan divination method as collected in comprehensive-shushu-engine (GPL-3.0). The two data files use variant glyphs for six Head names (e.g. Qiang / Jiang, Que / the variant form), but they are the same Heads; the Head Qiang’s text reads “purely firm” in one edition and “governing firmness” in another, and this page follows the Taixuan Jing data file. One entry was miscopied: the Head Sui’s Head text had the top-line Appraisal of the Head Qiang spliced into it, and this page removes the spliced part and shows the standard Head text.',
+  disclaimer: 'The Taixuan Jing is a traditional divination art, for reference only; it is not a basis for decisions.',
+  attrLine: 'Head & Appraisal texts: comprehensive-shushu-engine (GPL-3.0) — the Taixuan Jing of Yang Xiong · Taixuan divination method.',
+  offlineNote: 'Casting runs fully offline. Lunar conversion uses the local lunar.js and no data is sent to any server; Head texts are loaded on demand from this site’s data files.',
+  langLabel: 'Language'
+},
+'ja': {
+  'licenseLink': 'データと出典',
+  'navGroup1': '一事一問',
+  'navGroup2': '一生之図',
+  'navGroup3': '二人の間',
+  'navGroup4': '時の輪',
+  'nav_jiemeng': '夢占い',
+  'nav_liuyao': '六爻占い',
+  'nav_meihua': '梅花易数',
+  'nav_xiaoliuren': '小六壬',
+  'nav_taluo': 'タロット',
+  'nav_leinuoman': 'ルノルマン',
+  'nav_lunen': '北欧ルーン',
+  'nav_qimen': '奇門遁甲',
+  'nav_daliuren': '大六壬',
+  'nav_jinkoujue': '金口訣',
+  'nav_taiyi': '太乙神数',
+  'nav_zhanxing': '占星ダイス',
+  'nav_zhuge': '諸葛神数',
+  'nav_lingqi': '霊棋経',
+  'nav_cezi': '測字',
+  'nav_zhouyi': '周易占い',
+  'nav_bazi': '四柱八字',
+  'nav_ziwei': '紫微斗数',
+  'nav_tieban': '鉄板神数',
+  'nav_yilin': '焦氏易林',
+  'nav_jingfang': '京房易',
+  'nav_taixuan': '太玄経',
+  'nav_huangji': '皇極経世',
+  'nav_shengminglingshu': '生命数秘術',
+  'nav_chenggu': '称骨占い',
+  'nav_xiyang': '西洋占星術',
+  'nav_yindu': 'インド占星術',
+  'nav_qizheng': '七政四余',
+  'nav_xiyang-hepan': '西洋占星合盤',
+  'nav_bazi-hepan': '八字合盤',
+  'nav_ziwei-hepan': '紫微合盤',
+  'nav_yindu-hepan': 'インド合盤',
+  'nav_liunian': '流年流月',
+  'nav_maya': 'マヤ暦',
+  brandSub: '太玄経 · ローカル占い',
+  navSoon: '近日公開',
+  footNote: 'ローカル動作 · ネット不要',
+  eyebrow: '第一幕 · 問うこと',
+  slogan: '玄首既に得れば、<br>九賛自ずと分つ。',
+  subtitle: '太玄経 無料オンライン起首',
+  labelQuestion: '質問（任意）',
+  phQuestion: '例：このチャンスを受けるべき？',
+  labelMethod: '起首方法',
+  optPick: '直取首 · 番号または首名で',
+  optNumber: '数字起首 · 三数蓍法',
+  optTime: '時間起首 · 旧暦年月日時',
+  labelPickNum: '首序（1–81）',
+  phPickNum: '例 1',
+  labelPickName: '首名',
+  numHint: '古法の蓍策は四揲し、毎回一・二・三を得て方・州・部・家を定めて首を得ます。本頁では三数に簡略化：前三数が方・州・部を定め、第四数（家）は三数の合計から取ります。各数は三で割った余りで一・二・三に化します。',
+  labelNum1: '数字一（方）',
+  phNum1: '例 8',
+  labelNum2: '数字二（州）',
+  phNum2: '例 3',
+  labelNum3: '数字三（部）',
+  phNum3: '例 5',
+  labelTime: '時間',
+  btnNow: '現在時刻を使う',
+  timeHint: '旧暦の年支序・月・日と時支序の四数の合計を取り、八十一で割った余りで首を、九で割った余りで賛位を決めます。',
+  btnSubmit: '起首する',
+  errPickNum: '首序は 1–81 の整数にしてください。',
+  errNum: '三つの数字はすべて必須の正の整数です。',
+  errNoTime: 'まず時間を選択してください。',
+  errBadTime: '時間の形式が正しくありません。',
+  errData: '首辞データを読み込めませんでした。更新して再試行してください。',
+  resultTitle: '所得之首',
+  ai_interpret: 'AI 解釈',
+  shouOf: '第 {n} 首',
+  fzbLabel: '方州部家',
+  fzbKey: '四位',
+  tianLabel: '天',
+  posLabel: '位',
+  yinyangLabel: '家',
+  wuxingLabel: '五行',
+  shouciLabel: '首辞：',
+  zanLabel: '賛',
+  ceLabel: '測曰：',
+  mainZanTitle: '主賛',
+  noZanNote: '直取首では賛位が定まらないため、九賛を並列し、下の九賛全文をご覧ください。',
+  allZanBtn: '九賛全文を開く',
+  daynightTitle: '昼夜占断（参考）',
+  daynightPeriod: '時段',
+  daynightZan: '当令の賛',
+  daynightDivine: '占断',
+  guaciNote: '首辞・賛辞・測辞は中国語原文のまま表示しています。',
+  asked: '質問',
+  lunar: '旧暦',
+  castNums: '起首数',
+  castMethod: '起首方法',
+  methodPick: '直取首',
+  methodNumber: '数字起首',
+  methodTime: '時間起首',
+  fzbNums: '方州部家',
+  zanPos: '賛位',
+  year: '年', month: '月', day: '日', hour: '時',
+  dataLoading: '首辞データを読み込み中……',
+  dataFail: '首辞データを読み込めませんでした。番号と首名のみ表示します。更新して再試行してください。',
+  dataReady: '首辞データを読み込みました。',
+  faqTitle: '太玄経：無料起首とよくある質問',
+  faqQ1: '太玄経と周易の違いは？',
+  faqA1: '周易は六十四卦、各卦六爻で爻は陰陽に分かれます。太玄経は八十一首、各首は方・州・部・家の四位からなり、各一位は一・二・三画、賛は九つです。太玄は三数で起首し、首辞は大勢を、九賛は人事の進退を、測辞は吉凶を断じます。',
+  faqQ2: '三つの起首方法の違いは？',
+  faqA2: '直取首は番号または首名で直接一首を取るもので、首辞を調べるためのものです。数字起首は簡略化した蓍法で、三数が方州部家の四位となって首を得ます。時間起首は質問した瞬間の旧暦年月日時四数の合計で首を得ます。首を得た後の首辞と九賛の読み方は三方法とも同じです。',
+  faqQ3: '賛位はどう決まりますか？直取首に主賛がないのはなぜ？',
+  faqA3: '各首には初一から上九まで九賛があります。数字起首では三数の合計で、時間起首では四数の合計で賛位を決め、その一賛が主賛となり、測辞とともに読みます。残りの八賛は九賛全文にあります。直取首には賛位を決める起首数がないため、九賛が並列となり主賛は設けません。',
+  faqQ4: '玄図の四行、一画・二画・三画はどう読みますか？',
+  faqA4: '玄図は上から方・州・部・家の四位です。一画は一、二画は二、三画は三を表します。首序は四位を三進数として読んだものです。中首は一一一一、養首は三三三三で、他も順に並びます。図の金色の短横の段数がその位の画数です。',
+  faqQ5: '昼夜占断とは何ですか？',
+  faqA5: '太玄筮法では占う時刻を旦・日中・夕・夜中の四段に分け、各段に三賛が当令の賛としてあり、首の陰陽家と合わせて昼夜占断を得ます（例「始中休終咎」）。本頁では時間起首の際に参考として附します。時段は簡略化した四分（夜中 23–5 時、旦 5–11 時、日中 11–17 時、夕 17–23 時）で分けています。',
+  faqQ6: 'データはどこから来ますか？無料ですか？版本の違いはどう扱いますか？',
+  faqA6: '無料です。本頁の起首はローカルで計算され、ネット接続も料金も不要で、入力した質問は保存されません。首辞と賛辞のデータは comprehensive-shushu-engine（GPL-3.0）に収められた太玄経と太玄筮法によるものです。二つのデータファイルでは六つの首名の字が異体字です（例：強／彊、闕／𫔵）が、指す首は同じです。強首の首辞「純剛／統剛」は版本による異文で、本頁は太玄経データによります。なお一か所の録入ミスがあります。晬首の首辞に強首の上九賛辞が紛れ込んでいたため、本頁では紛れ込んだ部分を除き、通行本の首辞のみを示しています。',
+  disclaimer: '太玄経は伝統的な占術です。参考までとし、判断の根拠にはなりません。',
+  attrLine: '首辞・賛辞データ：comprehensive-shushu-engine（GPL-3.0）、揚雄『太玄経』・太玄筮法。',
+  offlineNote: '本頁の起首は完全オフラインで動作します。旧暦換算はローカルの lunar.js を使い、データは外部サーバーに送信されません。首辞テキストは必要に応じて当サイトのデータファイルから読み込みます。',
+  langLabel: '言語'
+}
+};
+
+// 九天（中天…成天）英文/日文名：zh 仍用中文
+var TIAN_EN = {'中天':'Zhong Tian','羡天':'Xian Tian','从天':'Cong Tian','减天':'Jian Tian','晬天':'Zui Tian','廓天':'Kuo Tian','更天':'Geng Tian','沉天':'Chen Tian','成天':'Cheng Tian'};
+var YINYANG_EN = {'阳家':'Yang family','阴家':'Yin family'};
+var ELEMENT_EN = {'金':'Metal','木':'Wood','水':'Water','火':'Fire','土':'Earth'};
+var PERIOD_EN = {'旦':'Dawn','日中':'Midday','夕':'Dusk','夜中':'Midnight'};
+var PERIOD_JA = {'旦':'旦','日中':'日中','夕':'夕','夜中':'夜中'};
+
+function detectLang() {
+  var l = '';
+  try { l = (navigator.language || 'zh-CN').toLowerCase(); } catch (e) { l = 'zh-cn'; }
+  if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+  if (l.indexOf('ja') === 0) return 'ja';
+  if (l.indexOf('en') === 0) return 'en';
+  return 'zh-CN';
+}
+var LANG = 'zh-CN';
+try { LANG = localStorage.getItem('daotianji-lang') || detectLang(); } catch (e) { LANG = detectLang(); }
+if (!(LANG in I18N)) LANG = 'zh-CN';
+
+var LAST_RESULT = null;
+
+function t(key) {
+  var d = I18N[LANG] || I18N['zh-CN'];
+  if (key in d) return d[key];
+  if (key in I18N['zh-CN']) return I18N['zh-CN'][key];
+  return key;
+}
+function tianName(n) { return LANG === 'en' ? (TIAN_EN[n] || n) : n; }
+function yinyangName(n) { return LANG === 'en' ? (YINYANG_EN[n] || n) : n; }
+function elementName(el) { return LANG === 'en' ? (ELEMENT_EN[el] || el) : el; }
+function periodName(p) { return LANG === 'en' ? (PERIOD_EN[p] || p) : (LANG === 'ja' ? (PERIOD_JA[p] || p) : p); }
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = '盗天机 · ' + t('brandSub');
+  var els = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < els.length; i++) els[i].textContent = t(els[i].getAttribute('data-i18n'));
+  var htmls = document.querySelectorAll('[data-i18n-html]');
+  for (var j = 0; j < htmls.length; j++) htmls[j].innerHTML = t(htmls[j].getAttribute('data-i18n-html'));
+  var phs = document.querySelectorAll('[data-i18n-ph]');
+  for (var k = 0; k < phs.length; k++) phs[k].setAttribute('placeholder', t(phs[k].getAttribute('data-i18n-ph')));
+  var sel = document.getElementById('lang-select');
+  if (sel) sel.value = LANG;
+  var ids = ['pick-error', 'number-error', 'time-error'];
+  for (var m = 0; m < ids.length; m++) { var e = document.getElementById(ids[m]); if (e) e.textContent = ''; }
+}
+
+function setLang(lang) {
+  if (!(lang in I18N)) return;
+  LANG = lang;
+  try { localStorage.setItem('daotianji-lang', lang); } catch (e) {}
+  applyI18n();
+  buildPickOptions();
+  if (LAST_RESULT) showResult(LAST_RESULT, true);
+}
+// ==I18N-END==
+</script>
+<script>
+// ==LOGIC-BEGIN==
+// 太玄经 · 八十一首。主数据 /data/taixuan.json（list，81 条，xu 1–81）；
+// 昼夜占断取 /data/taixuanshifa.json（可选，缺失不影响起首）。
+// 首序即方州部家四位三进制之数：xu = (f-1)*27 + (z-1)*9 + (b-1)*3 + (j-1) + 1。
+var BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var FZB_NAMES = ['方','州','部','家'];
+var DATA = null;
+var SHIFA = null;
+var dataPromise = null;
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function mod3safe(n) { var r = (n - 1) % 3; if (r < 0) r += 3; return r + 1; }
+function xuFromFZB(f, z, b, j) { return (f - 1) * 27 + (z - 1) * 9 + (b - 1) * 3 + (j - 1) + 1; }
+function fzbFromXu(xu) {
+  var x = xu - 1;
+  var f = Math.floor(x / 27) + 1; x = x % 27;
+  var z = Math.floor(x / 9) + 1; x = x % 9;
+  var b = Math.floor(x / 3) + 1;
+  var j = x % 3 + 1;
+  return [f, z, b, j];
+}
+// 三数蓍法（简化）：前三数各定方、州、部；家取三数之和。赞位取三数之和。
+function castFromNumbers(n1, n2, n3) {
+  var f = mod3safe(n1), z = mod3safe(n2), b = mod3safe(n3), j = mod3safe(n1 + n2 + n3);
+  var xu = xuFromFZB(f, z, b, j);
+  var zanIdx = ((n1 + n2 + n3 - 1) % 9 + 9) % 9 + 1;
+  return { xu: xu, fzb: [f, z, b, j], zanIdx: zanIdx };
+}
+// 时间起首：s = 年支序 + 农历月 + 农历日 + 时支序；首 = s 对 81 取余，赞位 = s 对 9 取余。
+function castFromTime(di) {
+  var s = di.yearNum + di.monthNum + di.dayNum + di.hourNum;
+  var xu = ((s - 1) % 81 + 81) % 81 + 1;
+  var zanIdx = ((s - 1) % 9 + 9) % 9 + 1;
+  return { xu: xu, fzb: fzbFromXu(xu), zanIdx: zanIdx, sum: s };
+}
+function hourBranchNum(hour) {
+  if (hour >= 23 || hour < 1) return 1;
+  return Math.floor((hour + 1) / 2) + 1;
+}
+function periodOfHour(hour) {
+  if (hour >= 23 || hour < 5) return '夜中';
+  if (hour < 11) return '旦';
+  if (hour < 17) return '日中';
+  return '夕';
+}
+function dateInfo(date) {
+  var solar = Solar.fromYmdHms(date.getFullYear(), date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), 0);
+  var lunar = solar.getLunar();
+  var yearGZ = lunar.getYearInGanZhi();
+  var monthGZ = lunar.getMonthInGanZhi();
+  var dayGZ = lunar.getDayInGanZhi();
+  var timeGZ = lunar.getTimeInGanZhi();
+  var yearNum = BRANCHES.indexOf(yearGZ.charAt(1)) + 1;
+  return {
+    date: date,
+    lunarYear: lunar.getYear(), lunarMonth: lunar.getMonth(), lunarDay: lunar.getDay(),
+    monthCN: lunar.getMonthInChinese(), dayCN: lunar.getDayInChinese(),
+    yearGZ: yearGZ, monthGZ: monthGZ, dayGZ: dayGZ, timeGZ: timeGZ,
+    yearNum: yearNum, monthNum: lunar.getMonth(), dayNum: lunar.getDay(), hourNum: hourBranchNum(date.getHours())
+  };
+}
+// 首辞清理：数据中晬首首辞误串入强首上九赞辞（内含“测曰”与第二个首辞，
+// 且串入的首名用异体字“睟”而非“晬”）。若首辞含“测曰”，只取最后一个“：”之后的部分；
+// 其余首辞原样返回。
+function cleanShouci(entry) {
+  var s = entry.shouci || '';
+  if (s.indexOf('测曰') >= 0) {
+    var idx = s.lastIndexOf('：');
+    if (idx > 0) return s.slice(idx + 1);
+  }
+  return s;
+}
+function shouOf(xu) {
+  if (!DATA || !DATA.byXu) return null;
+  return DATA.byXu[xu] || null;
+}
+function shouKey(entry) { return (entry.fangzhoubujia || fzbFromXu(entry.xu)).join(''); }
+
+function fetchJson(path) {
+  return fetch(path).then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
+}
+function setStatus(kind) {
+  var el = document.getElementById('data-status');
+  if (!el) return;
+  el.classList.toggle('err', kind === 'fail');
+  el.textContent = kind === 'loading' ? t('dataLoading') : kind === 'fail' ? t('dataFail') : kind === 'ready' ? t('dataReady') : '';
+}
+function ensureData() {
+  if (dataPromise) return dataPromise;
+  setStatus('loading');
+  dataPromise = Promise.all([
+    fetchJson('/data/taixuan.json'),
+    fetchJson('/data/taixuanshifa.json')
+  ]).then(function(arr) {
+    var list = arr[0];
+    if (list && list.length) {
+      var byXu = {};
+      for (var i = 0; i < list.length; i++) { if (list[i] && list[i].xu) byXu[list[i].xu] = list[i]; }
+      DATA = { list: list, byXu: byXu };
+    } else {
+      DATA = null;
+    }
+    SHIFA = arr[1] || null;
+    setStatus(DATA ? 'ready' : 'fail');
+    buildPickOptions();
+    return DATA;
+  });
+  return dataPromise;
+}
+
+function buildPickOptions() {
+  var sel = document.getElementById('pick-name');
+  if (!sel) return;
+  var cur = sel.value;
+  sel.innerHTML = '';
+  if (!DATA) {
+    var o0 = document.createElement('option');
+    o0.value = '';
+    o0.textContent = t('dataLoading');
+    sel.appendChild(o0);
+    return;
+  }
+  for (var xu = 1; xu <= 81; xu++) {
+    var e = DATA.byXu[xu];
+    if (!e) continue;
+    var o = document.createElement('option');
+    o.value = String(xu);
+    o.textContent = t('shouOf').replace('{n}', xu) + ' · ' + e.name;
+    sel.appendChild(o);
+  }
+  if (cur && DATA.byXu[parseInt(cur, 10)]) sel.value = cur;
+  var pn = document.getElementById('pick-num');
+  if (pn && pn.value) sel.value = pn.value;
+  else if (pn && !pn.value) { pn.value = '1'; sel.value = '1'; }
+}
+
+function syncPickNum() {
+  var pn = document.getElementById('pick-num');
+  var sel = document.getElementById('pick-name');
+  if (pn && sel && pn.value) sel.value = String(parseInt(pn.value, 10));
+}
+function syncPickName() {
+  var pn = document.getElementById('pick-num');
+  var sel = document.getElementById('pick-name');
+  if (pn && sel && sel.value) pn.value = sel.value;
+}
+
+function switchMethod(v) {
+  document.getElementById('panel-pick').classList.toggle('hidden', v !== 'pick');
+  document.getElementById('panel-number').classList.toggle('hidden', v !== 'number');
+  document.getElementById('panel-time').classList.toggle('hidden', v !== 'time');
+  var ids = ['pick-error', 'number-error', 'time-error'];
+  for (var i = 0; i < ids.length; i++) { var e = document.getElementById(ids[i]); if (e) e.textContent = ''; }
+}
+function localInputValue(d) {
+  function p(n) { return (n < 10 ? '0' : '') + n; }
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + 'T' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+function useNow() {
+  document.getElementById('datetime').value = localInputValue(new Date());
+  document.getElementById('time-error').textContent = '';
+}
+function readInt(id) {
+  var v = document.getElementById(id).value;
+  if (v === '' || v == null) return null;
+  var n = parseInt(v, 10);
+  if (isNaN(n)) return null;
+  return n;
+}
+
+function doCast() {
+  var method = document.getElementById('method').value;
+  var question = document.getElementById('question').value.trim();
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  ensureData().then(function() {
+    btn.disabled = false;
+    if (!DATA) {
+      var errId = method === 'pick' ? 'pick-error' : method === 'number' ? 'number-error' : 'time-error';
+      document.getElementById(errId).textContent = t('errData');
+      return;
+    }
+    var res = null;
+    if (method === 'pick') {
+      var xu = readInt('pick-num');
+      if (xu == null || xu < 1 || xu > 81 || !shouOf(xu)) {
+        document.getElementById('pick-error').textContent = t('errPickNum');
+        return;
+      }
+      res = { xu: xu, fzb: fzbFromXu(xu), zanIdx: null, method: 'pick', question: question };
+    } else if (method === 'number') {
+      var n1 = readInt('num1'), n2 = readInt('num2'), n3 = readInt('num3');
+      if (n1 == null || n2 == null || n3 == null || n1 < 1 || n2 < 1 || n3 < 1) {
+        document.getElementById('number-error').textContent = t('errNum');
+        return;
+      }
+      var c = castFromNumbers(n1, n2, n3);
+      res = { xu: c.xu, fzb: c.fzb, zanIdx: c.zanIdx, method: 'number', question: question, nums: [n1, n2, n3] };
+    } else {
+      var dv = document.getElementById('datetime').value;
+      if (!dv) { document.getElementById('time-error').textContent = t('errNoTime'); return; }
+      var d = new Date(dv.replace('T', ' ') + ':00');
+      if (isNaN(d.getTime())) { document.getElementById('time-error').textContent = t('errBadTime'); return; }
+      if (typeof Solar === 'undefined') { document.getElementById('time-error').textContent = t('errData'); return; }
+      var di = dateInfo(d);
+      var ct = castFromTime(di);
+      res = { xu: ct.xu, fzb: ct.fzb, zanIdx: ct.zanIdx, method: 'time', question: question, di: di, sum: ct.sum };
+    }
+    LAST_RESULT = res;
+    showResult(res, false);
+  });
+}
+
+// ---- 渲染 ----
+function xuanDiagram(fzb) {
+  var html = '<div class="xuan-diagram">';
+  for (var i = 0; i < 4; i++) {
+    var v = fzb[i];
+    var segs = '';
+    for (var s = 0; s < v; s++) segs += '<span class="seg"></span>';
+    html += '<div class="xuan-row"><span class="xlbl">' + FZB_NAMES[i] + '</span>' +
+      '<span class="xbar">' + segs + '</span>' +
+      '<span class="xnum">' + v + '画</span></div>';
+  }
+  html += '<div class="xuan-key">' + t('fzbKey') + ' · ' + fzb.join('') + '</div></div>';
+  return html;
+}
+function zanItem(entry, idx, highlight) {
+  var z = entry.zan[idx];
+  var ce = (entry.ce && entry.ce[idx]) ? entry.ce[idx] : '';
+  var cls = 'duan-item' + (highlight ? ' hl' : '');
+  var head = (highlight ? '● ' : '') + '<span class="cond">' + esc(z.weizhi) + '</span>　' + esc(z.ci);
+  var ceHtml = ce ? '<br>' + t('ceLabel') + esc(ce) : '';
+  return '<div class="' + cls + '">' + head + ceHtml + '</div>';
+}
+function showResult(res, isRerender) {
+  var entry = shouOf(res.xu);
+  if (!entry) return;
+  var card = document.getElementById('result-card');
+  card.classList.remove('hidden');
+  var head = '';
+  if (res.question) head += t('asked') + '：<b>' + esc(res.question) + '</b><br>';
+  head += t('castMethod') + '：<b>' + t(res.method === 'pick' ? 'methodPick' : res.method === 'number' ? 'methodNumber' : 'methodTime') + '</b><br>';
+  if (res.method === 'time' && res.di) {
+    var di = res.di;
+    head += t('lunar') + '：<b>' + di.yearGZ + t('year') + ' ' + di.monthCN + t('month') + di.dayCN + t('day') + ' · ' + di.timeGZ + t('hour') + '</b><br>';
+    head += t('castNums') + '：<b>' + di.yearNum + ' + ' + di.monthNum + ' + ' + di.dayNum + ' + ' + di.hourNum + ' = ' + res.sum + '</b><br>';
+  }
+  if (res.method === 'number' && res.nums) {
+    head += t('castNums') + '：<b>' + res.nums.join(' · ') + '</b><br>';
+  }
+  head += t('fzbNums') + '：<b>' + res.fzb.join(' · ') + '</b>';
+  if (res.zanIdx) {
+    var zw = entry.zan[res.zanIdx - 1];
+    head += '　' + t('zanPos') + '：<b>' + esc(zw.weizhi) + '</b>';
+  }
+  document.getElementById('result-head').innerHTML = head;
+
+  var shouci = cleanShouci(entry);
+  document.getElementById('verdict').innerHTML =
+    '<span class="level">' + t('shouOf').replace('{n}', entry.xu) + ' · ' + esc(entry.name) + '　' + t('shouciLabel') + '</span>' + esc(shouci);
+
+  var info = t('tianLabel') + ' <b>' + esc(tianName(entry.tian)) + ' · ' + t('posLabel') + ' ' + entry.pos + '</b>　' +
+    t('yinyangLabel') + ' <b>' + esc(yinyangName(entry.yinyang)) + '</b>　' +
+    t('wuxingLabel') + ' <b>' + esc(elementName(entry.wuxing)) + '</b>';
+  var note = t('guaciNote');
+  var cardHtml = '<div class="hex-card"><h3>' + t('fzbLabel') + '</h3>' +
+    '<div class="gua-name">' + t('shouOf').replace('{n}', entry.xu) + ' · ' + esc(entry.name) + '</div>' +
+    '<div class="tri-info">' + info + '</div>' +
+    xuanDiagram(res.fzb) +
+    (note ? '<div class="guaci-note">' + note + '</div>' : '') +
+    '</div>';
+  document.getElementById('hex-grid').innerHTML = cardHtml;
+
+  var zb = document.getElementById('zan-block');
+  if (res.zanIdx) {
+    zb.innerHTML = '<h3>' + t('mainZanTitle') + ' · ' + esc(entry.zan[res.zanIdx - 1].weizhi) + '</h3>' +
+      zanItem(entry, res.zanIdx - 1, true);
+  } else {
+    zb.innerHTML = '<h3>' + t('mainZanTitle') + '</h3><div class="duan-note">' + t('noZanNote') + '</div>';
+  }
+  var allHtml = '';
+  for (var i = 0; i < entry.zan.length; i++) allHtml += zanItem(entry, i, res.zanIdx === i + 1);
+  document.getElementById('allzan-list').innerHTML = allHtml;
+
+  var dnb = document.getElementById('daynight-block');
+  if (res.method === 'time' && res.di && SHIFA && SHIFA.daynightselect && SHIFA.divine_yy) {
+    var period = periodOfHour(res.di.date.getHours());
+    var zans = SHIFA.daynightselect[period] || [];
+    var key = period + (entry.yinyang === '阳家' ? '阳' : '阴');
+    var dv = SHIFA.divine_yy[key] || [];
+    dnb.classList.remove('hidden');
+    dnb.innerHTML = '<h3>' + t('daynightTitle') + '</h3>' +
+      '<div class="duan-item"><span class="cond">' + t('daynightPeriod') + '</span>　' + esc(periodName(period)) + '（' + esc(period) + '）</div>' +
+      '<div class="duan-item"><span class="cond">' + t('daynightZan') + '</span>　' + esc(zans.join('、')) + '</div>' +
+      (dv.length ? '<div class="duan-item"><span class="cond">' + t('daynightDivine') + '</span>　' + esc(dv.join(' · ')) + '</div>' : '');
+  } else {
+    dnb.classList.add('hidden');
+    dnb.innerHTML = '';
+  }
+  if (!isRerender) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ---- 启动 ----
+applyI18n();
+switchMethod('pick');
+ensureData();
+
+// ==AI-INTERPRET==
+// Shared AI 解读 button (/js/ai-jiegua.js). Summary comes from this page's
+// own result state; null/'' means "no result yet" and the button only shows
+// a hint instead of calling the backend.
+function aiTrunc(s, n) { s = String(s == null ? '' : s); return s.length > n ? s.slice(0, n) + '…' : s; }
+window.getJieguaSummary = function() {
+if (!LAST_RESULT) return null;
+var res = LAST_RESULT;
+var entry = shouOf(res.xu);
+if (!entry) return null;
+var parts = [];
+parts.push('太玄经·第' + entry.xu + '首 ' + entry.name);
+if (res.method === 'time' && res.di) parts.push('时间起卦：' + res.di.yearGZ + '年 ' + res.di.monthCN + '月' + res.di.dayCN + '日 ' + res.di.timeGZ + '时');
+if (res.method === 'number' && res.nums) parts.push('数字起卦：' + res.nums.join('、'));
+parts.push('方州部家：' + res.fzb.join(''));
+parts.push('首辞：' + aiTrunc(cleanShouci(entry), 200));
+if (res.zanIdx) { var z = entry.zan[res.zanIdx - 1]; if (z) parts.push('赞：' + z.weizhi + ' ' + aiTrunc(z.ci, 200)); }
+parts.push('天：' + tianName(entry.tian) + ' · 位：' + entry.pos + ' · 阴阳：' + yinyangName(entry.yinyang) + ' · 五行：' + elementName(entry.wuxing));
+return parts.join('\n');
+};
+window.getJieguaQuestion = function() { var el = document.getElementById('question'); return el ? el.value.trim() : ''; };
+if (window.AIInterpret) { window.AIInterpret.attach(); }
+else { document.addEventListener('DOMContentLoaded', function () { if (window.AIInterpret) window.AIInterpret.attach(); }); }
+</script>
+<script src="/js/ai-jiegua.js"></script>
+</body>
+</html>
