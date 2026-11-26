@@ -14,15 +14,19 @@
  * localStorage 'daotianji-lang' (default zh-CN). No API key here, no external
  * requests except the same-origin /api/jiegua call.
  *
- * Daily-use hint: after a successful call, localStorage 'daotianji-ai-used'
- * is set to today's date and the button shows "今日已用". This is only a
- * soft UX hint — the backend enforces the real per-IP daily limit.
+ * Daily-use hint: localStorage 'daotianji-ai-used' stores a JSON count for
+ * today, e.g. {"d":"2026-11-26","n":2}. DAILY_LIMIT (5) matches the backend
+ * per-IP daily limit. The button shows how many uses remain today, and
+ * "今日已用" only when the count reaches the limit. This is only a soft UX
+ * hint — the backend enforces the real per-IP daily limit. Old format (a
+ * plain date string) is read as count 1 for that date.
  */
 (function () {
   'use strict';
 
   var LANGS = ['zh-CN', 'zh-TW', 'en', 'ja'];
   var USED_KEY = 'daotianji-ai-used';
+  var DAILY_LIMIT = 5;
 
   var MSG = {
     loading: {
@@ -61,6 +65,12 @@
       'en': 'Used today',
       'ja': '本日使用済み'
     },
+    remaining: {
+      'zh-CN': 'AI 解读（今日还剩 {n} 次）',
+      'zh-TW': 'AI 解讀（今日還剩 {n} 次）',
+      'en': 'AI Reading ({n} left today)',
+      'ja': 'AI 解釈（本日あと {n} 回）'
+    },
     cardTitle: {
       'zh-CN': 'AI 解读',
       'zh-TW': 'AI 解讀',
@@ -95,23 +105,51 @@
     return d.getFullYear() + '-' + (m < 10 ? '0' + m : m) + '-' + (day < 10 ? '0' + day : day);
   }
 
-  function usedToday() {
+  function getUsage() {
     try {
-      return localStorage.getItem(USED_KEY) === todayStr();
+      var raw = localStorage.getItem(USED_KEY);
+      if (!raw) return { date: todayStr(), count: 0 };
+      var obj = null;
+      try { obj = JSON.parse(raw); } catch (e) { obj = null; }
+      if (obj && typeof obj === 'object' && typeof obj.n === 'number') {
+        if (obj.d === todayStr()) return { date: obj.d, count: obj.n };
+        return { date: todayStr(), count: 0 };
+      }
+      // Old format: plain date string means used once on that date.
+      if (raw === todayStr()) return { date: raw, count: 1 };
+      return { date: todayStr(), count: 0 };
     } catch (e) {
-      return false;
+      return { date: todayStr(), count: 0 };
     }
+  }
+
+  function usedCount() {
+    return getUsage().count;
+  }
+
+  function remainingCount() {
+    var r = DAILY_LIMIT - usedCount();
+    return r < 0 ? 0 : r;
   }
 
   function markUsed() {
     try {
-      localStorage.setItem(USED_KEY, todayStr());
+      var u = getUsage();
+      localStorage.setItem(USED_KEY, JSON.stringify({ d: u.date, n: u.count + 1 }));
     } catch (e) {}
   }
 
+  function usedToday() {
+    return usedCount() >= DAILY_LIMIT;
+  }
+
   function applyUsedLabel(btn) {
-    if (usedToday() && btn.textContent !== t('usedToday')) {
-      btn.textContent = t('usedToday');
+    var n = remainingCount();
+    if (n <= 0) {
+      if (btn.textContent !== t('usedToday')) btn.textContent = t('usedToday');
+    } else if (usedCount() > 0) {
+      var label = t('remaining').replace('{n}', String(n));
+      if (btn.textContent !== label) btn.textContent = label;
     }
   }
 
@@ -180,15 +218,21 @@
     btn.dataset.aiAttached = '1';
     injectStyle();
 
-    // Soft daily-use hint: if already used today, show it on the button.
+    // Soft daily-use hint: show remaining uses today, or "今日已用" at the limit.
     // Re-applied if the page's language switcher re-renders the label.
     applyUsedLabel(btn);
     if (typeof MutationObserver !== 'undefined') {
-      var obs = new MutationObserver(function () { applyUsedLabel(btn); });
+      var obs = new MutationObserver(function () {
+        if (!btn.disabled) applyUsedLabel(btn);
+      });
       obs.observe(btn, { childList: true, characterData: true, subtree: true });
     }
 
     btn.addEventListener('click', function () {
+      if (usedToday()) {
+        showMessage(output, t('dailyCap'));
+        return;
+      }
       var summary = null;
       try {
         if (typeof window.getJieguaSummary === 'function') {
@@ -240,7 +284,8 @@
         showMessage(output, t('netError'));
       }).finally(function () {
         btn.disabled = false;
-        if (!usedToday()) btn.textContent = oldText;
+        applyUsedLabel(btn);
+        if (!usedToday() && usedCount() === 0) btn.textContent = oldText;
       });
     });
   }
