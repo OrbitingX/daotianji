@@ -3,9 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0b0b1e">
-<link rel="apple-touch-icon" href="/icon-192.png">
 <title>盗天机 · 西洋合盘</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -316,7 +313,7 @@
   </section>
 
   <footer>
-    <span data-i18n="disclaimer">西洋合盘属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a> · <a href="https://github.com/OrbitingX/daotianji" data-i18n="sourceLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">源码</a><br>
+    <span data-i18n="disclaimer">西洋合盘属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
     <span data-i18n="offlineNote">本页合盘在本地计算，不向任何服务器发送出生信息；点击「AI 解读」时才会把结果摘要发给后端。</span>
   </footer>
 </div>
@@ -329,7 +326,6 @@
 var I18N = {
 'zh-CN': {
   'licenseLink': '数据与出处',
-  'sourceLink': '源码',
   'navGroup1': '一事一问', 'navGroup2': '一生之图', 'navGroup3': '两人之间', 'navGroup4': '时机之轮',
   'nav_jiemeng': '解梦', 'nav_liuyao': '六爻占卜', 'nav_meihua': '梅花易数', 'nav_xiaoliuren': '小六壬',
   'nav_taluo': '塔罗牌', 'nav_leinuoman': '雷诺曼', 'nav_lunen': '北欧卢恩符文', 'nav_qimen': '奇门遁甲',
@@ -391,7 +387,6 @@ var I18N = {
 },
 'zh-TW': {
   'licenseLink': '數據與出處',
-  'sourceLink': '原始碼',
   'navGroup1': '一事一問', 'navGroup2': '一生之圖', 'navGroup3': '兩人之間', 'navGroup4': '時機之輪',
   'nav_jiemeng': '解夢', 'nav_liuyao': '六爻占卜', 'nav_meihua': '梅花易數', 'nav_xiaoliuren': '小六壬',
   'nav_taluo': '塔羅牌', 'nav_leinuoman': '雷諾曼', 'nav_lunen': '北歐盧恩符文', 'nav_qimen': '奇門遁甲',
@@ -453,7 +448,6 @@ var I18N = {
 },
 'en': {
   'licenseLink': 'Data & Sources',
-  'sourceLink': 'Source',
   'navGroup1': 'One Question', 'navGroup2': 'Life Chart', 'navGroup3': 'Between Two', 'navGroup4': 'Wheel of Time',
   'nav_jiemeng': 'Dream Interpretation', 'nav_liuyao': 'Six Lines Divination', 'nav_meihua': 'Meihua Yishu', 'nav_xiaoliuren': 'Xiao Liuren',
   'nav_taluo': 'Tarot', 'nav_leinuoman': 'Lenormand', 'nav_lunen': 'Norse Runes', 'nav_qimen': 'Qimen Dunjia',
@@ -515,7 +509,6 @@ var I18N = {
 },
 'ja': {
   'licenseLink': 'データと出典',
-  'sourceLink': 'ソース',
   'navGroup1': '一事一問', 'navGroup2': '一生之図', 'navGroup3': '二人の間', 'navGroup4': '時の輪',
   'nav_jiemeng': '夢占い', 'nav_liuyao': '六爻占い', 'nav_meihua': '梅花易数', 'nav_xiaoliuren': '小六壬',
   'nav_taluo': 'タロット', 'nav_leinuoman': 'ルノルマン', 'nav_lunen': '北欧ルーン', 'nav_qimen': '奇門遁甲',
@@ -763,14 +756,15 @@ return norm360(Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body[bodyKey], t
 }
 
 // 上升点：RAMC 用地方恒星时（格林尼治恒星时 + 经度），标准公式
-// ASC = atan2(-cos RAMC, sin RAMC · cos ε + tan φ · sin ε)
-// 已用暴力扫描（沿黄道找东地平交点）核对：北京 1990-01-01 12:00+8，
-// 公式 191.82°，暴力扫描 191.85°，一致。
+// ASC = atan2(cos RAMC, -(sin RAMC · cos ε + tan φ · sin ε))
+// 注意：atan2 两参数同时取反会差 180°，旧式算出来的是下降点（DSC），
+// 2026-11-27 已修正，与印占模块 /yindu/ 同式。北京 1990-01-01 12:00+8，
+// 修正后 11.82°，暴力扫描东地平交点 11.90°，一致；旧式 191.82° 实为下降点。
 function ascendantLon(ramcDeg, latDeg) {
 var eps = EPSILON * Math.PI / 180;
 var ramc = ramcDeg * Math.PI / 180;
 var lat = latDeg * Math.PI / 180;
-var asc = Math.atan2(-Math.cos(ramc), Math.sin(ramc) * Math.cos(eps) + Math.tan(lat) * Math.sin(eps));
+var asc = Math.atan2(Math.cos(ramc), -(Math.sin(ramc) * Math.cos(eps) + Math.tan(lat) * Math.sin(eps)));
 return norm360(asc * 180 / Math.PI);
 }
 
@@ -1053,13 +1047,6 @@ applyI18n();
 <script>
 // 共享脚本与本页主脚本都已加载后再挂接（getJieguaSummary 已定义）。
 if (window.AIInterpret) window.AIInterpret.attach();
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js');
-  });
-}
 </script>
 </body>
 </html>

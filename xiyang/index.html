@@ -3,9 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0b0b1e">
-<link rel="apple-touch-icon" href="/icon-192.png">
 <title>盗天机 · 西洋占星</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -282,7 +279,7 @@
   </section>
 
   <footer>
-    <span data-i18n="disclaimer">西洋占星属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a> · <a href="https://github.com/OrbitingX/daotianji" data-i18n="sourceLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">源码</a><br>
+    <span data-i18n="disclaimer">西洋占星属传统术数，仅供参考，不构成决策依据。</span> <a href="/license/" data-i18n="licenseLink" style="color:#c9a962;text-decoration:none;border-bottom:1px solid rgba(201,169,98,.4)">数据与出处</a><br>
     <span data-i18n="offlineNote">本页星盘在本地计算，不向任何服务器发送出生信息；点击「AI 解读」时才会把结果摘要发给后端。</span>
   </footer>
 </div>
@@ -295,7 +292,6 @@
 var I18N = {
 'zh-CN': {
   'licenseLink': '数据与出处',
-  'sourceLink': '源码',
   'navGroup1': '一事一问',
   'navGroup2': '一生之图',
   'navGroup3': '两人之间',
@@ -391,7 +387,6 @@ var I18N = {
 },
 'zh-TW': {
   'licenseLink': '數據與出處',
-  'sourceLink': '原始碼',
   'navGroup1': '一事一問',
   'navGroup2': '一生之圖',
   'navGroup3': '兩人之間',
@@ -487,7 +482,6 @@ var I18N = {
 },
 'en': {
   'licenseLink': 'Data & Sources',
-  'sourceLink': 'Source',
   'navGroup1': 'One Question',
   'navGroup2': 'Life Chart',
   'navGroup3': 'Between Two',
@@ -583,7 +577,6 @@ var I18N = {
 },
 'ja': {
   'licenseLink': 'データと出典',
-  'sourceLink': 'ソース',
   'navGroup1': '一事一問',
   'navGroup2': '一生之図',
   'navGroup3': '二人の間',
@@ -717,12 +710,58 @@ var PLANET_ROLE = {
   'ja': ['中核的な自己と生命力', '感情、安心感と本能的な反応', '思考、コミュニケーションと学び方', '愛、美しさと価値観', '行動力、欲望と競争の仕方', '成長、信念と機会', '責任、制限と長期的な課題', '変革、独立とひらめき', '夢、直感と境界の溶解', '変容、力と深い欲望']
 };
 
-// 星座特质（四语）——逐星解读的“星座”一半
-var SIGN_TRAIT = {
-  'zh-CN': ['直接果断、行动先行', '稳健务实、重视感官与安全', '好奇多变、善于表达与联结', '敏感顾家、重视情感归属', '热情自信、渴望被看见', '细致挑剔、追求精确与秩序', '讲究平衡、善于协调与合作', '专注深刻、不轻易示人', '乐观开阔、追求意义与远方', '务实自律、以长期成就为目标', '独立超前、重视理念与自由', '敏感共情、富有想象与包容'],
-  'zh-TW': ['直接果斷、行動先行', '穩健務實、重視感官與安全', '好奇多變、善於表達與聯結', '敏感顧家、重視情感歸屬', '熱情自信、渴望被看見', '細緻挑剔、追求精確與秩序', '講究平衡、善於協調與合作', '專注深刻、不輕易示人', '樂觀開闊、追求意義與遠方', '務實自律、以長期成就為目標', '獨立超前、重視理念與自由', '敏感共情、富有想像與包容'],
-  'en': ['direct, decisive and action-first', 'steady and practical, valuing comfort and security', 'curious and versatile, quick with words and connections', 'sensitive and home-oriented, valuing emotional belonging', 'warm and confident, wanting to be seen', 'precise and discerning, seeking order and accuracy', 'balanced and diplomatic, skilled at cooperation', 'intense and private, going deep', 'optimistic and broad-minded, seeking meaning and horizons', 'disciplined and pragmatic, aiming at long-term achievement', 'independent and forward-looking, valuing ideas and freedom', 'sensitive and empathic, imaginative and compassionate'],
-  'ja': ['率直で決断が早く、行動先行', '堅実で現実的、安心感と五感を大切にする', '好奇心旺盛で多才、表現とつながりが得意', '繊細で家庭的、感情の帰属を大切にする', '情熱的で自信に満ち、人に見られることを望む', '細やかで分析的、正確さと秩序を求める', 'バランスを重んじ、調整と協力が得意', '集中力が深く、内面を簡単には見せない', '楽観的で視野が広く、意味と遠方を求める', '現実的で自律的、長期的な達成を目指す', '独立独歩で先進的、理念と自由を重んじる', '繊細で共感力が高く、想像力と包容力に富む']
+// 逐星解读：行星 × 星座专属短句。2026-11-27 修正：旧版 SIGN_TRAIT 按星座共用，
+// 同一星座的不同行星会复用同一句文案（如海王星水瓶复用天王星水瓶、
+// 水星天秤复用太阳天秤）；现改为行星 × 星座专属，每格一句。
+var PLANET_SIGN_TRAIT = {
+  'zh-CN': [
+    ['自我鲜明、敢闯敢为', '沉稳坚定、重视实际成果', '好奇灵活、多面表达', '情感细腻、重视归属', '光芒外放、渴望被肯定', '严谨细致、追求完善', '优雅平衡、重视关系和谐', '深沉专注、意志坚定', '豁达乐观、追求远方', '务实自律、目标长远', '独立超前、重视理念自由', '敏感共情、富有想象'],
+    ['情绪直接、来得快去得快', '情绪稳定、需要安全感与舒适', '情绪多变、需要交流与新鲜感', '情绪细腻、依恋家庭与归属', '情绪热烈、需要被重视与赞赏', '情绪内敛、通过秩序获得安心', '情绪温和、需要和谐与陪伴', '情绪深沉、不轻易外露', '情绪开朗、需要自由与空间', '情绪克制、通过成就获得安全感', '情绪疏离、重视理性与独立', '情绪敏感、容易共情与吸收他人情绪'],
+    ['思维直接、想到就说', '思维稳健、讲究实际与逻辑', '思维敏捷、善于表达与联结', '思维感性、重视记忆与情感', '思维自信、表达富有感染力', '思维缜密、追求精确与条理', '思维平衡、善于协调与对话', '思维深刻、善于洞察与追问', '思维开阔、追求意义与远方', '思维务实、讲究结构与长远', '思维超前、重视理念与创新', '思维发散、富有想象与直觉'],
+    ['爱得直接热烈、喜欢就行动', '爱得稳定务实、重视感官享受', '爱得轻快多变、需要新鲜与交流', '爱得细腻顾家、重视情感归属', '爱得热烈张扬、需要被崇拜', '爱得细致体贴、通过照顾表达', '爱得优雅平衡、重视和谐与美感', '爱得深沉专一、不轻易交付', '爱得自由开朗、需要空间与成长', '爱得务实长久、重视承诺与责任', '爱得独立理性、重视理念与自由', '爱得浪漫包容、富有想象与奉献'],
+    ['行动力强、直接果断', '行动稳健、耐力持久', '行动灵活、多线并行', '行动受情绪驱动、为守护而战', '行动热烈、渴望表现与胜利', '行动细致、讲究方法与效率', '行动讲求策略、善于迂回与合作', '行动深沉、意志坚定不轻易放弃', '行动目标远大、追求意义与冒险', '行动务实自律、为长期目标坚持', '行动独立超前、为理念而战', '行动凭直觉、容易受情绪影响'],
+    ['通过开拓与行动获得成长', '通过积累与务实获得成长', '通过学习与交流获得成长', '通过情感与家庭获得成长', '通过表现与创造获得成长', '通过精进与服务获得成长', '通过合作与关系获得成长', '通过深度与转化获得成长', '通过探索与远方获得成长', '通过自律与成就获得成长', '通过理念与创新获得成长', '通过包容与想象获得成长'],
+    ['功课在克制冲动、学会耐心', '功课在放下固执、学会变通', '功课在专注深入、避免浮躁', '功课在情感独立、不过度依赖', '功课在谦逊务实、不依赖赞赏', '功课在接纳不完美、避免过度挑剔', '功课在独立决断、不依赖他人认同', '功课在放下控制、学会信任', '功课在脚踏实地、避免空想', '功课在平衡成就与生活、避免过度严苛', '功课在兼顾理想与现实、避免疏离', '功课在建立边界、避免过度牺牲'],
+    ['变革来自敢于打破常规、率先行动', '变革来自打破固有模式、重建价值', '变革来自思维跳跃、信息与联结', '变革来自情感模式的突破、重建归属', '变革来自自我表达的突破、不按套路', '变革来自方法与系统的革新', '变革来自关系模式的重新定义', '变革来自深层结构的颠覆与重生', '变革来自信念与视野的拓展', '变革来自制度与结构的重组', '变革来自理念超前、独立自由', '变革来自边界消融、直觉与想象'],
+    ['梦想带着冲动与开拓的色彩', '梦想扎根于感官与物质的美好', '梦想在交流与想象中流动', '梦想围绕情感归属与家的意象', '梦想带着舞台感与创造的渴望', '梦想在细节与秩序中寻求纯净', '梦想追求和谐与美的理想关系', '梦想深入潜意识与转化的深渊', '梦想指向远方与意义的追寻', '梦想在现实与理想之间寻求落点', '梦想带着超前理念与集体愿景', '梦想最为纯粹、直觉与包容的源头'],
+    ['转化通过直面冲突与自我突破', '转化通过重建价值与物质安全感', '转化通过思维模式的彻底更新', '转化通过情感根源的清理与重生', '转化通过权力与自我认同的重塑', '转化通过细节与习惯的深层清理', '转化通过关系权力的重新平衡', '转化最为彻底、直面欲望与死亡重生', '转化通过信念体系的推倒重建', '转化通过结构与权威的瓦解重建', '转化通过集体与理念的颠覆', '转化通过消融与潜意识的彻底释放']
+  ],
+  'zh-TW': [
+    ['自我鮮明、敢闖敢為', '沉穩堅定、重視實際成果', '好奇靈活、多面表達', '情感細膩、重視歸屬', '光芒外放、渴望被肯定', '嚴謹細緻、追求完善', '優雅平衡、重視關係和諧', '深沉專注、意志堅定', '豁達樂觀、追求遠方', '務實自律、目標長遠', '獨立超前、重視理念自由', '敏感共情、富有想象'],
+    ['情緒直接、來得快去得快', '情緒穩定、需要安全感與舒適', '情緒多變、需要交流與新鮮感', '情緒細膩、依戀家庭與歸屬', '情緒熱烈、需要被重視與讚賞', '情緒內斂、通過秩序獲得安心', '情緒溫和、需要和諧與陪伴', '情緒深沉、不輕易外露', '情緒開朗、需要自由與空間', '情緒剋制、通過成就獲得安全感', '情緒疏離、重視理性與獨立', '情緒敏感、容易共情與吸收他人情緒'],
+    ['思維直接、想到就說', '思維穩健、講究實際與邏輯', '思維敏捷、善於表達與聯結', '思維感性、重視記憶與情感', '思維自信、表達富有感染力', '思維縝密、追求精確與條理', '思維平衡、善於協調與對話', '思維深刻、善於洞察與追問', '思維開闊、追求意義與遠方', '思維務實、講究結構與長遠', '思維超前、重視理念與創新', '思維發散、富有想象與直覺'],
+    ['愛得直接熱烈、喜歡就行動', '愛得穩定務實、重視感官享受', '愛得輕快多變、需要新鮮與交流', '愛得細膩顧家、重視情感歸屬', '愛得熱烈張揚、需要被崇拜', '愛得細緻體貼、通過照顧表達', '愛得優雅平衡、重視和諧與美感', '愛得深沉專一、不輕易交付', '愛得自由開朗、需要空間與成長', '愛得務實長久、重視承諾與責任', '愛得獨立理性、重視理念與自由', '愛得浪漫包容、富有想象與奉獻'],
+    ['行動力強、直接果斷', '行動穩健、耐力持久', '行動靈活、多線並行', '行動受情緒驅動、為守護而戰', '行動熱烈、渴望表現與勝利', '行動細緻、講究方法與效率', '行動講求策略、善於迂迴與合作', '行動深沉、意志堅定不輕易放棄', '行動目標遠大、追求意義與冒險', '行動務實自律、為長期目標堅持', '行動獨立超前、為理念而戰', '行動憑直覺、容易受情緒影響'],
+    ['通過開拓與行動獲得成長', '通過積累與務實獲得成長', '通過學習與交流獲得成長', '通過情感與家庭獲得成長', '通過表現與創造獲得成長', '通過精進與服務獲得成長', '通過合作與關係獲得成長', '通過深度與轉化獲得成長', '通過探索與遠方獲得成長', '通過自律與成就獲得成長', '通過理念與創新獲得成長', '通過包容與想象獲得成長'],
+    ['功課在剋制衝動、學會耐心', '功課在放下固執、學會變通', '功課在專注深入、避免浮躁', '功課在情感獨立、不過度依賴', '功課在謙遜務實、不依賴讚賞', '功課在接納不完美、避免過度挑剔', '功課在獨立決斷、不依賴他人認同', '功課在放下控制、學會信任', '功課在腳踏實地、避免空想', '功課在平衡成就與生活、避免過度嚴苛', '功課在兼顧理想與現實、避免疏離', '功課在建立邊界、避免過度犧牲'],
+    ['變革來自敢於打破常規、率先行動', '變革來自打破固有模式、重建價值', '變革來自思維跳躍、信息與聯結', '變革來自情感模式的突破、重建歸屬', '變革來自自我表達的突破、不按套路', '變革來自方法與系統的革新', '變革來自關係模式的重新定義', '變革來自深層結構的顛覆與重生', '變革來自信念與視野的拓展', '變革來自制度與結構的重組', '變革來自理念超前、獨立自由', '變革來自邊界消融、直覺與想象'],
+    ['夢想帶着衝動與開拓的色彩', '夢想紮根於感官與物質的美好', '夢想在交流與想象中流動', '夢想圍繞情感歸屬與家的意象', '夢想帶着舞臺感與創造的渴望', '夢想在細節與秩序中尋求純淨', '夢想追求和諧與美的理想關係', '夢想深入潛意識與轉化的深淵', '夢想指向遠方與意義的追尋', '夢想在現實與理想之間尋求落點', '夢想帶着超前理念與集體願景', '夢想最為純粹、直覺與包容的源頭'],
+    ['轉化通過直面衝突與自我突破', '轉化通過重建價值與物質安全感', '轉化通過思維模式的徹底更新', '轉化通過情感根源的清理與重生', '轉化通過權力與自我認同的重塑', '轉化通過細節與習慣的深層清理', '轉化通過關係權力的重新平衡', '轉化最為徹底、直面慾望與死亡重生', '轉化通過信念體系的推倒重建', '轉化通過結構與權威的瓦解重建', '轉化通過集體與理念的顛覆', '轉化通過消融與潛意識的徹底釋放']
+  ],
+  'en': [
+    ['bold self, daring to act', 'steady and grounded, valuing real results', 'curious and versatile, many-sided expression', 'emotionally attuned, valuing belonging', 'radiant and expressive, wanting recognition', 'precise and meticulous, seeking refinement', 'graceful and balanced, valuing harmony in relationships', 'intense and focused, strong-willed', 'open and optimistic, seeking horizons', 'pragmatic and disciplined, long-term goals', 'independent and forward-looking, valuing ideas and freedom', 'sensitive and empathic, rich in imagination'],
+    ['emotions direct, quick to come and go', 'emotions steady, needing security and comfort', 'emotions changeable, needing talk and novelty', 'emotions tender, attached to home and belonging', 'emotions warm, needing to feel valued and praised', 'emotions reserved, finding calm through order', 'emotions gentle, needing harmony and company', 'emotions deep, rarely shown outwardly', 'emotions cheerful, needing freedom and space', 'emotions restrained, finding security through achievement', 'emotions detached, valuing reason and independence', 'emotions sensitive, easily absorbing others’ feelings'],
+    ['thinking direct, saying what comes to mind', 'thinking steady, practical and logical', 'thinking quick, good with words and connections', 'thinking feeling-led, valuing memory and emotion', 'thinking confident, expressive and engaging', 'thinking precise, seeking accuracy and order', 'thinking balanced, skilled at dialogue and mediation', 'thinking deep, probing and insightful', 'thinking broad, seeking meaning and horizons', 'thinking pragmatic, structured and long-term', 'thinking ahead, valuing ideas and innovation', 'thinking associative, imaginative and intuitive'],
+    ['loving directly and warmly, acting on attraction', 'loving steadily and sensually, valuing comfort', 'loving lightly and variably, needing novelty and talk', 'loving tenderly and protectively, valuing belonging', 'loving warmly and showily, wanting admiration', 'loving attentively, showing care through service', 'loving gracefully, valuing harmony and beauty', 'loving deeply and exclusively, slow to commit', 'loving freely and openly, needing space to grow', 'loving pragmatically, valuing commitment and responsibility', 'loving independently, valuing ideas and freedom', 'loving romantically, imaginative and giving'],
+    ['drive strong, direct and decisive', 'drive steady, enduring and persistent', 'drive flexible, juggling many threads', 'drive moved by feeling, fighting to protect', 'drive passionate, wanting to perform and win', 'drive precise, methodical and efficient', 'drive strategic, working through allies and indirection', 'drive intense, unyielding once committed', 'drive far-sighted, chasing meaning and adventure', 'drive disciplined, persisting toward long goals', 'drive independent, fighting for ideals', 'drive intuitive, easily swayed by mood'],
+    ['growth through boldness and action', 'growth through accumulation and practicality', 'growth through learning and exchange', 'growth through feeling and family', 'growth through performance and creativity', 'growth through refinement and service', 'growth through partnership and relationship', 'growth through depth and transformation', 'growth through exploration and horizons', 'growth through discipline and achievement', 'growth through ideas and innovation', 'growth through compassion and imagination'],
+    ['lesson in curbing impulse and learning patience', 'lesson in letting go of rigidity and learning flexibility', 'lesson in focus and depth, avoiding restlessness', 'lesson in emotional independence, not over-relying', 'lesson in humility and substance, not needing applause', 'lesson in accepting imperfection, easing criticism', 'lesson in deciding alone, not needing approval', 'lesson in releasing control and learning trust', 'lesson in staying grounded, avoiding empty ideals', 'lesson in balancing achievement with life, easing harshness', 'lesson in joining ideals with reality, avoiding distance', 'lesson in setting boundaries, avoiding self-sacrifice'],
+    ['change by daring to break convention and act first', 'change by breaking fixed patterns and rebuilding value', 'change through leaps of thought, information and connection', 'change by breaking emotional patterns and rebuilding belonging', 'change through bold self-expression, off-script', 'change through new methods and systems', 'change by redefining relationship patterns', 'change through overturning deep structures and rebirth', 'change through expanding beliefs and horizons', 'change through restructuring institutions', 'change through forward ideas, independence and freedom', 'change through dissolving boundaries, intuition and imagination'],
+    ['dreams coloured by impulse and pioneering', 'dreams rooted in sensory and material beauty', 'dreams flowing through talk and imagination', 'dreams circling belonging and the image of home', 'dreams with a stage and a longing to create', 'dreams seeking purity in detail and order', 'dreams of harmony and an ideal relationship', 'dreams sinking into the subconscious and transformation', 'dreams reaching for horizons and meaning', 'dreams seeking a foothold between real and ideal', 'dreams carrying forward ideas and collective vision', 'dreams at their purest, intuition and compassion'],
+    ['transformation by facing conflict and breaking through', 'transformation by rebuilding value and material security', 'transformation by wholly renewing thought patterns', 'transformation by clearing emotional roots and rebirth', 'transformation by reshaping power and identity', 'transformation by deep clearing of habits and detail', 'transformation by rebalancing power in relationships', 'transformation at its deepest, facing desire and death-rebirth', 'transformation by tearing down and rebuilding beliefs', 'transformation by dismantling and rebuilding structures and authority', 'transformation by overturning the collective and its ideas', 'transformation through dissolution and the deep subconscious']
+  ],
+  'ja': [
+    ['自己を鮮明に、果敢に行動', '堅実で着実、実際の成果を重視', '好奇心旺盛で柔軟、多面的な表現', '感情豊かで、帰属を大切にする', '輝きを放ち、認められたい', '厳密で細やか、完成度を追求', '優雅でバランスよく、関係の調和を重視', '深く集中し、意志が強い', 'おおらかで楽観的、遠方を求める', '現実的で自律的、長期的な目標', '独立独歩で先進的、理念と自由を重視', '敏感で共感力が高く、想像力豊か'],
+    ['感情は直接的、来るのも去るのも早い', '感情は安定し、安心感と快適さを求める', '感情は変わりやすく、会話と新鮮さを求める', '感情は繊細で、家庭と帰属に執着', '感情は熱烈で、重視され称賛されたい', '感情は控えめで、秩序によって安心を得る', '感情は穏やかで、調和と寄り添いを求める', '感情は深く、外には出さない', '感情は明るく、自由と空間を求める', '感情は抑制的で、達成によって安心を得る', '感情は距離を置き、理性と独立を重視', '感情は敏感で、他人の感情を吸収しやすい'],
+    ['思考は直接的、思ったことをすぐ口にする', '思考は堅実で、実際と論理を重んじる', '思考は敏捷で、表現とつながりが得意', '思考は感覚的で、記憶と感情を重視', '思考は自信に満ち、表現に感染力がある', '思考は緻密で、正確さと筋道を追求', '思考はバランスよく、対話と調整が得意', '思考は深く、洞察と追及が得意', '思考は広く、意味と遠方を求める', '思考は現実的で、構造と長期を重視', '思考は先進的で、理念と革新を重視', '思考は拡散的で、想像と直感に富む'],
+    ['愛は直接的で熱烈、好きになれば行動', '愛は安定し現実的、感覚的な楽しみを重視', '愛は軽やかで変わりやすく、新鮮さと会話を求める', '愛は繊細で家庭的、感情の帰属を重視', '愛は熱烈で華やか、崇拝されたい', '愛は細やかで献身的、世話をすることで表現', '愛は優雅でバランスよく、調和と美しさを重視', '愛は深く一途で、簡単には委ねない', '愛は自由でおおらか、空間と成長を求める', '愛は現実的で長続きし、約束と責任を重視', '愛は独立し理性的、理念と自由を重視', '愛はロマンチックで包容力があり、想像と献身に富む'],
+    ['行動力は強く、直接的で決断が早い', '行動は堅実で、忍耐強く持続する', '行動は柔軟で、複数のことを並行する', '行動は感情に動かされ、守るために戦う', '行動は熱烈で、表現と勝利を渇望する', '行動は細やかで、方法と効率を重んじる', '行動は戦略的で、迂回と協力を得意とする', '行動は深く、意志が強く簡単には諦めない', '行動は目標が遠大で、意味と冒険を求める', '行動は現実的で自律的、長期的な目標のために堅持する', '行動は独立独歩で先進的、理念のために戦う', '行動は直感に頼り、感情に左右されやすい'],
+    ['開拓と行動によって成長する', '蓄積と現実主義によって成長する', '学びと交流によって成長する', '感情と家庭によって成長する', '表現と創造によって成長する', '精進と奉仕によって成長する', '協力と関係によって成長する', '深さと変容によって成長する', '探索と遠方によって成長する', '自律と達成によって成長する', '理念と革新によって成長する', '包容と想像によって成長する'],
+    ['課題は衝動を抑え、忍耐を学ぶこと', '課題は頑固さを手放し、柔軟さを学ぶこと', '課題は集中して深めること、浮つきを避けること', '課題は感情的に自立し、過度に依存しないこと', '課題は謙虚で現実的になり、称賛に頼らないこと', '課題は不完全さを受け入れ、過度な批判を避けること', '課題は独力で決断し、他人の承認に頼らないこと', '課題はコントロールを手放し、信頼を学ぶこと', '課題は地に足をつけ、空想を避けること', '課題は達成と生活のバランスを取り、過度な厳しさを避けること', '課題は理想と現実を両立させ、疎外を避けること', '課題は境界を築き、過度な犠牲を避けること'],
+    ['変革は慣習を破り、率先して行動することから', '変革は固定したパターンを破り、価値を再構築することから', '変革は思考の跳躍、情報とつながりから', '変革は感情パターンの突破、帰属の再構築から', '変革は自己表現の突破、型にはまらないことから', '変革は方法とシステムの革新から', '変革は関係パターンの再定義から', '変革は深層構造の転覆と再生から', '変革は信念と視野の拡大から', '変革は制度と構造の再編から', '変革は先進的な理念、独立と自由から', '変革は境界の溶解、直感と想像から'],
+    ['夢は衝動と開拓の色を帯びる', '夢は感覚と物質の美しさに根ざす', '夢は交流と想像のなかを流れる', '夢は感情の帰属と家のイメージをめぐる', '夢は舞台感と創造への渇望を帯びる', '夢は細部と秩序のなかで純粋さを求める', '夢は調和と美しい理想の関係を追う', '夢は潜在意識と変容の深淵に沈む', '夢は遠方と意味の追及を指す', '夢は現実と理想のあいだに着地点を求める', '夢は先進的な理念と集合的なビジョンを帯びる', '夢は最も純粋で、直感と包容の源である'],
+    ['変容は対立に真正面から向き合い、自己を突破することから', '変容は価値と物質的な安心感の再構築から', '変容は思考パターンの徹底的な更新から', '変容は感情の根源の浄化と再生から', '変容は権力と自己認識の再形成から', '変容は習慣と細部の深層的な浄化から', '変容は関係における権力の再均衡から', '変容は最も徹底的で、欲望と死と再生に直面することから', '変容は信念体系の破壊と再構築から', '変容は構造と権威の瓦解と再建から', '変容は集合体と理念の転覆から', '変容は溶解と潜在意識の徹底的な解放から']
+  ]
 };
 
 function detectLang() {
@@ -806,15 +845,17 @@ function bodyLongitude(bodyKey, time) {
   return norm360(Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body[bodyKey], time, true)).elon);
 }
 
-// 上升点：RAMC 用地方恒星时（格林尼治恒星时 + 经度），标准公式
-// ASC = atan2(-cos RAMC, sin RAMC · cos ε + tan φ · sin ε)
-// 已用暴力扫描（沿黄道找东地平交点）核对：北京 1990-01-01 12:00+8，
-// 公式 191.82°，暴力扫描 191.85°，一致。
+// 上升点：RAMC 用地方恒星时（格林尼治恒星时 + 经度）
+// ASC = atan2(cos RAMC, -(sin RAMC · cos ε + tan φ · sin ε))
+// 注意：atan2 两参数同时取反会差 180°。旧式 atan2(-cos RAMC, sin RAMC·cos ε + tan φ·sin ε)
+// 算出来的是下降点（DSC），2026-11-27 已修正，与印占模块 /yindu/ 同式。
+// 核对：北京 1990-01-01 12:00+8，修正后 11.82°，暴力扫描东地平交点 11.90°，一致；
+// 旧式 191.82° 实为下降点。赤道 RAMC=0 时 ASC=90°（巨蟹 0°），亦与推导一致。
 function ascendantLon(ramcDeg, latDeg) {
   var eps = EPSILON * Math.PI / 180;
   var ramc = ramcDeg * Math.PI / 180;
   var lat = latDeg * Math.PI / 180;
-  var asc = Math.atan2(-Math.cos(ramc), Math.sin(ramc) * Math.cos(eps) + Math.tan(lat) * Math.sin(eps));
+  var asc = Math.atan2(Math.cos(ramc), -(Math.sin(ramc) * Math.cos(eps) + Math.tan(lat) * Math.sin(eps)));
   return norm360(asc * 180 / Math.PI);
 }
 
@@ -889,12 +930,13 @@ function findAspects(positions) {
 
 function readingLine(i, signIdx) {
   var roles = PLANET_ROLE[LANG] || PLANET_ROLE['zh-CN'];
-  var traits = SIGN_TRAIT[LANG] || SIGN_TRAIT['zh-CN'];
+  var pst = PLANET_SIGN_TRAIT[LANG] || PLANET_SIGN_TRAIT['zh-CN'];
   var p = planetName(i), s = signName(signIdx);
-  if (LANG === 'en') return p + ' rules ' + roles[i] + '; in ' + s + ' this shows as ' + traits[signIdx] + '.';
-  if (LANG === 'ja') return p + 'は' + roles[i] + 'を表し、' + s + 'では' + traits[signIdx] + 'という形で現れます。';
-  if (LANG === 'zh-TW') return p + '代表' + roles[i] + '，在' + s + '表現為' + traits[signIdx] + '。';
-  return p + '代表' + roles[i] + '，在' + s + '表现为' + traits[signIdx] + '。';
+  var trait = (pst[i] && pst[i][signIdx]) || '';
+  if (LANG === 'en') return p + ' rules ' + roles[i] + '; in ' + s + ' this shows as ' + trait + '.';
+  if (LANG === 'ja') return p + 'は' + roles[i] + 'を表し、' + s + 'では' + trait + 'という形で現れます。';
+  if (LANG === 'zh-TW') return p + '代表' + roles[i] + '，在' + s + '表現為' + trait + '。';
+  return p + '代表' + roles[i] + '，在' + s + '表现为' + trait + '。';
 }
 
 function esc(s) {
@@ -1017,13 +1059,6 @@ applyI18n();
 <script>
 // 共享脚本与本页主脚本都已加载后再挂接（getJieguaSummary 已定义）。
 if (window.AIInterpret) window.AIInterpret.attach();
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js');
-  });
-}
 </script>
 </body>
 </html>
